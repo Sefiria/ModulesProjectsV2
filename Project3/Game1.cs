@@ -16,6 +16,7 @@ namespace Project3
         public static MS MS = new MS();
         public long Ticks = 0;
         public Texture2D tex_tilemap = null;
+        int screenWidth, screenHeight;
 
         public Game1()
         {
@@ -26,10 +27,10 @@ namespace Project3
         }
         protected override void Initialize()
         {
-            int _ScreenWidth = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Width;
-            int _ScreenHeight = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Height;
-            graphics.PreferredBackBufferWidth = _ScreenWidth;
-            graphics.PreferredBackBufferHeight = _ScreenHeight;
+            screenWidth = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Width;
+            screenHeight = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Height;
+            graphics.PreferredBackBufferWidth = screenWidth;
+            graphics.PreferredBackBufferHeight = screenHeight;
             graphics.IsFullScreen = false;
             graphics.ApplyChanges();
             UserInterface.Initialize(Content, BuiltinThemes.hd);
