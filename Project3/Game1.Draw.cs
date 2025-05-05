@@ -1,14 +1,18 @@
-﻿using Microsoft.Xna.Framework;
+﻿using LibNoise.Primitive;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using LibNoise.Primitive;
-using LibNoise.Combiner;
+using System;
+using Tooling;
 
 namespace Project3
 {
     public partial class Game1 : Game
     {
-        int tilecount, mapw, maph;
+        const int mapw = 48, maph = 32;
+        int tilecount;
         byte[] map;
+        byte[] map_blocs_durability;
+        byte[] map_blocs_types_max_durability;
 
         private void InitDraw()
         {
@@ -20,17 +24,22 @@ namespace Project3
         private void DefineMap()
         {
             var perlin = new ImprovedPerlin((int)(Ticks % int.MaxValue), LibNoise.NoiseQuality.Best);
-            mapw = 48; maph = 32;
             map = new byte[mapw * maph];
+            map_blocs_durability = new byte[mapw * maph];
+            map_blocs_types_max_durability = new byte[tilecount];
             float min = 0.33F;
             float max = 1F;
+            for (int k = 0; k < tilecount; k++)
+                map_blocs_types_max_durability[tilecount - 1 - k] = (byte)Math.Min(byte.MaxValue, k * k * 0.5F);
             for (int j = 0; j < maph; j++)
             {
                 for (int i = 0; i < mapw; i++)
                 {
                     double noiseValue = perlin.GetValue(i * 0.15F, j * 0.15F, 0F);
                     double normalizedValue = ((noiseValue + 1) / 2) * (max - min) + min;
-                    map[j * mapw + i] = (byte)(normalizedValue * tilecount);
+                    byte value = (byte)(normalizedValue * tilecount);
+                    map[j * mapw + i] = value;
+                    map_blocs_durability[j * mapw + i] = map_blocs_types_max_durability[value];
                 }
             }
         }
@@ -40,7 +49,7 @@ namespace Project3
             //Graphics.Graphics.Instance.DrawString("test", 50, 50, Resources.Instance.Fonts[0], Color.White);
             for (int j = 0; j < maph; j++)
                 for (int i = 0; i < mapw; i++)
-                    Graphics.Graphics.Instance.DrawTexture(tex_tilemap, screenWidth / 2 - mapw * scaleFactor / 2 + i * scaleFactor, screenHeight / 2 - maph * scaleFactor / 2 + j * scaleFactor, tilescale, new Rectangle(8 * map[j * mapw + i], 0, tilesize, tilesize));
+                    Graphics.Graphics.Instance.DrawTexture(tex_tilemap, screenWidth / 2 - mapw * scaleFactor / 2 + i * scaleFactor, screenHeight / 2 - maph * scaleFactor / 2 + j * scaleFactor, tilescale - RandomThings.rnd()/20F, new Rectangle(tilesize * map[j * mapw + i], 0, tilesize, tilesize));
         }
     }
 }
