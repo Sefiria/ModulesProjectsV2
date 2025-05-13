@@ -41,13 +41,11 @@ namespace Project5
 
         private void MS_OnButtonPressed(Tools.Inputs.MS.MouseButtons button)
         {
-            for (int i = 0; i < Chains.Count; i++)
-            {
-                if (!chains_holding[i][1] && button == Tools.Inputs.MS.MouseButtons.Left && Maths.Distance(MS.X, MS.Y, Chains[i].A.X, Chains[i].A.Y) < Chains[i].point_size)
-                    chains_holding[i][0] = true;
-                if (!chains_holding[i][0] && button == Tools.Inputs.MS.MouseButtons.Left && Maths.Distance(MS.X, MS.Y, Chains[i].B.X, Chains[i].B.Y) < Chains[i].point_size)
-                    chains_holding[i][1] = true;
-            }
+            bool escape = false;
+            for (int i = 0; !escape && i < Chains.Count; i++)
+                for (int j = 0; !escape && j < 2; j++)
+                    if (button == Tools.Inputs.MS.MouseButtons.Left && Maths.Distance(MS.X, MS.Y, j == 0 ? Chains[i].A.X: Chains[i].B.X, j == 0 ? Chains[i].A.Y : Chains[i].B.Y) < Chains[i].point_size)
+                        chains_holding[i][j] = escape = true;
         }
 
         private void MS_OnButtonDown(Tools.Inputs.MS.MouseButtons button)
