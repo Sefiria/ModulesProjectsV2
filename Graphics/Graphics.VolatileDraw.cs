@@ -49,7 +49,7 @@ namespace Graphics
                 int _r = r - i;
                 int cx = _r + i;
                 int cy = _r + i;
-                for (int angle = 0; angle < 360; angle++)
+                for (float angle = 0; angle < 360; angle+=0.5F)
                 {
                     double radian = angle * Math.PI / 180;
                     int px = (int)(_r * Math.Cos(radian));
@@ -67,7 +67,7 @@ namespace Graphics
             }
 
             tex.SetData(data);
-            DrawTexture(tex, x, y);
+            DrawTexture(tex, x - radius, y - radius);
         }
         public void DrawLine(int start_x, int start_y, int end_x, int end_y, Color color, int thickness)
         {
@@ -100,5 +100,55 @@ namespace Graphics
         {
             SpriteBatch.DrawString(font, text, new Vector2(x, y), color, 0F, Vector2.Zero, 1F, SpriteEffects.None, 1F);
         }
+
+        public void FillRectangle(int x, int y, int w, int h, Color col)
+        {
+            if (w <= 0 || h <= 0)
+                return;
+
+            Texture2D tex = new Texture2D(GraphicsDevice, w, h);
+            Color[] data = new Color[w * h];
+
+            for (int i = 0; i < w; i++)
+            {
+                for (int j = 0; j < h; j++)
+                {
+                    data[j * w + i] = col;
+                }
+            }
+
+            tex.SetData(data);
+            DrawTexture(tex, x, y);
+        }
+
+        public void FillCircle(int x, int y, int radius, Color col)
+        {
+            Texture2D tex = new Texture2D(GraphicsDevice, radius * 2, radius * 2);
+            Color[] data = new Color[(radius * 2) * (radius * 2)];
+
+            int r = radius;
+            int cx = r;
+            int cy = r;
+
+            for (int py = -r; py <= r; py++)
+            {
+                for (int px = -r; px <= r; px++)
+                {
+                    if (px * px + py * py <= r * r)
+                    {
+                        int dx = cx + px;
+                        int dy = cy + py;
+                        if (dx >= 0 && dx < r * 2 && dy >= 0 && dy < r * 2)
+                        {
+                            data[dy * (r * 2) + dx] = col;
+                        }
+                    }
+                }
+            }
+
+            tex.SetData(data);
+            DrawTexture(tex, x - radius, y - radius);
+        }
+
     }
 }

@@ -18,6 +18,14 @@ namespace Graphics
             SpriteBatch.Draw(texture, position, source, color ?? Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
         }
 
+        public void DrawTexture(string name, float x, float y, float scale, Color color, Rectangle? source = null) => DrawTexture(Textures[name], x, y, scale, color, source);
+        public void DrawTexture(string name, Vector2 position, float scale, Color color, Rectangle? source = null) => DrawTexture(Textures[name], position, scale, color, source);
+        public void DrawTexture(Texture2D texture, float x, float y, float scale, Color color, Rectangle? source = null) => DrawTexture(texture, new Vector2(x, y), scale, color, source);
+        public void DrawTexture(Texture2D texture, Vector2 position, float scale, Color color, Rectangle? source = null)
+        {
+            SpriteBatch.Draw(texture, position, source, color, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+        }
+
         public void DrawTexture(string name, float x, float y, float scale, Rectangle? source = null) => DrawTexture(Textures[name], x, y, scale, source);
         public void DrawTexture(string name, Vector2 position, float scale, Rectangle? source = null) => DrawTexture(Textures[name], position, scale, source);
         public void DrawTexture(Texture2D texture, float x, float y, float scale, Rectangle? source = null) => DrawTexture(texture, new Vector2(x, y), scale, source);

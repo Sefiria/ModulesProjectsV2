@@ -1,11 +1,10 @@
-﻿using GeonBit.UI;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Project3.particles;
+using SFX;
 using Tools.Inputs;
 
-namespace Project3
+namespace Project4
 {
     public partial class Game1 : Game
     {
@@ -16,10 +15,7 @@ namespace Project3
         public static KB KB = new KB();
         public static MS MS = new MS();
         public long Ticks = 0;
-        public Texture2D tex_tilemap = null;
         int screenWidth, screenHeight;
-
-        public ParticlesManager ParticlesManager;
 
         public Game1()
         {
@@ -28,53 +24,45 @@ namespace Project3
             Content.RootDirectory = "Content";
             Window.IsBorderless = true;
         }
+
         protected override void Initialize()
         {
-            screenWidth = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Width;
-            screenHeight = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Height;
+            //screenWidth = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Width;
+            //screenHeight = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Height;
+            screenWidth = 320;
+            screenHeight = 320;
             graphics.PreferredBackBufferWidth = screenWidth;
             graphics.PreferredBackBufferHeight = screenHeight;
             graphics.IsFullScreen = false;
             graphics.ApplyChanges();
-            UserInterface.Initialize(Content, BuiltinThemes.hd);
-            UserInterface.Active.UseRenderTarget = true;
-            UserInterface.Active.IncludeCursorInRenderTarget = false;
             spriteBatch = spriteBatch ?? new SpriteBatch(GraphicsDevice);
             Graphics.Graphics.Instance.Initialize(GraphicsDevice, spriteBatch);
-            InitializeUI();
             InitUpdate();
             InitDraw();
-            ParticlesManager = new ParticlesManager();
-            ParticlesManager.Initialize();
             base.Initialize();
         }
+
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            Update();
-            ParticlesManager.Update();
+            update(gameTime);
 
             KB.Update();
             MS.Update();
 
-            UpdateUI();
-
-            UserInterface.Active.Update(gameTime);
             base.Update(gameTime);
 
             Ticks++;
         }
+
         protected override void Draw(GameTime gameTime)
         {
-            UserInterface.Active.Draw(spriteBatch);
             GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
-            Draw();
-            ParticlesManager.Draw();
+            draw(gameTime);
             spriteBatch.End();
-            UserInterface.Active.DrawMainRenderTarget(spriteBatch);
             base.Draw(gameTime);
         }
     }

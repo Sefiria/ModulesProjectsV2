@@ -15,7 +15,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeonBit.UI", "GeonBit.UI\Ge
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeonBit.UI.Examples", "GeonBit.UI.Examples\GeonBit.UI.Examples.csproj", "{FCF0FD04-C856-46F6-A192-406853F5D311}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project3", "Project3\Project3.csproj", "{63DBEA92-469B-4EB3-B886-C35D07AD26E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project3", "Project3\Project3.csproj", "{63DBEA92-469B-4EB3-B886-C35D07AD26E5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFX", "SFX\SFX.csproj", "{62D6147D-8105-4230-80B7-2F474833E340}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{BF2DBA3A-E0B1-4663-88D3-1A36CAE35100}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project4", "Project4\Project4.csproj", "{7898302C-A8FD-429D-BB67-B324B587CA62}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -66,6 +72,24 @@ Global
 		{63DBEA92-469B-4EB3-B886-C35D07AD26E5}.Editor|Any CPU.Build.0 = Debug|Any CPU
 		{63DBEA92-469B-4EB3-B886-C35D07AD26E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{63DBEA92-469B-4EB3-B886-C35D07AD26E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62D6147D-8105-4230-80B7-2F474833E340}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62D6147D-8105-4230-80B7-2F474833E340}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62D6147D-8105-4230-80B7-2F474833E340}.Editor|Any CPU.ActiveCfg = Debug|Any CPU
+		{62D6147D-8105-4230-80B7-2F474833E340}.Editor|Any CPU.Build.0 = Debug|Any CPU
+		{62D6147D-8105-4230-80B7-2F474833E340}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62D6147D-8105-4230-80B7-2F474833E340}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF2DBA3A-E0B1-4663-88D3-1A36CAE35100}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF2DBA3A-E0B1-4663-88D3-1A36CAE35100}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF2DBA3A-E0B1-4663-88D3-1A36CAE35100}.Editor|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF2DBA3A-E0B1-4663-88D3-1A36CAE35100}.Editor|Any CPU.Build.0 = Debug|Any CPU
+		{BF2DBA3A-E0B1-4663-88D3-1A36CAE35100}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF2DBA3A-E0B1-4663-88D3-1A36CAE35100}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7898302C-A8FD-429D-BB67-B324B587CA62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7898302C-A8FD-429D-BB67-B324B587CA62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7898302C-A8FD-429D-BB67-B324B587CA62}.Editor|Any CPU.ActiveCfg = Debug|Any CPU
+		{7898302C-A8FD-429D-BB67-B324B587CA62}.Editor|Any CPU.Build.0 = Debug|Any CPU
+		{7898302C-A8FD-429D-BB67-B324B587CA62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7898302C-A8FD-429D-BB67-B324B587CA62}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
