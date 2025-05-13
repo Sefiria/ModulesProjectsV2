@@ -10,12 +10,14 @@ namespace Graphics
 {
     public partial class Graphics
     {
+        public float Rotation = 0F;
+
         public void DrawTexture(string name, float x, float y, Color? color = null, Rectangle? source = null) => DrawTexture(Textures[name], x, y, color, source);
         public void DrawTexture(string name, Vector2 position, Color? color = null, Rectangle? source = null) => DrawTexture(Textures[name], position, color, source);
         public void DrawTexture(Texture2D texture, float x, float y, Color? color = null, Rectangle? source = null) => DrawTexture(texture, new Vector2(x, y), color, source);
         public void DrawTexture(Texture2D texture, Vector2 position, Color? color = null, Rectangle? source = null)
         {
-            SpriteBatch.Draw(texture, position, source, color ?? Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            SpriteBatch.Draw(texture, position, source, color ?? Color.White, Rotation, Vector2.Zero, 1f, SpriteEffects.None, 0f);
         }
 
         public void DrawTexture(string name, float x, float y, float scale, Color color, Rectangle? source = null) => DrawTexture(Textures[name], x, y, scale, color, source);

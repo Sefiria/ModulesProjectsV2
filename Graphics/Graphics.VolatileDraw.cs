@@ -71,28 +71,31 @@ namespace Graphics
         }
         public void DrawLine(int start_x, int start_y, int end_x, int end_y, Color color, int thickness)
         {
-            int x, y;
-            int w = Math.Max(start_x, end_x) - Math.Min(start_x, end_x);
-            int h = Math.Max(start_y, end_y) - Math.Min(start_y, end_y);
-            if (w == 0 || h == 0)
+            int w = Math.Abs(end_x - start_x);
+            int h = Math.Abs(end_y - start_y);
+            if (w == 0 && h == 0)
                 return;
-            Texture2D tex = new Texture2D(GraphicsDevice, w, h);
-            Color[] data = new Color[w * h];
+
+            Texture2D tex = new Texture2D(GraphicsDevice, w + thickness, h + thickness);
+            Color[] data = new Color[(w + thickness) * (h + thickness)];
             float d = Maths.Distance(start_x, start_y, end_x, end_y);
+
             for (float t = 0F; t <= 1F; t += 1F / d)
             {
-                x = (int)Maths.Abs(Maths.Lerp(start_x, end_x, t) - start_x);
-                y = (int)Maths.Abs(Maths.Lerp(start_y, end_y, t) - start_y);
-                for (int j = 0; j < t; j++)
+                int x = (int)Maths.Lerp(start_x, end_x, t);
+                int y = (int)Maths.Lerp(start_y, end_y, t);
+
+                for (int j = 0; j < thickness; j++)
                 {
-                    for (int i = 0; i < t; i++)
+                    for (int i = 0; i < thickness; i++)
                     {
-                        int index = (y + j) * w + (x + i);
+                        int index = (y - Math.Min(start_y, end_y) + i) * (w + thickness) + (x - Math.Min(start_x, end_x) + j);
                         if (index >= 0 && index < data.Length)
                             data[index] = color;
                     }
                 }
             }
+
             tex.SetData(data);
             DrawTexture(tex, Math.Min(start_x, end_x), Math.Min(start_y, end_y));
         }
@@ -101,7 +104,8 @@ namespace Graphics
             SpriteBatch.DrawString(font, text, new Vector2(x, y), color, 0F, Vector2.Zero, 1F, SpriteEffects.None, 1F);
         }
 
-        public void FillRectangle(int x, int y, int w, int h, Color col)
+        public void FillRectangle(Rectangle rect, Color col, float rotation = 0F) => FillRectangle(rect.X, rect.Y, rect.Width, rect.Height, col, rotation);
+        public void FillRectangle(int x, int y, int w, int h, Color col, float rotation = 0F)
         {
             if (w <= 0 || h <= 0)
                 return;
@@ -118,7 +122,9 @@ namespace Graphics
             }
 
             tex.SetData(data);
+            Rotation = rotation;
             DrawTexture(tex, x, y);
+            Rotation = 0F;
         }
 
         public void FillCircle(int x, int y, int radius, Color col)
