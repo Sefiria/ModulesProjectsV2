@@ -21,9 +21,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFX", "SFX\SFX.csproj", "{6
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{BF2DBA3A-E0B1-4663-88D3-1A36CAE35100}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project4", "Project4\Project4.csproj", "{7898302C-A8FD-429D-BB67-B324B587CA62}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project4", "Project4\Project4.csproj", "{7898302C-A8FD-429D-BB67-B324B587CA62}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project5", "Project5\Project5.csproj", "{5CC29D06-E2A3-4C7D-A5D2-19CD6D0451AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project5", "Project5\Project5.csproj", "{5CC29D06-E2A3-4C7D-A5D2-19CD6D0451AF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project6", "Project6\Project6.csproj", "{99B9F476-7E65-4B80-842E-ADC376D2617D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -98,6 +100,12 @@ Global
 		{5CC29D06-E2A3-4C7D-A5D2-19CD6D0451AF}.Editor|Any CPU.Build.0 = Debug|Any CPU
 		{5CC29D06-E2A3-4C7D-A5D2-19CD6D0451AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5CC29D06-E2A3-4C7D-A5D2-19CD6D0451AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99B9F476-7E65-4B80-842E-ADC376D2617D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99B9F476-7E65-4B80-842E-ADC376D2617D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99B9F476-7E65-4B80-842E-ADC376D2617D}.Editor|Any CPU.ActiveCfg = Debug|Any CPU
+		{99B9F476-7E65-4B80-842E-ADC376D2617D}.Editor|Any CPU.Build.0 = Debug|Any CPU
+		{99B9F476-7E65-4B80-842E-ADC376D2617D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99B9F476-7E65-4B80-842E-ADC376D2617D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
