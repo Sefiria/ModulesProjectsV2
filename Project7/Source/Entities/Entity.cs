@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using Project7.Entities.Behaviors;
+using Project7.Source.Entities.Behaviors;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Net.NetworkInformation;
@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using Tooling;
 using Tools.Animations;
 
-namespace Project7.Entities
+namespace Project7.Source.Entities
 {
     public class Entity
     {
@@ -44,7 +44,7 @@ namespace Project7.Entities
         public void Draw(GraphicsDevice graphics)
         {
             Texture2D tex = AnimationController?.GetCurrentFrame();
-            if(tex != null)
+            if (tex != null)
             {
                 Graphics.Graphics.Instance.DrawTexture(tex, X, Y, 0F, 1F, LookX < 0F, 0F);
             }

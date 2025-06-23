@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project7.Entities.Behaviors
+namespace Project7.Source.Entities.Behaviors
 {
     public class Behavior
     {

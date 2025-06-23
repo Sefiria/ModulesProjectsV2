@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Project7.Entities;
 using Tools.Inputs;
 
 namespace Project7
@@ -38,6 +37,7 @@ namespace Project7
             UserInterface.Initialize(Content, BuiltinThemes.hd);
             UserInterface.Active.UseRenderTarget = true;
             UserInterface.Active.IncludeCursorInRenderTarget = false;
+            UserInterface.Active.ShowCursor = false;
             spriteBatch = spriteBatch ?? new SpriteBatch(GraphicsDevice);
             InitializeUI();
             Graphics.Graphics.Instance.Initialize(GraphicsDevice, spriteBatch);
@@ -65,9 +65,21 @@ namespace Project7
         protected override void Draw(GameTime gameTime)
         {
             UserInterface.Active.Draw(spriteBatch);
-            Graphics.Graphics.Instance.BeginDraw(Color.Black);
-            Draw();
+
+            // == AlphaBlend
+
+            Graphics.Graphics.Instance.BeginDraw(Color.Black, BlendState.AlphaBlend);
+            Draw_Tiles();
             Graphics.Graphics.Instance.EndDraw();
+
+            // == NonPremultiplied
+
+            Graphics.Graphics.Instance.BeginDraw(null, BlendState.NonPremultiplied);
+            Draw_Entities();
+            // Draw Cursor
+            Graphics.Graphics.Instance.DrawTexture(cursor_texture, MS.X - 8, MS.Y - 16, 0F, 1F, false);
+            Graphics.Graphics.Instance.EndDraw();
+
             UserInterface.Active.DrawMainRenderTarget(spriteBatch);
             base.Draw(gameTime);
         }

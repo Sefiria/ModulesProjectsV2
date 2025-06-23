@@ -11,16 +11,18 @@ namespace Project7
 {
     public partial class Game1 : Game
     {
-        Paragraph test;
+        Texture2D cursor_texture;
+        //Paragraph test;
         void InitializeUI()
         {
-            test = new Paragraph("Test\nun\ndeux___________zd_______________zd", Anchor.TopLeft);
-            UserInterface.Active.AddEntity(test);
+            //test = new Paragraph("Test\nun\ndeux___________zd_______________zd", Anchor.TopLeft);
+            //UserInterface.Active.AddEntity(test);
+            cursor_texture = Texture2D.FromFile(GraphicsDevice, assets_bindings.Resources["cursor"]);
         }
 
         private void UpdateUI()
         {
-            test.Offset = new Vector2(MS.X, MS.Y - test.TotalHeight);
+            //test.Offset = new Vector2(MS.X, MS.Y - test.TotalHeight);
         }
     }
 }

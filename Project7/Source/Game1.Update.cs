@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using Project7.Entities;
+using Project7.Source.Entities;
 
 namespace Project7
 {
@@ -11,7 +11,7 @@ namespace Project7
         {
             EntityManager = new EntityManager();
 
-            for(int n=0;n<50; n++)
+            for(int n=0;n<20; n++)
                 EntityFactory.CreateRabbit();
         }
         void Update()

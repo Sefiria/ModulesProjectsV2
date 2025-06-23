@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project7.Entities
+namespace Project7.Source.Entities
 {
     public class EntityManager
     {
@@ -17,7 +17,7 @@ namespace Project7.Entities
         public void Update()
         {
             var list = new List<Entity>(Entities);
-            foreach(var entity in list)
+            foreach (var entity in list)
             {
                 if (entity.Exists)
                     entity.Update();

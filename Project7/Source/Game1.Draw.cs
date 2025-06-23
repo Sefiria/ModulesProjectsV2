@@ -24,12 +24,14 @@ namespace Project7
             TexGrass = GraphicsDevice.SplitTexture("Assets/Textures/Tilesets/grass.png", 0, 16);
         }
 
-        void Draw()
+        void Draw_Tiles()
         {
             for (int y = 0; y < 32; y++)
                 for (int x = 0; x < 32; x++)
                     draw(TexGrass, x * tilesize * scale, y * tilesize * scale, 16, 16, DrawStyle.Wavy);
-
+        }
+        void Draw_Entities()
+        {
             EntityManager.Draw(GraphicsDevice);
         }
 

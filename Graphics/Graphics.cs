@@ -43,10 +43,11 @@ namespace Graphics
             Textures[name] = tex;
             return true;
         }
-        public void BeginDraw(Color clear_color)
+        public void BeginDraw(Color? clear_color = null, BlendState BlendState = null)
         {
-            GraphicsDevice.Clear(clear_color);
-            SpriteBatch.Begin();
+            if(clear_color != null)
+                GraphicsDevice.Clear(clear_color.Value);
+            SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState);
         }
         public void EndDraw()
         {
