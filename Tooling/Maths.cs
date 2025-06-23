@@ -54,7 +54,7 @@ namespace Tooling
         public static float ScalarProduct(PointF AB, PointF AP) => AB.X * AP.X + AB.Y * AP.Y;
         public static float ScalarProduct(PointF A, PointF B, PointF P) => ScalarProduct(B.MinusF(A), P.MinusF(A));
         //public static float Abs(float K) => Sqrt(Sq(K));
-        public static float Abs(float K) => K < 0F ? -K : K;
+        public static float Abs(float K) => K == 0 ? 1 : (K < 0F ? -K : K);
         public static float Sign(float K)
         {
             var v = (float)Math.Round(K / Abs(K));

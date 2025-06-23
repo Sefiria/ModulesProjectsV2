@@ -17,6 +17,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using GeonBit.UI.DataTypes;
 using System.Text;
+using static System.Net.Mime.MediaTypeNames;
+using System.Linq;
 
 namespace GeonBit.UI.Entities
 {
@@ -652,5 +654,10 @@ namespace GeonBit.UI.Entities
                     Rotation, origin, scale, SpriteEffects.None, 0.5f);
             }
         }
+
+
+
+        public int LinesCount => 1 + Text.Count(c => c == '\n');
+        public float TotalHeight => LinesCount * GetCharacterActualSize().Y;
     }
 }

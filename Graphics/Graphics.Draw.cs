@@ -35,13 +35,19 @@ namespace Graphics
         {
             SpriteBatch.Draw(texture, position, source, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
         }
-
-        public void DrawTexture(string name, float x, float y, float scale, float depth = 0f) => DrawTexture(Textures[name], new Vector2(x, y), scale, depth);
-        public void DrawTexture(string name, Vector2 position, float scale, float depth = 0f) => DrawTexture(Textures[name], position, scale, depth);
-        public void DrawTexture(Texture2D texture, float x, float y, float scale, float depth = 0f) => DrawTexture(texture, new Vector2(x, y), scale, depth);
-        public void DrawTexture(Texture2D texture, Vector2 position, float scale, float depth = 0f)
+        public void DrawTexture(Texture2D texture, Vector2 position, float scale, Rectangle? source = null, float alpha = 1f)
         {
-            SpriteBatch.Draw(texture, position, null, Color.White, scale, Vector2.Zero, 1f, SpriteEffects.None, depth);
+            SpriteBatch.Draw(texture, position, source, Color.White * alpha, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+        }
+
+
+        public void DrawTexture(string name, float x, float y, float rotation, float scale, bool flipX, float depth = 0f) => DrawTexture(Textures[name], new Vector2(x, y), rotation, scale, flipX, depth);
+        public void DrawTexture(string name, Vector2 position, float rotation, float scale, bool flipX, float depth = 0f) => DrawTexture(Textures[name], position, rotation, scale, flipX, depth);
+        public void DrawTexture(Texture2D texture, float x, float y, float rotation, float scale, bool flipX, float depth = 0f) => DrawTexture(texture, new Vector2(x, y), rotation, scale, flipX, depth);
+        public void DrawTexture(Texture2D texture, Vector2 position, float rotation, float scale, bool flipX, float depth = 0f)
+        {
+            SpriteEffects effects = flipX ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+            SpriteBatch.Draw(texture, position, null, Color.White, rotation, Vector2.Zero, scale, effects, depth);
         }
     }
 }

@@ -27,6 +27,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project5", "Project5\Projec
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project6", "Project6\Project6.csproj", "{99B9F476-7E65-4B80-842E-ADC376D2617D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project7", "Project7\Project7.csproj", "{35890D61-1A4E-4DD7-A0CB-9E9819E285B8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pixanim", "Pixanim\Pixanim.csproj", "{F53313DD-646B-438F-9313-3A3D0D0A191F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -106,6 +110,18 @@ Global
 		{99B9F476-7E65-4B80-842E-ADC376D2617D}.Editor|Any CPU.Build.0 = Debug|Any CPU
 		{99B9F476-7E65-4B80-842E-ADC376D2617D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{99B9F476-7E65-4B80-842E-ADC376D2617D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35890D61-1A4E-4DD7-A0CB-9E9819E285B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35890D61-1A4E-4DD7-A0CB-9E9819E285B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35890D61-1A4E-4DD7-A0CB-9E9819E285B8}.Editor|Any CPU.ActiveCfg = Debug|Any CPU
+		{35890D61-1A4E-4DD7-A0CB-9E9819E285B8}.Editor|Any CPU.Build.0 = Debug|Any CPU
+		{35890D61-1A4E-4DD7-A0CB-9E9819E285B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35890D61-1A4E-4DD7-A0CB-9E9819E285B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F53313DD-646B-438F-9313-3A3D0D0A191F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F53313DD-646B-438F-9313-3A3D0D0A191F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F53313DD-646B-438F-9313-3A3D0D0A191F}.Editor|Any CPU.ActiveCfg = Debug|Any CPU
+		{F53313DD-646B-438F-9313-3A3D0D0A191F}.Editor|Any CPU.Build.0 = Debug|Any CPU
+		{F53313DD-646B-438F-9313-3A3D0D0A191F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F53313DD-646B-438F-9313-3A3D0D0A191F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
