@@ -7,14 +7,16 @@ namespace Project7.Source.Entities.Behaviors
 {
     public class BehaviorRabbit : Behavior
     {
+        public bool Held;
+
         Entity Target;
         Action trigger_idle, trigger_run, trigger_holding;
-        bool mouse_near, held;
+        bool mouse_near;
         int near_time, peaceful_time, next_random_peaceful_run, force_run_time;
         public BehaviorRabbit(Entity e, Action trigger_idle, Action trigger_run, Action trigger_holding)
         {
             Target = e;
-            mouse_near = held = false;
+            mouse_near = Held = false;
             near_time = int.MaxValue;
             peaceful_time = force_run_time = 0;
             next_random_peaceful_run = Random.Shared.Next(10, 100);
@@ -30,17 +32,17 @@ namespace Project7.Source.Entities.Behaviors
 
             // If click successful : hold the entity
 
-            bool holding = (Game1.MS.IsLeftDown && held) || (Game1.MS.IsLeftPressed && Maths.CollisionPointCercle(Game1.MS.X, Game1.MS.Y, Target.X + Target.W / 2F, Target.Y + Target.W / 2F, Target.W / 2F));
+            bool holding = (Game1.MS.IsLeftDown && Held) || (Game1.MS.IsLeftPressed && Maths.CollisionPointCercle(Game1.MS.X, Game1.MS.Y, Target.X + Target.W / 2F, Target.Y + Target.W / 2F, Target.W / 2F));
             if(holding)
             {
-                if (!held)
+                if (!Held)
                 {
                     trigger_holding?.Invoke();
                     Target.Velocity = 0F;
                     near_time = int.MaxValue;
                     peaceful_time = 0;
                     force_run_time = 0;
-                    held = true;
+                    Held = true;
                 }
                 Target.X = Game1.MS.X - Target.W / 2F;
                 Target.Y = Game1.MS.Y - 4;
@@ -49,9 +51,9 @@ namespace Project7.Source.Entities.Behaviors
 
             // Else : escape or idle
 
-            if(held)
+            if(Held)
             {
-                held = false;
+                Held = false;
                 Idle();
                 near_time = 0;
                 peaceful_time = 0;
@@ -73,6 +75,7 @@ namespace Project7.Source.Entities.Behaviors
                 if (near_time > 35)
                 {
                     Run();
+                    Game1.Instance.PlaySoundAsync(Game1.Instance.SE_RABBII_JUMPS[Random.Shared.Next(0,3)]);
                     near_time = 0;
                     force_run_time = 0;
                     peaceful_time = 0;

@@ -11,7 +11,7 @@ namespace Project7
         public static Game1 Instance { get; private set; }
 
         private GraphicsDeviceManager graphics;
-        private SpriteBatch spriteBatch;
+        public SpriteBatch spriteBatch;
         public static KB KB = new KB();
         public static MS MS = new MS();
         public long Ticks = 0;
@@ -43,6 +43,7 @@ namespace Project7
             Graphics.Graphics.Instance.Initialize(GraphicsDevice, spriteBatch);
             base.Initialize();
 
+            LoadSFX();
             LoadUpdate();
             LoadDraw();
         }
@@ -76,8 +77,10 @@ namespace Project7
 
             Graphics.Graphics.Instance.BeginDraw(null, BlendState.NonPremultiplied);
             Draw_Entities();
+            Draw_Events();
             // Draw Cursor
-            Graphics.Graphics.Instance.DrawTexture(cursor_texture, MS.X - 8, MS.Y - 16, 0F, 1F, false);
+            if(!UserInterface.Active.ShowCursor)
+                Graphics.Graphics.Instance.DrawTexture(cursor_texture, MS.X - 8, MS.Y - 16, 0F, 1F, false);
             Graphics.Graphics.Instance.EndDraw();
 
             UserInterface.Active.DrawMainRenderTarget(spriteBatch);

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Tools
 {
@@ -95,6 +96,16 @@ namespace Tools
                 }
             }
             return result.ToArray();
+        }
+        public static Texture2D CropTexture2D(this GraphicsDevice graphicsDevice, string filename, int x, int y, int w, int h)
+        {
+            Texture2D tex = Texture2D.FromFile(graphicsDevice, filename);
+            Rectangle sourceRectangle = new Rectangle(x * w, y * h, w, h);
+            Texture2D subTexture = new Texture2D(graphicsDevice, w, h);
+            Color[] data = new Color[w * h];
+            tex.GetData(0, sourceRectangle, data, 0, data.Length);
+            subTexture.SetData(data);
+            return subTexture;
         }
     }
 
