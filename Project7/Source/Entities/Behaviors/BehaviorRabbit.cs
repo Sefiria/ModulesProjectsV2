@@ -112,7 +112,7 @@ namespace Project7.Source.Entities.Behaviors
         void Run()
         {
             trigger_run?.Invoke();
-            Target.Velocity = (0.5F + (float)Random.Shared.NextDouble()) * (mouse_near ? 3F : 1F);
+            Target.Velocity = (0.5F + (float)Random.Shared.NextDouble() / 2F) * (mouse_near ? 2F : 1F);
             if (mouse_near)
             {
                 Target.LookX = Target.X + Target.W / 2F - Game1.MS.X;

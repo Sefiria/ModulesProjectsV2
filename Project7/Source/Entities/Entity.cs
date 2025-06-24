@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Project7.Source.Entities.Behaviors;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Net.NetworkInformation;
@@ -34,12 +35,32 @@ namespace Project7.Source.Entities
             AnimationController?.Update();
             Behaviors.ForEach(b => b.Update());
 
-            X += Maths.Normalize(LookX) * Velocity;
-            Y += Maths.Normalize(LookY) * Velocity;
-            if (X < 0) X = 10;
-            if (Y < 0) Y = 10;
-            if (X > Game1.Instance.ScreenWidth - 40) X = Game1.Instance.ScreenWidth - 40;
-            if (Y > Game1.Instance.ScreenHeight - 40) Y = Game1.Instance.ScreenHeight - 40;
+            float delta_x = Maths.Normalize(LookX) * Velocity;
+            float delta_y = Maths.Normalize(LookY) * Velocity;
+            bool stucked = Game1.Instance.Map[1, (int)((X + W / 2) / Game1.Instance.scale / Game1.Instance.tilesize), (int)((Y + H / 2) / Game1.Instance.scale / Game1.Instance.tilesize)] != -1;
+            if (stucked || CheckCollisions(X, Y, delta_x, delta_y))
+            {
+                X += delta_x;
+                Y += delta_y;
+            }
+        }
+        private bool CheckCollisions(float _x, float _y, float delta_x, float delta_y)
+        {
+            if (delta_x == 0F && delta_y == 0F)
+                return false;
+            _x += W / 2;
+            _y += H / 2;
+            int ofst_x = (int)(Maths.Sign(delta_x) * W / 4);
+            int ofst_y = (int)(Maths.Sign(delta_y) * H / 4);
+            int x = (int)((_x + delta_x + ofst_x) / Game1.Instance.scale / Game1.Instance.tilesize);
+            int y = (int)((_y + delta_y + ofst_y) / Game1.Instance.scale / Game1.Instance.tilesize);
+            if (x - 1 < 0) return false;
+            if (y - 1 < 0) return false;
+            if (x >= Game1.Instance.screen_tiles_width) return false;
+            if (y >= Game1.Instance.screen_tiles_height) return false;
+            if (Game1.Instance.Map[1, x, y] != -1)
+                return false;
+            return true;
         }
         public void Draw(GraphicsDevice graphics)
         {

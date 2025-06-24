@@ -11,10 +11,12 @@ namespace Project7
     {
         public static readonly Dictionary<string, string> Resources = new Dictionary<string, string>()
         {
+            ["tilesets/grass"] = "Assets/Textures/Tilesets/grass.png",
             ["cursor"] = "Assets/Textures/UI/cursor.png",
             ["pinou_idle"] = "Assets/Textures/pinou_idle.png",
             ["pinou_run"] = "Assets/Textures/pinou_run.png",
             ["pinou_hold"] = "Assets/Textures/pinou_hold.png",
+            ["wooden_fence"] = "Assets/Textures/wooden_fence.png",
         };
     }
 }

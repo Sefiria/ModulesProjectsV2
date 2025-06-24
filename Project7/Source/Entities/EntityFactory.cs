@@ -5,13 +5,14 @@ namespace Project7.Source.Entities
 {
     public class EntityFactory
     {
-        public static Entity CreateRabbit()
+        public static Entity CreateRabbit(int tile_x, int tile_y) => CreateRabbit((float)tile_x * Game1.Instance.tilesize, (float)tile_y * Game1.Instance.tilesize);
+        public static Entity CreateRabbit(float x = -1F, float y = -1F)
         {
             var context = Game1.Instance;
 
             var pinou = new Entity();
-            pinou.X = Random.Shared.Next(10, context.ScreenWidth - 40);
-            pinou.Y = Random.Shared.Next(10, context.ScreenHeight - 40);
+            pinou.X = x != -1F ? x : Random.Shared.Next(10, context.ScreenWidth - 40);
+            pinou.Y = y != -1F ? y : Random.Shared.Next(10, context.ScreenHeight - 40);
             pinou.AnimationController = new Tools.Animations.AnimationController(context.GraphicsDevice);
             pinou.AnimationController.AddAnimation(context.GraphicsDevice, "idle", assets_bindings.Resources["pinou_idle"]);
             pinou.AnimationController.AddAnimation(context.GraphicsDevice, "run", assets_bindings.Resources["pinou_run"]);

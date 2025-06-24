@@ -4,6 +4,7 @@ using GeonBit.UI.Utils;
 using Microsoft.VisualBasic.Logging;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Project7.Source.Map;
 using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
@@ -14,39 +15,78 @@ namespace Project7
 {
     public partial class Game1 : Game
     {
-        float scale = 2F;
-        int tilesize = 16;
+        public float scale = 2F;
+        public int tilesize = 16;
         Texture2D[] TexGrass;
+        Texture2D TexWoodenFence;
         uint RNG = (uint)Random.Shared.NextInt64();
+        public int screen_tiles_width => (int)(ScreenWidth / tilesize / scale);
+        public int screen_tiles_height => (int)(ScreenHeight / tilesize / scale);
 
         void LoadDraw()
         {
-            TexGrass = GraphicsDevice.SplitTexture("Assets/Textures/Tilesets/grass.png", 0, 16);
+            TexGrass = GraphicsDevice.SplitTexture(assets_bindings.Resources["tilesets/grass"], 0, 16);
+            TexWoodenFence = Texture2D.FromFile(GraphicsDevice, assets_bindings.Resources["wooden_fence"]);
         }
 
         void Draw_Tiles()
         {
-            for (int y = 0; y < 32; y++)
-                for (int x = 0; x < 32; x++)
-                    draw(TexGrass, x * tilesize * scale, y * tilesize * scale, 16, 16, DrawStyle.Wavy);
+            for (int z = 0; z < Map.z; z++)
+                for (int y = 0; y < Map.h; y++)
+                    for (int x = 0; x < Map.w; x++)
+                        draw_tile(z, x, y);
+        }
+        void draw_tile(int z, int x, int y)
+        {
+            if (Map[z, x, y] < 0)
+                return;
+
+            if(z == 0)
+            {
+                Texture2D[] texs = null;
+                switch(Map[z, x, y])
+                {
+                    default:
+                    case 0: texs = TexGrass; break;
+                }
+                draw(texs, x * tilesize * scale, y * tilesize * scale, 16, 16, DrawStyle.Wavy);
+            }
+            else
+            {
+                Texture2D tex = null;
+                int index = -2;
+                switch (Map[z, x, y])
+                {
+                    default:
+                    case 0:
+                        tex = TexWoodenFence;
+                        index = Autotile.Calculate(Map, z, x, y, "a,z,q,s,d,h,v,zq,zd,sq,sd,f,ns,nz,nd,nq");
+                        break;
+                }
+                if (index == -2)
+                    draw(tex, x * tilesize * scale, y * tilesize * scale, 16, 16, DrawStyle.Static);
+                else if (index > -1)
+                    draw(tex, x * tilesize * scale, y * tilesize * scale, 16, 16, DrawStyle.Static, index);
+            }
         }
         void Draw_Entities()
         {
             EntityManager.Draw(GraphicsDevice);
         }
 
+
         public enum DrawStyle
         {
             Static=0, Framed, Wavy
         }
-        void draw(Texture2D tex, float x, float y, int w, int h, int eDrawStyle) => draw([tex], x, y, w, h, (DrawStyle)eDrawStyle);
-        void draw(Texture2D tex, float x, float y, int w, int h, DrawStyle style) => draw([tex], x, y, w, h, style);
-        void draw(Texture2D[] tex, float x, float y, int w, int h, DrawStyle style)
+        void draw(Texture2D tex, float x, float y, int w, int h, int eDrawStyle, int splitofst_x = 0, int splitofst_y = 0) => draw([tex], x, y, w, h, (DrawStyle)eDrawStyle, splitofst_x, splitofst_y);
+        void draw(Texture2D tex, float x, float y, int w, int h, DrawStyle style, int splitofst_x = 0, int splitofst_y = 0) => draw([tex], x, y, w, h, style, splitofst_x, splitofst_y);
+        void draw(Texture2D[] tex, float x, float y, int w, int h, DrawStyle style, int splitofst_x = 0, int splitofst_y = 0)
         {
             switch(style)
             {
                 default:
-                case DrawStyle.Static: draw_static(tex, x, y, w, h); break;
+                case DrawStyle.Static: draw_static(tex, x, y, w, h, splitofst_x, splitofst_y); break;
                 case DrawStyle.Framed: draw_framed(tex, x, y, w, h); break;
                 case DrawStyle.Wavy: draw_wavy(tex, x, y, w, h); break;
             }
@@ -76,7 +116,7 @@ namespace Project7
                 return (int)(hash & 0x7FFFFFFF); // Assure un entier positif
             }
         }
-        void draw_static(Texture2D[] tex, float x, float y, int w, int h)
+        void draw_static(Texture2D[] tex, float x, float y, int w, int h, int splitofst_x = 0, int splitofst_y = 0)
         {
             int id = GetTexIdByTile(tex, x, y);
             if (id == -1) return;
@@ -86,7 +126,7 @@ namespace Project7
                 x,
                 y,
                 scale,
-                new Rectangle(0, 0, w, h)
+                new Rectangle(splitofst_x * w, splitofst_y * h, w, h)
             );
         }
         void draw_framed(Texture2D[] tex, float x, float y, int w, int h)
