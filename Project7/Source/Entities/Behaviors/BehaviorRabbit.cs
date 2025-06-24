@@ -13,6 +13,9 @@ namespace Project7.Source.Entities.Behaviors
         Action trigger_idle, trigger_run, trigger_holding;
         bool mouse_near;
         int near_time, peaceful_time, next_random_peaceful_run, force_run_time;
+
+        Game1 Context => Game1.Instance;
+
         public BehaviorRabbit(Entity e, Action trigger_idle, Action trigger_run, Action trigger_holding)
         {
             Target = e;
@@ -37,6 +40,7 @@ namespace Project7.Source.Entities.Behaviors
             {
                 if (!Held)
                 {
+                    Context.PlaySoundAsync(Context.SE_RABBII_GRIP);
                     trigger_holding?.Invoke();
                     Target.Velocity = 0F;
                     near_time = int.MaxValue;
@@ -53,6 +57,7 @@ namespace Project7.Source.Entities.Behaviors
 
             if(Held)
             {
+                Context.PlaySoundAsync(Context.SE_RABBII_RELEASE);
                 Held = false;
                 Idle();
                 near_time = 0;
@@ -75,7 +80,7 @@ namespace Project7.Source.Entities.Behaviors
                 if (near_time > 35)
                 {
                     Run();
-                    Game1.Instance.PlaySoundAsync(Game1.Instance.SE_RABBII_JUMPS[Random.Shared.Next(0,3)]);
+                    Context.PlaySoundAsync(Context.SE_RABBII_JUMPS[Random.Shared.Next(0,3)]);
                     near_time = 0;
                     force_run_time = 0;
                     peaceful_time = 0;
