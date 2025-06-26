@@ -1,13 +1,12 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Project7.Source.Entities.Behaviors;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Net.NetworkInformation;
-using System.Windows.Forms;
 using Tooling;
-using Tools.Animations;
+using AnimationController = Tools.Animations.AnimationController;
 
 namespace Project7.Source.Entities
 {
@@ -22,6 +21,7 @@ namespace Project7.Source.Entities
         public List<Behavior> Behaviors;
         public float X, Y;
         public float LookX, LookY, Velocity;
+        public bool HasCollisions = true, ApplyRotationFromLook = false;
 
         public float W => AnimationController?.GetCurrentFrame()?.Width ?? 0F;
         public float H => AnimationController?.GetCurrentFrame()?.Height ?? 0F;
@@ -55,16 +55,23 @@ namespace Project7.Source.Entities
             if (delta_x == 0f && delta_y == 0f)
                 return;
 
-            var (tileX_X, tileY_X) = GetTileAtOffset(delta_x, 0);
-            if (!CheckMapTilesCollisions(tileX_X, tileY_X) && !CheckMapBounds(X, Y, delta_x, 0))
+            if (HasCollisions == false)
             {
                 X += delta_x;
-            }
-
-            var (tileX_Y, tileY_Y) = GetTileAtOffset(0, delta_y);
-            if (!CheckMapTilesCollisions(tileX_Y, tileY_Y) && !CheckMapBounds(X, Y, 0, delta_y))
-            {
                 Y += delta_y;
+            }
+            else
+            {
+                var (tileX_X, tileY_X) = GetTileAtOffset(delta_x, 0);
+                if (!CheckMapTilesCollisions(tileX_X, tileY_X) && !CheckMapBounds(X, Y, delta_x, 0))
+                {
+                    X += delta_x;
+                }
+                var (tileX_Y, tileY_Y) = GetTileAtOffset(0, delta_y);
+                if (!CheckMapTilesCollisions(tileX_Y, tileY_Y) && !CheckMapBounds(X, Y, 0, delta_y))
+                {
+                    Y += delta_y;
+                }
             }
         }
         public (int TileX, int TileY) GetTileAtOffset(float dx, float dy)
@@ -103,7 +110,7 @@ namespace Project7.Source.Entities
             Texture2D tex = AnimationController?.GetCurrentFrame();
             if (tex != null)
             {
-                Graphics.Graphics.Instance.DrawTexture(tex, X, Y, 0F, 1F, LookX < 0F, 0F);
+                Graphics.Graphics.Instance.DrawTexture(tex, X, Y, ApplyRotationFromLook ? Maths.GetAngle(new PointF(LookX, LookY), false) + MathF.PI / 2F : 0F, 1F, LookX < 0F, 0F, ApplyRotationFromLook ? new Vector2(W / 2f, H / 2f) : null);
             }
         }
     }

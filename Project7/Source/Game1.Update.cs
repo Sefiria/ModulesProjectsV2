@@ -1,27 +1,32 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project7.Source.Entities;
-using Project7.Source.Particles;
 using Project7.Source.Entities.Behaviors;
 using Project7.Source.Events;
 using Project7.Source.Map;
-using Tools;
-using GeonBit.UI.Entities;
-using System.Security.Policy;
-using Entity = Project7.Source.Entities.Entity;
+using Project7.Source.Particles;
+using System;
 using System.Linq;
+using Tools;
+using Entity = Project7.Source.Entities.Entity;
 
 namespace Project7
 {
     public partial class Game1 : Game
     {
+        public const int CONST_MAX_FLIES = 5;
+
         public Map Map;
         public EntityManager EntityManager;
         public EventManager EventManager;
         public ParticleManager ParticleManager;
         public QuestManager QuestManager;
 
-        public string pinou_gift_name = "pinou_gift_name";
+        public string pinou_gift_name = "pinou_gift_name", kill_flies_quest_name = "kill_flies_quest_name";
+
+        private long afk_time = 0;
+        private Point old_ms_pos;
+        private int killed_flies = 0;
 
         void LoadUpdate()
         {
@@ -30,6 +35,8 @@ namespace Project7
             Init_Particles();
             Init_Events();
             Init_Quests();
+
+            old_ms_pos = MS.Position;
         }
         void Init_Map()
         {
@@ -85,9 +92,17 @@ namespace Project7
             });
             QuestManager.AddQuest("Ticks d'existence 0/1000", (quest) =>
             {
-                quest.SetText($"Ticks d'existence {Ticks}/1000");
                 if (Ticks >= 1000)
-                    quest.Validate();
+                    quest.Validate($"Ticks d'existence 1000/1000");
+                else
+                    quest.SetText($"Ticks d'existence {Ticks}/1000");
+            });
+            QuestManager.AddQuest("Ecrase des mouches 0/5", (quest) =>
+            {
+                if (killed_flies >= 5)
+                    quest.Validate("Ecrase des mouches 5/5");
+                else
+                    quest.SetText($"Ecrase des mouches {killed_flies}/5");
             });
         }
         void Update()
@@ -96,6 +111,23 @@ namespace Project7
             ParticleManager.Update();
             EventManager.Update();
             QuestManager.Update();
+
+            ManageFlies();
+
+            if (MS.Position == old_ms_pos)
+                afk_time++;
+            else
+                afk_time = 0;
+            old_ms_pos = MS.Position;
+        }
+
+        private void ManageFlies()
+        {
+            if (afk_time < 300 || EntityManager.Entities.Count(e => e.Name.StartsWith("fly-")) >= CONST_MAX_FLIES - 1)
+                return;
+            var rng = Random.Shared.NextDouble();
+            if (rng > 0.220 && rng < 0.230)
+                EntityFactory.CreateFly(name: "fly-" + Random.Shared.Next(100000), trigger_dead: () => killed_flies++);
         }
     }
 }

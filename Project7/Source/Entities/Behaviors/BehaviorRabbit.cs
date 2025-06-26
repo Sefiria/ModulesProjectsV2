@@ -1,7 +1,5 @@
 ﻿using System;
-using Project7.Source.Entities;
 using Tooling;
-using Tools.Inputs;
 
 namespace Project7.Source.Entities.Behaviors
 {

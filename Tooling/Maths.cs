@@ -176,7 +176,7 @@ namespace Tooling
         public static float ToRadians(this float degrees) => (float)Math.PI * degrees / 180F;
         public static float ToDegrees(this float radians) => radians / (float)Math.PI * 180F;
         public static PointF AngleToPointF(this float degrees) => new PointF((float)Math.Cos(degrees.ToRadians()), (float)Math.Sin(degrees.ToRadians()));
-        public static float GetAngle(this PointF pt) => ((float)Math.Atan2(pt.Y, pt.X)).ToDegrees();
+        public static float GetAngle(this PointF pt, bool in_degrees = true) => in_degrees ? ((float)Math.Atan2(pt.Y, pt.X)).ToDegrees() : ((float)Math.Atan2(pt.Y, pt.X));
         public static float GetAngleWith(this ICoords self, ICoords other) => new PointF(other.X - self.X, other.Y - self.Y).GetAngle();
 
         public static float Lerp(float v0, float v1, double t)

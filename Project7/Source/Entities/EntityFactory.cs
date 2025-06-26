@@ -25,5 +25,21 @@ namespace Project7.Source.Entities
             ));
             return pinou;
         }
+        public static Entity CreateFly(float x = -1F, float y = -1F, string name = null, Action trigger_dead = null)
+        {
+            var context = Game1.Instance;
+
+            var fly = new Entity(name);
+            fly.X = x != -1F ? x : Random.Shared.Next(10, context.ScreenWidth - 40);
+            fly.Y = y != -1F ? y : Random.Shared.Next(10, context.ScreenHeight - 40);
+            fly.AnimationController = new Tools.Animations.AnimationController(context.GraphicsDevice);
+            fly.AnimationController.AddAnimation(context.GraphicsDevice, "idle", assets_bindings.Resources["fly_idle"], 1);
+            fly.AnimationController.AddAnimation(context.GraphicsDevice, "flying", assets_bindings.Resources["fly_flying"]);
+            fly.AnimationController.CurrentAnimation = "idle";
+            fly.Behaviors.Add(new BehaviorFly(fly, "idle", "flying", trigger_dead));
+            fly.HasCollisions = false;
+            fly.ApplyRotationFromLook = true;
+            return fly;
+        }
     }
 }

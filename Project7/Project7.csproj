@@ -32,4 +32,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="Assets\Textures\fly_idle.png" />
+  </ItemGroup>
 </Project>

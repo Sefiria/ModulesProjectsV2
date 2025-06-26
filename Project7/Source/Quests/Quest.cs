@@ -9,12 +9,16 @@ namespace Project7.Source.Entities
     {
         Game1 Context => Game1.Instance;
 
+        public Guid ID;
+        public string Name;
         public bool Success = false;
         public RichParagraph TargetUI;
         public Action<Quest> ConditionChecker;
 
-        public Quest(Action<Quest> ConditionChecker, RichParagraph TargetUI)
+        public Quest(Action<Quest> ConditionChecker, RichParagraph TargetUI, string name = null)
         {
+            ID = Guid.NewGuid();
+            Name = name;
             this.TargetUI = TargetUI;
             this.ConditionChecker = ConditionChecker;
             Context.QuestManager.Quests.Add(this);
