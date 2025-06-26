@@ -83,10 +83,10 @@ namespace Project7
                 if (!quest.Success && (Entity.GetByName(pinou_gift_name)?.Behaviors.FirstOrDefault() as BehaviorRabbit)?.Trust == 1F)
                     quest.Validate("Apprivoise le pinou 1/1");
             });
-            QuestManager.AddQuest("Ticks d'existence 0/5000", (quest) =>
+            QuestManager.AddQuest("Ticks d'existence 0/1000", (quest) =>
             {
-                quest.SetText($"Ticks d'existence {Ticks}/5000");
-                if (Ticks >= 5000)
+                quest.SetText($"Ticks d'existence {Ticks}/1000");
+                if (Ticks >= 1000)
                     quest.Validate();
             });
         }
