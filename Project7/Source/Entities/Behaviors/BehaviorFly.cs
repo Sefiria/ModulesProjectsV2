@@ -62,29 +62,25 @@ namespace Project7.Source.Entities.Behaviors
 
         void Move()
         {
-            // Variation périodique de la direction pour simuler des virages
-            timer += 0.01f; // à ajuster selon le framerate
-            angle += (float)(Math.Sin(timer * 2.0f) * 0.1f); // permet une trajectoire courbée
+            timer += 0.01f;
+            angle += (float)(Math.Sin(timer * 2.0f) * 0.1f);
 
-            // Génère une direction de vol légèrement erratique autour d'un angle de base
-            float baseAngle = angle + (float)(rng.NextDouble() - 0.5) * 0.5f; // bruit aléatoire
+            float baseAngle = angle + (float)(rng.NextDouble() - 0.5) * 0.33f;
             float dx = (float)Math.Cos(baseAngle);
             float dy = (float)Math.Sin(baseAngle);
 
-            // Met à jour la direction et la vitesse
             Target.LookX = dx;
             Target.LookY = dy;
-            Target.Velocity = 2F; // ajustable
+            Target.Velocity = 2F;
         }
         void NormalBehavor()
         {
-            stateTimer += 0.05f; // Ajuste selon ton framerate
+            stateTimer += 0.01f;
 
             if (stateTimer >= stateDuration)
             {
-                // Changement aléatoire d'état
                 currentState = (FlyState)rng.Next(0, 3);
-                stateDuration = 0.5f + (float)rng.NextDouble() * 4f; // entre 0.5 et 2.5 sec
+                stateDuration = 0.5f + (float)rng.NextDouble() * 4f;
                 stateTimer = 0f;
             }
 
@@ -96,12 +92,11 @@ namespace Project7.Source.Entities.Behaviors
                     break;
 
                 case FlyState.Flying:
-                    Move(); // On garde la trajectoire courbée de ta méthode Move()
+                    Move();
                     Target.AnimationController.CurrentAnimation = anim_name_flying;
                     break;
 
                 case FlyState.Turning:
-                    // Change la direction de façon plus brutale
                     float angle = (float)(rng.NextDouble() * Math.PI * 2);
                     Target.LookX = (float)Math.Cos(angle);
                     Target.LookY = (float)Math.Sin(angle);
