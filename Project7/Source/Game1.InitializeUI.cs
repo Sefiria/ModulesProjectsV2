@@ -1,11 +1,10 @@
 ﻿using GeonBit.UI;
 using GeonBit.UI.Entities;
-using GeonBit.UI.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
+using Project7.Source.Entities.Behaviors;
 using System.Linq;
-using Tools;
+using Panel = GeonBit.UI.Entities.Panel;
 
 namespace Project7
 {
@@ -13,6 +12,8 @@ namespace Project7
     {
         Texture2D cursor_texture;
         //Paragraph test;
+
+
         void InitializeUI()
         {
             //test = new Paragraph("Test\nun\ndeux___________zd_______________zd", Anchor.TopLeft);

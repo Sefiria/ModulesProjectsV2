@@ -6,6 +6,10 @@ using Project7.Source.Entities.Behaviors;
 using Project7.Source.Events;
 using Project7.Source.Map;
 using Tools;
+using GeonBit.UI.Entities;
+using System.Security.Policy;
+using Entity = Project7.Source.Entities.Entity;
+using System.Linq;
 
 namespace Project7
 {
@@ -15,6 +19,9 @@ namespace Project7
         public EntityManager EntityManager;
         public EventManager EventManager;
         public ParticleManager ParticleManager;
+        public QuestManager QuestManager;
+
+        public string pinou_gift_name = "pinou_gift_name";
 
         void LoadUpdate()
         {
@@ -22,6 +29,7 @@ namespace Project7
             Init_Entities();
             Init_Particles();
             Init_Events();
+            Init_Quests();
         }
         void Init_Map()
         {
@@ -59,7 +67,7 @@ namespace Project7
             new GiftEvent(
                 "Voici un cadeau de bienvenue, attrape-le (drag&drop) avec ton curseur afin de le placer quelque part sur la map !",
                 GraphicsDevice.CropTexture2D(assets_bindings.Resources["pinou_idle"], 0, 0, 32, 32),
-                () => { (EntityFactory.CreateRabbit(MS.X, MS.Y).Behaviors[0] as BehaviorRabbit).Held = true; },
+                () => { (EntityFactory.CreateRabbit(MS.X, MS.Y, pinou_gift_name).Behaviors[0] as BehaviorRabbit).Held = true; },
                 panel_size: new Vector2(480, 240),
                 dragdrop_panel_size: new Vector2(64, 64),
                 dragdrop_panel_offset: new Vector2(0, 56),
@@ -67,11 +75,27 @@ namespace Project7
                 img_offset: new Vector2(-8, -8)
             );
         }
+        void Init_Quests()
+        {
+            QuestManager = new QuestManager();
+            QuestManager.AddQuest("Apprivoise le pinou 0/1", (quest) =>
+            {
+                if (!quest.Success && (Entity.GetByName(pinou_gift_name)?.Behaviors.FirstOrDefault() as BehaviorRabbit)?.Trust == 1F)
+                    quest.Validate("Apprivoise le pinou 1/1");
+            });
+            QuestManager.AddQuest("Ticks d'existence 0/5000", (quest) =>
+            {
+                quest.SetText($"Ticks d'existence {Ticks}/5000");
+                if (Ticks >= 5000)
+                    quest.Validate();
+            });
+        }
         void Update()
         {
             EntityManager.Update();
             ParticleManager.Update();
             EventManager.Update();
+            QuestManager.Update();
         }
     }
 }

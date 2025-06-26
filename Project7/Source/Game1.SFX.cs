@@ -10,6 +10,7 @@ namespace Project7
     public partial class Game1
     {
         public Sample SE_GIFT, SE_RABBII_GRIP, SE_RABBII_RELEASE;
+        public Sample SE_QUEST_SUCCESS;
         public List<Sample> SE_RABBII_JUMPS;
 
         private int activeSounds = 0;
@@ -28,6 +29,7 @@ namespace Project7
                 new Sample([0x32E1, 0x52E1, 0x23E1], SampleRates.MediumDown, Instruments.Triangle, 0.2),
                 new Sample([0x32E1, 0x62E1, 0x33E1], SampleRates.MediumDown, Instruments.Triangle, 0.2)
             };
+            SE_QUEST_SUCCESS = new Sample([0x44B1, 0x84B1, 0x45B1, 0x85B1, 0x46B1, 0x27B1], SampleRates.MediumDown, Instruments.Triangle, 0.2);
         }
         public async Task PlaySoundAsync(Sample se)
         {

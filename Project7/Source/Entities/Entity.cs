@@ -3,6 +3,7 @@ using Project7.Source.Entities.Behaviors;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Net.NetworkInformation;
 using System.Windows.Forms;
 using Tooling;
@@ -14,6 +15,8 @@ namespace Project7.Source.Entities
     {
         Game1 Context => Game1.Instance;
 
+        public Guid ID;
+        public string Name;
         public bool Exists;
         public AnimationController AnimationController;
         public List<Behavior> Behaviors;
@@ -25,10 +28,14 @@ namespace Project7.Source.Entities
         public RectangleF GetTextureBounds() => new RectangleF(X, Y, W, H);
         public int TileX => (int)((X + W / 2f) / Context.scale / Context.tilesize);
         public int TileY => (int)((Y + H / 2f) / Context.scale / Context.tilesize);
+        public static Entity GetByID(Guid id) => Game1.Instance.EntityManager.Entities.FirstOrDefault(e => e.ID == id);
+        public static Entity GetByName(string name) => Game1.Instance.EntityManager.Entities.FirstOrDefault(e => e.Name == name);
 
 
-        public Entity()
+        public Entity(string name = null)
         {
+            ID = Guid.NewGuid();
+            Name = name;
             Exists = true;
             Behaviors = new List<Behavior>();
             LookX = 1F;

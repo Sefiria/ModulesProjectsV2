@@ -8,7 +8,9 @@ namespace Project7.Source.Entities.Behaviors
 {
     public class Behavior
     {
-        public Behavior() { }
+        public Behavior()
+        {
+        }
         public virtual string Update() => "";
     }
 }

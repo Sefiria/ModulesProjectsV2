@@ -27,7 +27,6 @@ namespace Project7.Source.Events
         void Initialize(Vector2 panel_size, Vector2 dragdrop_panel_size, Vector2 dragdrop_panel_offset, Vector2 img_size, Vector2 img_offset)
         {
             panel = new Panel(panel_size);
-            UserInterface.Active.ShowCursor = true;
             panel.Draggable = true;
             UserInterface.Active.AddEntity(panel);
 

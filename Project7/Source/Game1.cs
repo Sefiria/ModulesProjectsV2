@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SharpDX.Direct3D9;
 using Tools.Inputs;
 
 namespace Project7
@@ -39,13 +40,13 @@ namespace Project7
             UserInterface.Active.IncludeCursorInRenderTarget = false;
             UserInterface.Active.ShowCursor = false;
             spriteBatch = spriteBatch ?? new SpriteBatch(GraphicsDevice);
-            InitializeUI();
             Graphics.Graphics.Instance.Initialize(GraphicsDevice, spriteBatch);
             base.Initialize();
 
             LoadSFX();
             LoadUpdate();
             LoadDraw();
+            InitializeUI();
         }
         protected override void Update(GameTime gameTime)
         {
@@ -79,12 +80,19 @@ namespace Project7
             Draw_Entities();
             Draw_Particles();
             Draw_Events();
-            // Draw Cursor
-            if(!UserInterface.Active.ShowCursor)
-                Graphics.Graphics.Instance.DrawTexture(cursor_texture, MS.X - 8, MS.Y - 16, 0F, 1F, false);
+
             Graphics.Graphics.Instance.EndDraw();
 
             UserInterface.Active.DrawMainRenderTarget(spriteBatch);
+
+            // Draw Cursor
+            if (!UserInterface.Active.ShowCursor)
+            {
+                Graphics.Graphics.Instance.BeginDraw(null, BlendState.NonPremultiplied);
+                spriteBatch.Draw(cursor_texture, new Vector2(MS.X - 8, MS.Y - 16), null, Color.White, 0F, Vector2.Zero, 1F, SpriteEffects.None, 0F);
+                Graphics.Graphics.Instance.EndDraw();
+            }
+
             base.Draw(gameTime);
         }
     }

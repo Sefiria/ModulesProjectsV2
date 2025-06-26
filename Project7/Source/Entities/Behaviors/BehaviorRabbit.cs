@@ -30,6 +30,7 @@ namespace Project7.Source.Entities.Behaviors
         Game1 Context => Game1.Instance;
 
         public BehaviorRabbit(Entity e, Action trigger_idle, Action trigger_run, Action trigger_holding)
+            : base()
         {
             Target = e;
             Trust = 0F;
@@ -73,8 +74,8 @@ namespace Project7.Source.Entities.Behaviors
                         float y;
                         for (int n = 0; n < 1 + Random.Shared.Next(2); n++)
                         {
-                            x = Target.X - 2F * Context.tilesize + 4F * Context.tilesize * (float)Random.Shared.NextDouble();
-                            y = Target.Y - 2F * Context.tilesize + 2F * Context.tilesize * (float)Random.Shared.NextDouble();
+                            x = Target.X - 1F * Context.tilesize + 2F * Context.tilesize * (float)Random.Shared.NextDouble();
+                            y = Target.Y - 1F * Context.tilesize + 1F * Context.tilesize * (float)Random.Shared.NextDouble();
                             new Particle(assets_bindings.Resources["ei_heart"], x, y, 1F + (float)Random.Shared.NextDouble());
                         }
                     }
