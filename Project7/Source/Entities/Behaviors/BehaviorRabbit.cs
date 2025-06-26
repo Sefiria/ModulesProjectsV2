@@ -7,20 +7,32 @@ namespace Project7.Source.Entities.Behaviors
 {
     public class BehaviorRabbit : Behavior
     {
-        public bool Held;
-
-        Entity Target;
+        float m_trust;
         Action trigger_idle, trigger_run, trigger_holding;
         bool mouse_near;
         int near_time, peaceful_time, next_random_peaceful_run, force_run_time;
-        float Trust = 0F;
         int emotion_heart_cooldown = 0;
+        bool can_play_atframe_escape_sound = true;
+
+        public Entity Target;
+        public bool Held;
+        public float Trust
+        {
+            get => m_trust;
+            set
+            {
+                m_trust = value;
+                if (m_trust < 0F) m_trust = 0F;
+                if (m_trust > 1F) m_trust = 1F;
+            }
+        }
 
         Game1 Context => Game1.Instance;
 
         public BehaviorRabbit(Entity e, Action trigger_idle, Action trigger_run, Action trigger_holding)
         {
             Target = e;
+            Trust = 0F;
             mouse_near = Held = false;
             near_time = int.MaxValue;
             peaceful_time = force_run_time = 0;
@@ -28,9 +40,6 @@ namespace Project7.Source.Entities.Behaviors
             this.trigger_idle = trigger_idle;
             this.trigger_run = trigger_run;
             this.trigger_holding = trigger_holding;
-            // DEBUG ==
-            Trust = 1F;
-            // == DEBUG
             Idle();
         }
         public override string Update()
@@ -42,20 +51,27 @@ namespace Project7.Source.Entities.Behaviors
         }
         void Emotions()
         {
-            if(Trust == 1F)
+            if (Trust == 1F && emotion_heart_cooldown > 0)
+                emotion_heart_cooldown--;
+            else
             {
-                if (emotion_heart_cooldown > 0)
-                    emotion_heart_cooldown--;
-                else
+                int inflate = 50;
+                bool mouse_near = Maths.CollisionPointCercle(Game1.MS.X, Game1.MS.Y, Target.X + Target.W / 2F, Target.Y + Target.W / 2F, Target.W / 2F + inflate);
+                if (mouse_near)
                 {
-                    int inflate = 50;
-                    bool mouse_near = Maths.CollisionPointCercle(Game1.MS.X, Game1.MS.Y, Target.X + Target.W / 2F, Target.Y + Target.W / 2F, Target.W / 2F + inflate);
-                    if (mouse_near)
+                    if (Trust < 1F)
                     {
-                        emotion_heart_cooldown += 500;
+                        if (!Held)
+                        {
+                            Trust += 0.0025F;
+                        }
+                    }
+                    else
+                    {
+                        emotion_heart_cooldown += 200;
                         float x;
                         float y;
-                        for (int n = 0; n < 1 + Random.Shared.Next(4); n++)
+                        for (int n = 0; n < 1 + Random.Shared.Next(2); n++)
                         {
                             x = Target.X - 2F * Context.tilesize + 4F * Context.tilesize * (float)Random.Shared.NextDouble();
                             y = Target.Y - 2F * Context.tilesize + 2F * Context.tilesize * (float)Random.Shared.NextDouble();
@@ -117,13 +133,24 @@ namespace Project7.Source.Entities.Behaviors
                 if (near_time > 35)
                 {
                     Run();
-                    Context.PlaySoundAsync(Context.SE_RABBII_JUMPS[Random.Shared.Next(0,3)]);
                     near_time = 0;
                     force_run_time = 0;
                     peaceful_time = 0;
                 }
                 else
+                {
                     near_time++;
+                    if ((int)Target.AnimationController.GetCurrentAnimation().FrameIndex == 1)
+                    {
+                        if (can_play_atframe_escape_sound)
+                        {
+                            Context.PlaySoundAsync(Context.SE_RABBII_JUMPS[Random.Shared.Next(0, 3)]);
+                            can_play_atframe_escape_sound = false;
+                        }
+                    }
+                    else
+                        can_play_atframe_escape_sound = true;
+                }
             }
 
             if (mouse_near == old_mouse_near && old_mouse_near == false)
