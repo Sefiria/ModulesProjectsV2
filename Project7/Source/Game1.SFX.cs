@@ -18,6 +18,7 @@ namespace Project7
 
         void LoadSFX()
         {
+            // 0xABCD : A=Pitch, B=Octave, C=Duration, D=Volume (from 0 (0) to F (15))
             SE_GIFT = new Sample([0x26A1, 0x46A1], SampleRates.MediumDown, Instruments.Triangle, 0.2);
             SE_RABBII_GRIP = new Sample([0x32F1, 0x62E1, 0x33E1, 0x63E1], SampleRates.MediumDown, Instruments.Triangle, 0.3);
             SE_RABBII_RELEASE = new Sample([0x63D1, 0x33D1, 0x62D1, 0x32D1], SampleRates.MediumDown, Instruments.Triangle, 0.2);
