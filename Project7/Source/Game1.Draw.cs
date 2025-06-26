@@ -73,6 +73,10 @@ namespace Project7
         {
             EntityManager.Draw(GraphicsDevice);
         }
+        void Draw_Particles()
+        {
+            ParticleManager.Draw(GraphicsDevice);
+        }
         void Draw_Events()
         {
             EventManager.Draw(GraphicsDevice);

@@ -39,12 +39,18 @@ namespace Tools.Animations
                 return Animations[CurrentAnimation].GetCurrentFrame();
             return null;
         }
+        public Animation? GetCurrentAnimation()
+        {
+            if (Animations.ContainsKey(CurrentAnimation))
+                return Animations[CurrentAnimation];
+            return null;
+        }
         /// <returns>true if loading is successful.</returns>
-        public bool AddAnimation(GraphicsDevice graphics, string AnimationName, string filename)
+        public bool AddAnimation(GraphicsDevice graphics, string AnimationName, string filename, int frames_count = 4)
         {
             if (Animations.ContainsKey(AnimationName))
                 return false;
-            Animations[AnimationName] = new Animation(graphics, filename);
+            Animations[AnimationName] = new Animation(graphics, filename, frames_count);
             return true;
         }
     }

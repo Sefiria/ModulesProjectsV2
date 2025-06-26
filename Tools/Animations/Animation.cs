@@ -13,9 +13,9 @@ namespace Tools.Animations
         public float FrameIndex;
         public float Speed = 10F;
 
-        public Animation(GraphicsDevice graphics, string filename)
+        public Animation(GraphicsDevice graphics, string filename, int frames_count)
         {
-            Frames = graphics.SplitTexturePerCount(filename, 4, 1).ToList();
+            Frames = graphics.SplitTexturePerCount(filename, frames_count, 1).ToList();
             FrameIndex = 0F;
         }
         public void Update()

@@ -13,6 +13,8 @@ namespace Project7.Source.Entities.Behaviors
         Action trigger_idle, trigger_run, trigger_holding;
         bool mouse_near;
         int near_time, peaceful_time, next_random_peaceful_run, force_run_time;
+        float Trust = 0F;
+        int emotion_heart_cooldown = 0;
 
         Game1 Context => Game1.Instance;
 
@@ -26,9 +28,44 @@ namespace Project7.Source.Entities.Behaviors
             this.trigger_idle = trigger_idle;
             this.trigger_run = trigger_run;
             this.trigger_holding = trigger_holding;
+            // DEBUG ==
+            Trust = 1F;
+            // == DEBUG
             Idle();
         }
         public override string Update()
+        {
+            string result = "";
+            Emotions();
+            result = Movement();
+            return result;
+        }
+        void Emotions()
+        {
+            if(Trust == 1F)
+            {
+                if (emotion_heart_cooldown > 0)
+                    emotion_heart_cooldown--;
+                else
+                {
+                    int inflate = 50;
+                    bool mouse_near = Maths.CollisionPointCercle(Game1.MS.X, Game1.MS.Y, Target.X + Target.W / 2F, Target.Y + Target.W / 2F, Target.W / 2F + inflate);
+                    if (mouse_near)
+                    {
+                        emotion_heart_cooldown += 500;
+                        float x;
+                        float y;
+                        for (int n = 0; n < 1 + Random.Shared.Next(4); n++)
+                        {
+                            x = Target.X - 2F * Context.tilesize + 4F * Context.tilesize * (float)Random.Shared.NextDouble();
+                            y = Target.Y - 2F * Context.tilesize + 2F * Context.tilesize * (float)Random.Shared.NextDouble();
+                            new Particle(assets_bindings.Resources["ei_heart"], x, y, 1F + (float)Random.Shared.NextDouble());
+                        }
+                    }
+                }
+            }
+        }
+        string Movement()
         {
             int inflate_harm = 50;
             int inflate_safe = 150;
@@ -75,7 +112,7 @@ namespace Project7.Source.Entities.Behaviors
                 peaceful_time = 0;
                 force_run_time = 0;
             }
-            else if (mouse_near)
+            else if (mouse_near && Trust < 1F)
             {
                 if (near_time > 35)
                 {

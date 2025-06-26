@@ -17,6 +17,7 @@ namespace Project7
             ["pinou_run"] = "Assets/Textures/pinou_run.png",
             ["pinou_hold"] = "Assets/Textures/pinou_hold.png",
             ["wooden_fence"] = "Assets/Textures/wooden_fence.png",
+            ["ei_heart"] = "Assets/Textures/EI/heart.png",
         };
     }
 }

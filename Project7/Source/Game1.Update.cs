@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project7.Source.Entities;
+using Project7.Source.Particles;
 using Project7.Source.Entities.Behaviors;
 using Project7.Source.Events;
 using Project7.Source.Map;
@@ -13,11 +14,13 @@ namespace Project7
         public Map Map;
         public EntityManager EntityManager;
         public EventManager EventManager;
+        public ParticleManager ParticleManager;
 
         void LoadUpdate()
         {
             Init_Map();
             Init_Entities();
+            Init_Particles();
             Init_Events();
         }
         void Init_Map()
@@ -46,6 +49,10 @@ namespace Project7
         {
             EntityManager = new EntityManager();
         }
+        void Init_Particles()
+        {
+            ParticleManager = new ParticleManager();
+        }
         void Init_Events()
         {
             EventManager = new EventManager();
@@ -63,6 +70,7 @@ namespace Project7
         void Update()
         {
             EntityManager.Update();
+            ParticleManager.Update();
             EventManager.Update();
         }
     }

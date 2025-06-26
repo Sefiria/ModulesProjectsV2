@@ -77,6 +77,7 @@ namespace Project7
 
             Graphics.Graphics.Instance.BeginDraw(null, BlendState.NonPremultiplied);
             Draw_Entities();
+            Draw_Particles();
             Draw_Events();
             // Draw Cursor
             if(!UserInterface.Active.ShowCursor)
