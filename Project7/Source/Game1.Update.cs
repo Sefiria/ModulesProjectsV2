@@ -27,6 +27,7 @@ namespace Project7
         private long afk_time = 0;
         private Point old_ms_pos;
         private int killed_flies = 0;
+        private bool first_time_a_fly_appears = true;
 
         void LoadUpdate()
         {
@@ -58,6 +59,20 @@ namespace Project7
             {
                 Map.SetTile(1, 2, y, 0);
                 Map.SetTile(1, 13, y, 0);
+            }
+
+
+            //flowers
+            int _x, _y;
+            for (int i = 0; i < Random.Shared.Next(5); i++)
+            {
+                do
+                {
+                    _x = 10 + Random.Shared.Next(15);
+                    _y = 12 + Random.Shared.Next(10);
+                }
+                while (Map[1, _x, _y] == 1);
+                Map.SetTile(1, _x, _y, 1);
             }
         }
         void Init_Entities()
@@ -97,13 +112,6 @@ namespace Project7
                 else
                     quest.SetText($"Ticks d'existence {Ticks}/1000");
             });
-            QuestManager.AddQuest("Ecrase des mouches 0/5", (quest) =>
-            {
-                if (killed_flies >= 5)
-                    quest.Validate("Ecrase des mouches 5/5");
-                else
-                    quest.SetText($"Ecrase des mouches {killed_flies}/5");
-            });
         }
         void Update()
         {
@@ -127,7 +135,20 @@ namespace Project7
                 return;
             var rng = Random.Shared.NextDouble();
             if (rng > 0.220 && rng < 0.230)
+            {
                 EntityFactory.CreateFly(name: "fly-" + Random.Shared.Next(100000), trigger_dead: () => killed_flies++);
+                if(first_time_a_fly_appears)
+                {
+                    first_time_a_fly_appears = false;
+                    QuestManager.AddQuest("Ecrase des mouches 0/5", (quest) =>
+                    {
+                        if (killed_flies >= 5)
+                            quest.Validate("Ecrase des mouches 5/5");
+                        else
+                            quest.SetText($"Ecrase des mouches {killed_flies}/5");
+                    });
+                }
+            }
         }
     }
 }

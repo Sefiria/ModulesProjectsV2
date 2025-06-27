@@ -17,7 +17,7 @@ namespace Project7
     {
         public float scale = 2F;
         public int tilesize = 16;
-        Texture2D[] TexGrass;
+        Texture2D[] TexGrass, Flowers;
         Texture2D TexWoodenFence;
         uint RNG = (uint)Random.Shared.NextInt64();
         public int screen_tiles_width => (int)(ScreenWidth / tilesize / scale);
@@ -26,6 +26,7 @@ namespace Project7
         void LoadDraw()
         {
             TexGrass = GraphicsDevice.SplitTexture(assets_bindings.Resources["tilesets/grass"], 0, 16);
+            Flowers = GraphicsDevice.SplitTexture(assets_bindings.Resources["flowers"], 16, 0);
             TexWoodenFence = Texture2D.FromFile(GraphicsDevice, assets_bindings.Resources["wooden_fence"]);
         }
 
@@ -61,6 +62,9 @@ namespace Project7
                     case 0:
                         tex = TexWoodenFence;
                         index = Autotile.Calculate(Map, z, x, y, "a,z,q,s,d,h,v,zq,zd,sq,sd,f,ns,nz,nd,nq");
+                        break;
+                    case 1:
+                        tex = Flowers[0];
                         break;
                 }
                 if (index == -2)
