@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
@@ -31,8 +31,6 @@
     <Content Include="Assets\**\*.*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="Assets\Textures\fly_idle.png" />
+    <Folder Include="Assets\SFX\" />
   </ItemGroup>
 </Project>

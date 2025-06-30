@@ -11,6 +11,8 @@ namespace SFX
 
     public class SFX
     {
+        public static readonly string SFX_AssetsFolder = $"{Directory.GetCurrentDirectory()}/Assets/SFX";
+
         public static async Task PlayAsync(Sample sample) => await PlayAsync(sample.Notes, sample.SampleRate, sample.Instrument, sample.GlobalVolume);
         public static async Task PlayAsync(int[] notes, int sampleRate, Instrument instrument, double global_volume)
         {
@@ -59,6 +61,71 @@ namespace SFX
                 }
             }
         }
+
+        public static async Task PlayAndCacheAsync(Sample sample) => await PlayAndCacheAsync(sample.Name, sample.Notes, sample.SampleRate, sample.Instrument, sample.GlobalVolume);
+        public static async Task PlayAndCacheAsync(string name, int[] notes, int sampleRate, Instrument instrument, double global_volume)
+        {
+            string filename = $"{SFX_AssetsFolder}/{name}.wav";
+
+            if (!File.Exists(filename))
+            {
+                double[] frequencies = ConvertNotesToFrequencies(notes);
+                int[] durations = ConvertNotesToDurations(notes);
+                double[] volumes = ConvertNotesToVolumes(notes);
+
+                WaveFormat waveFormat = new WaveFormat(sampleRate, 1);
+                using (MemoryStream memoryStream = new MemoryStream())
+                using (WaveFileWriter waveFileWriter = new WaveFileWriter(memoryStream, waveFormat))
+                {
+                    for (int i = 0; i < notes.Length; i++)
+                    {
+                        int totalSamples = sampleRate * durations[i] / 1000;
+                        int attackSamples = totalSamples / 10; // 10% de la durée pour l'attaque
+                        int releaseSamples = totalSamples / 10; // 10% de la durée pour la relâche
+
+                        for (int n = 0; n < totalSamples; n++)
+                        {
+                            double amplitude = frequencies[i] == 0 ? 0 : instrument(frequencies[i], volumes[i] * global_volume, n / (double)sampleRate);
+
+                            // Appliquer l'enveloppe d'attaque
+                            if (n < attackSamples)
+                            {
+                                amplitude *= (double)n / attackSamples;
+                            }
+                            // Appliquer l'enveloppe de relâche
+                            else if (n > totalSamples - releaseSamples)
+                            {
+                                amplitude *= (double)(totalSamples - n) / releaseSamples;
+                            }
+
+                            waveFileWriter.WriteSample((float)amplitude);
+                        }
+                    }
+
+                    waveFileWriter.Flush();
+                    memoryStream.Position = 0;
+
+                    File.WriteAllBytes(filename, memoryStream.ToArray());
+                }
+            }
+
+            PlayWavFileAsync(filename);
+        }
+
+        public static async Task PlayWavFileAsync(string filePath)
+        {
+            using (var audioFile = new AudioFileReader(filePath))
+            using (var outputDevice = new WaveOutEvent())
+            {
+                outputDevice.Init(audioFile);
+                outputDevice.Play();
+                while (outputDevice.PlaybackState == PlaybackState.Playing)
+                {
+                    await Task.Delay(100);
+                }
+            }
+        }
+
 
         static double[] ConvertNotesToFrequencies(int[] notes)
         {

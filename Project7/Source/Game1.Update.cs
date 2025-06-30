@@ -140,12 +140,12 @@ namespace Project7
                 if(first_time_a_fly_appears)
                 {
                     first_time_a_fly_appears = false;
-                    QuestManager.AddQuest("Ecrase des mouches 0/5", (quest) =>
+                    QuestManager.AddQuest("Ecrase des mouches 0/3", (quest) =>
                     {
-                        if (killed_flies >= 5)
-                            quest.Validate("Ecrase des mouches 5/5");
+                        if (killed_flies >= 3)
+                            quest.Validate("Ecrase des mouches 3/3");
                         else
-                            quest.SetText($"Ecrase des mouches {killed_flies}/5");
+                            quest.SetText($"Ecrase des mouches {killed_flies}/3");
                     });
                 }
             }

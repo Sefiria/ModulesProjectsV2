@@ -42,6 +42,12 @@ namespace Project7.Source.Particles
             if (Quests.Count > 0 && Quests.All(q => q.Success) && plan_clear_quests_in == 0)
             {
                 Quests.Clear();
+                var quest_text_paragraphs = panelQuests.Children.OfType<RichParagraph>().ToList();
+                foreach (var child_control in quest_text_paragraphs)
+                {
+                    panelQuests.RemoveChild(child_control);
+                    panelQuests.Size = new Vector2(panelQuests.Size.X, panelQuests.Size.Y - 35);
+                }
                 plan_clear_quests_in = -1;
             }
             else if (plan_clear_quests_in > 0)
