@@ -38,7 +38,7 @@ namespace Project7.Source.Entities
                 return;
             Success = true;
             SetText(newText);
-            Game1.Instance.PlaySoundAsync(Game1.Instance.SE_QUEST_SUCCESS);
+            SFX.SFX.PlaySoundAsync(Game1.Instance.SE_QUEST_SUCCESS);
         }
     }
 }

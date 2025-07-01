@@ -41,9 +41,9 @@ namespace Project7.Source.Entities.Behaviors
             if(!IsDead)
             {
                 if (Maths.CollisionPointCercle(Game1.MS.X, Game1.MS.Y, Target.X, Target.Y, Target.W + 50))
-                    Context.StartRepeatSoundAsync(ID.ToString(), Context.SE_FLY_FLYING, true);
+                    SFX.SFX.StartRepeatSoundAsync(ID.ToString(), Context.SE_FLY_FLYING, Context.Ticks, true);
                 else
-                    Context.StopRepeatSoundAsync(ID.ToString());
+                    SFX.SFX.StopRepeatSoundAsync(ID.ToString());
                 if (Maths.CollisionPointCercle(Game1.MS.X, Game1.MS.Y, Target.X, Target.Y, Target.W + 10))
                 {
                     if (Game1.MS.IsLeftPressed)
@@ -54,8 +54,8 @@ namespace Project7.Source.Entities.Behaviors
                         Target.LookX = 0F;
                         Target.LookY = 1F;
                         Target.Velocity = 6F;
-                        Context.StopRepeatSoundAsync(ID.ToString());
-                        Context.PlaySoundAsync(Context.SE_FLY_DYING);
+                        SFX.SFX.StopRepeatSoundAsync(ID.ToString());
+                        SFX.SFX.PlaySoundAsync(Context.SE_FLY_DYING);
                     }
                     else
                     {

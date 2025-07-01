@@ -13,6 +13,12 @@ namespace SFX
     {
         public static readonly string SFX_AssetsFolder = $"{Directory.GetCurrentDirectory()}/Assets/SFX";
 
+        public static int activeSounds = 0;
+        private static readonly object lockObject = new object();
+        public static int max_sfx = 4;
+        public static List<SFXTask> RepeatSFXTasks = new List<SFXTask>();
+
+
         public static async Task PlayAsync(Sample sample) => await PlayAsync(sample.Notes, sample.SampleRate, sample.Instrument, sample.GlobalVolume);
         public static async Task PlayAsync(int[] notes, int sampleRate, Instrument instrument, double global_volume)
         {
@@ -174,6 +180,40 @@ namespace SFX
             }
 
             return volumes;
+        }
+
+
+        public static async Task PlaySoundAsync(Sample se)
+        {
+            lock (lockObject)
+            {
+                if (activeSounds >= max_sfx)
+                    return;
+                activeSounds++;
+            }
+
+            await SFX.PlayAndCacheAsync(se);
+
+            lock (lockObject)
+            {
+                activeSounds--;
+            }
+        }
+        public static void StartRepeatSoundAsync(string name, Sample se, long current_ticks, bool fade_occurence = true, long timeout = 0)
+        {
+            if (RepeatSFXTasks.FirstOrDefault(t => t.Name == name) == null)
+            {
+                RepeatSFXTasks.Add(new SFXTask(name, se, current_ticks, fade_occurence));
+            }
+        }
+        public static void StopRepeatSoundAsync(string name)
+        {
+            var task = RepeatSFXTasks.FirstOrDefault(t => t.Name == name);
+            if (task != null)
+            {
+                task.Stop();
+                RepeatSFXTasks.Remove(task);
+            }
         }
     }
 

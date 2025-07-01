@@ -92,7 +92,7 @@ namespace Project7.Source.Entities.Behaviors
             {
                 if (!Held)
                 {
-                    Context.PlaySoundAsync(Context.SE_RABBII_GRIP);
+                    SFX.SFX.PlaySoundAsync(Context.SE_RABBII_GRIP);
                     trigger_holding?.Invoke();
                     Target.Velocity = 0F;
                     near_time = int.MaxValue;
@@ -109,7 +109,7 @@ namespace Project7.Source.Entities.Behaviors
 
             if(Held)
             {
-                Context.PlaySoundAsync(Context.SE_RABBII_RELEASE);
+                SFX.SFX.PlaySoundAsync(Context.SE_RABBII_RELEASE);
                 Held = false;
                 Idle();
                 near_time = 0;
@@ -143,7 +143,7 @@ namespace Project7.Source.Entities.Behaviors
                     {
                         if (can_play_atframe_escape_sound)
                         {
-                            Context.PlaySoundAsync(Context.SE_RABBII_JUMPS[Random.Shared.Next(0, 3)]);
+                            SFX.SFX.PlaySoundAsync(Context.SE_RABBII_JUMPS[Random.Shared.Next(0, 3)]);
                             can_play_atframe_escape_sound = false;
                         }
                     }
