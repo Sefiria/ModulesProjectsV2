@@ -30,7 +30,7 @@ namespace Project7
                 new Sample([0x32E2, 0x62E2, 0x33E2], SampleRates.MediumDown, Instruments.Triangle, 0.2, Name: "SE_RABBII_JUMPS_2")
             };
             SE_QUEST_SUCCESS = new Sample([0x44B2, 0x84B2, 0x45B2, 0x85B2, 0x46B2, 0x27B2], SampleRates.MediumDown, Instruments.Triangle, 0.2, "SE_QUEST_SUCCESS");
-            SE_FLY_FLYING = new Sample([0x523B], SampleRates.VeryLow, Instruments.Saw, 0.05, "SE_FLY_FLYING");
+            SE_FLY_FLYING = new Sample([0x523B], SampleRates.VeryLow, Instruments.Saw, 0.02, "SE_FLY_FLYING");
             SE_FLY_DYING = new Sample([0x32B2, 0x12B2, 0x51B2], SampleRates.MediumDown, Instruments.Triangle, 0.2, "SE_FLY_DYING");
         }
     }
