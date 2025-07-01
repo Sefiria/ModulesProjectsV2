@@ -65,8 +65,16 @@ namespace SFX
         public static async Task PlayAndCacheAsync(Sample sample) => await PlayAndCacheAsync(sample.Name, sample.Notes, sample.SampleRate, sample.Instrument, sample.GlobalVolume);
         public static async Task PlayAndCacheAsync(string name, int[] notes, int sampleRate, Instrument instrument, double global_volume)
         {
-            string filename = $"{SFX_AssetsFolder}/{name}.wav";
+            CreateWaveFile(name, notes, sampleRate, instrument, global_volume);
 
+            string filename = $"{SFX_AssetsFolder}/{name}.wav";
+            await PlayWavFileAsync(filename);
+        }
+
+        public static void CreateWaveFile(Sample sample) => CreateWaveFile(sample.Name, sample.Notes, sample.SampleRate, sample.Instrument, sample.GlobalVolume);
+        public static void CreateWaveFile(string name, int[] notes, int sampleRate, Instrument instrument, double global_volume)
+        {
+            string filename = $"{SFX_AssetsFolder}/{name}.wav";
             if (!File.Exists(filename))
             {
                 double[] frequencies = ConvertNotesToFrequencies(notes);
@@ -85,7 +93,8 @@ namespace SFX
 
                         for (int n = 0; n < totalSamples; n++)
                         {
-                            double amplitude = frequencies[i] == 0 ? 0 : instrument(frequencies[i], volumes[i] * global_volume, n / (double)sampleRate);
+                            double time = n / (double)sampleRate;
+                            double amplitude = instrument(frequencies[i], volumes[i] * global_volume, time);
 
                             // Appliquer l'enveloppe d'attaque
                             if (n < attackSamples)
@@ -108,8 +117,6 @@ namespace SFX
                     File.WriteAllBytes(filename, memoryStream.ToArray());
                 }
             }
-
-            PlayWavFileAsync(filename);
         }
 
         public static async Task PlayWavFileAsync(string filePath)
@@ -119,13 +126,9 @@ namespace SFX
             {
                 outputDevice.Init(audioFile);
                 outputDevice.Play();
-                while (outputDevice.PlaybackState == PlaybackState.Playing)
-                {
-                    await Task.Delay(100);
-                }
+                await Task.Delay(audioFile.TotalTime);
             }
         }
-
 
         static double[] ConvertNotesToFrequencies(int[] notes)
         {
@@ -154,7 +157,7 @@ namespace SFX
             for (int i = 0; i < notes.Length; i++)
             {
                 int durationIndex = notes[i] & 0x0F; // Récupérer la durée (L)
-                durations[i] = durationMapping[durationIndex];
+                durations[i] = durationMapping[durationIndex] / 2;
             }
 
             return durations;
@@ -203,6 +206,17 @@ namespace SFX
         public static double Noise(double frequency, double volume, double time)
         {
             return volume * (2.0 * random.NextDouble() - 1.0);
+        }
+        public static double HybridTriangleGlissando(double frequency, double volume, double time)
+        {
+            double duration = 0.5;
+            double startFrequency = frequency;
+            double endFrequency = frequency;
+            double currentFrequency = startFrequency + (endFrequency - startFrequency) * (time / duration);
+            double triangle = 4.0 * Math.Abs((time * currentFrequency) % 1.0 - 0.5) - 1.0;
+            double sine = Math.Sin(2 * Math.PI * currentFrequency * time);
+            double noise = volume * (2.0 * random.NextDouble() - 1.0);
+            return volume * (0.4 * triangle + 0.4 * sine + 0.2 * noise);
         }
     }
     public static class SampleRates

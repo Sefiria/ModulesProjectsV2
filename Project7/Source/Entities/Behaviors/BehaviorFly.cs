@@ -1,5 +1,7 @@
-﻿using System;
+﻿using SFX;
+using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Tooling;
 
 namespace Project7.Source.Entities.Behaviors
@@ -20,10 +22,13 @@ namespace Project7.Source.Entities.Behaviors
         float stateDuration = 1f;
         enum FlyState { Idle, Flying, Turning }
         FlyState currentState = FlyState.Idle;
+        Task SFX_Flying = null;
+        Guid ID;
 
         public BehaviorFly(Entity e, string anim_name_idle, string anim_name_flying, Action trigger_dead = null)
             : base()
         {
+            ID = Guid.NewGuid();
             Target = e;
             IsDead = false;
             Target.Velocity = 0F;
@@ -35,6 +40,10 @@ namespace Project7.Source.Entities.Behaviors
         {
             if(!IsDead)
             {
+                if (Maths.CollisionPointCercle(Game1.MS.X, Game1.MS.Y, Target.X, Target.Y, Target.W + 50))
+                    Context.StartRepeatSoundAsync(ID.ToString(), Context.SE_FLY_FLYING, true);
+                else
+                    Context.StopRepeatSoundAsync(ID.ToString());
                 if (Maths.CollisionPointCercle(Game1.MS.X, Game1.MS.Y, Target.X, Target.Y, Target.W + 10))
                 {
                     if (Game1.MS.IsLeftPressed)
@@ -45,10 +54,13 @@ namespace Project7.Source.Entities.Behaviors
                         Target.LookX = 0F;
                         Target.LookY = 1F;
                         Target.Velocity = 6F;
-                        Context.PlaySoundAsync(Context.SE_KILLED_FLY);
+                        Context.StopRepeatSoundAsync(ID.ToString());
+                        Context.PlaySoundAsync(Context.SE_FLY_DYING);
                     }
                     else
+                    {
                         Move();
+                    }
                 }
                 else
                 {
@@ -56,7 +68,9 @@ namespace Project7.Source.Entities.Behaviors
                 }
             }
             if (Target.Y < 0 || Target.Y > Context.ScreenHeight || Target.X < 0 || Target.X > Context.ScreenWidth)
+            {
                 Target.Exists = false;
+            }
             return "";
         }
 

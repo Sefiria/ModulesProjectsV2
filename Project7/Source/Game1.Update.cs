@@ -131,7 +131,7 @@ namespace Project7
 
         private void ManageFlies()
         {
-            if (afk_time < 300 || EntityManager.Entities.Count(e => e.Name.StartsWith("fly-")) >= CONST_MAX_FLIES - 1)
+            if (/*afk_time < 300 ||*/ EntityManager.Entities.Count(e => e.Name.StartsWith("fly-")) >= CONST_MAX_FLIES - 1)
                 return;
             var rng = Random.Shared.NextDouble();
             if (rng > 0.220 && rng < 0.230)
