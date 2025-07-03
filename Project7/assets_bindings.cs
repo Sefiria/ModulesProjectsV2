@@ -12,7 +12,8 @@ namespace Project7
         public static readonly Dictionary<string, string> Resources = new Dictionary<string, string>()
         {
             ["tilesets/grass"] = "Assets/Textures/Tilesets/grass.png",
-            ["flowers"] = "Assets/Textures/Tilesets/flowers.png",
+            ["tilesets/flowers"] = "Assets/Textures/Tilesets/flowers.png",
+            ["tilesets/arcade"] = "Assets/Textures/Tilesets/arcade.png",
             ["cursor"] = "Assets/Textures/UI/cursor.png",
             ["pinou_idle"] = "Assets/Textures/pinou_idle.png",
             ["pinou_run"] = "Assets/Textures/pinou_run.png",

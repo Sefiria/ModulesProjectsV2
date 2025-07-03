@@ -61,7 +61,6 @@ namespace Project7
                 Map.SetTile(1, 13, y, 0);
             }
 
-
             //flowers
             int _x, _y;
             for (int i = 0; i < Random.Shared.Next(5); i++)
@@ -71,13 +70,14 @@ namespace Project7
                     _x = 10 + Random.Shared.Next(15);
                     _y = 12 + Random.Shared.Next(10);
                 }
-                while (Map[1, _x, _y] == 1);
+                while (Map[1, _x, _y] == 0);
                 Map.SetTile(1, _x, _y, 1);
             }
         }
         void Init_Entities()
         {
             EntityManager = new EntityManager();
+            EntityFactory.CreateArcade(13 * tilesize, 3 * tilesize, "arcade");
         }
         void Init_Particles()
         {

@@ -17,8 +17,8 @@ namespace Project7
     {
         public float scale = 2F;
         public int tilesize = 16;
-        Texture2D[] TexGrass, Flowers;
-        Texture2D TexWoodenFence;
+        Texture2D[] TexGrass, TexFlowers;
+        Texture2D TexWoodenFence, TexArcade;
         uint RNG = (uint)Random.Shared.NextInt64();
         public int screen_tiles_width => (int)(ScreenWidth / tilesize / scale);
         public int screen_tiles_height => (int)(ScreenHeight / tilesize / scale);
@@ -26,8 +26,9 @@ namespace Project7
         void LoadDraw()
         {
             TexGrass = GraphicsDevice.SplitTexture(assets_bindings.Resources["tilesets/grass"], 0, 16);
-            Flowers = GraphicsDevice.SplitTexture(assets_bindings.Resources["flowers"], 16, 0);
+            TexFlowers = GraphicsDevice.SplitTexture(assets_bindings.Resources["tilesets/flowers"], 16, 0);
             TexWoodenFence = Texture2D.FromFile(GraphicsDevice, assets_bindings.Resources["wooden_fence"]);
+            TexArcade = Texture2D.FromFile(GraphicsDevice, assets_bindings.Resources["tilesets/arcade"]);
         }
 
         void Draw_Tiles()
@@ -56,6 +57,8 @@ namespace Project7
             {
                 Texture2D tex = null;
                 int index = -2;
+                DrawStyle drawstyle = DrawStyle.Static;
+                int w = 16, h = 16;
                 switch (Map[z, x, y])
                 {
                     default:
@@ -64,13 +67,18 @@ namespace Project7
                         index = Autotile.Calculate(Map, z, x, y, "a,z,q,s,d,h,v,zq,zd,sq,sd,f,ns,nz,nd,nq");
                         break;
                     case 1:
-                        tex = Flowers[0];
+                        tex = TexFlowers[0];
                         break;
+                    //case 2:
+                    //    tex = TexArcade;
+                    //    drawstyle = DrawStyle.Framed;
+                    //    h = 32;
+                    //    break;
                 }
                 if (index == -2)
-                    draw(tex, x * tilesize * scale, y * tilesize * scale, 16, 16, DrawStyle.Static);
+                    draw(tex, x * tilesize * scale, y * tilesize * scale, w, h, drawstyle);
                 else if (index > -1)
-                    draw(tex, x * tilesize * scale, y * tilesize * scale, 16, 16, DrawStyle.Static, index);
+                    draw(tex, x * tilesize * scale, y * tilesize * scale, w, h, drawstyle, index);
             }
         }
         void Draw_Entities()

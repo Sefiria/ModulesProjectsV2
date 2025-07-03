@@ -107,6 +107,26 @@ namespace Tools
             subTexture.SetData(data);
             return subTexture;
         }
+        public static Texture2D CloneAsWhite(this GraphicsDevice graphicsDevice, Texture2D original)
+        {
+            // Récupérer les données de pixels
+            Color[] data = new Color[original.Width * original.Height];
+            original.GetData(data);
+
+            // Modifier chaque pixel : blanc avec alpha d'origine
+            for (int i = 0; i < data.Length; i++)
+            {
+                byte alpha = data[i].A;
+                data[i] = new Color((byte)255, (byte)255, (byte)255, alpha);
+            }
+
+            // Créer une nouvelle texture et y appliquer les données modifiées
+            Texture2D whiteTexture = new Texture2D(graphicsDevice, original.Width, original.Height);
+            whiteTexture.SetData(data);
+
+            return whiteTexture;
+        }
+
     }
 
 }

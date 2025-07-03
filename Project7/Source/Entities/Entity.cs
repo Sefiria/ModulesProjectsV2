@@ -6,7 +6,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using Tooling;
+using Tools;
 using AnimationController = Tools.Animations.AnimationController;
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace Project7.Source.Entities
 {
@@ -19,12 +21,16 @@ namespace Project7.Source.Entities
         public bool Exists;
         public AnimationController AnimationController;
         public List<Behavior> Behaviors;
-        public float X, Y;
+        public float X, Y, scale = 1F;
         public float LookX, LookY, Velocity;
         public bool HasCollisions = true, ApplyRotationFromLook = false;
+        public bool OutlineWhenHover = false, ForceOutline = false;
 
-        public float W => AnimationController?.GetCurrentFrame()?.Width ?? 0F;
-        public float H => AnimationController?.GetCurrentFrame()?.Height ?? 0F;
+        private bool Outlined = false;
+        private Texture2D CachedWhiteTex = null;
+
+        public float W => AnimationController?.GetCurrentFrame()?.Width * scale ?? 0F;
+        public float H => AnimationController?.GetCurrentFrame()?.Height * scale ?? 0F;
         public RectangleF GetTextureBounds() => new RectangleF(X, Y, W, H);
         public int TileX => (int)((X + W / 2f) / Context.scale / Context.tilesize);
         public int TileY => (int)((Y + H / 2f) / Context.scale / Context.tilesize);
@@ -47,6 +53,8 @@ namespace Project7.Source.Entities
         {
             AnimationController?.Update();
             Behaviors.ForEach(b => b.Update());
+
+            Outlined = ForceOutline || (OutlineWhenHover && Maths.CollisionPointBox(Game1.MS.X, Game1.MS.Y, new Box(X, Y, W, H)));
 
             var vn = Maths.Normalized(new PointF(LookX, LookY));
             float delta_x = vn.X * Velocity;
@@ -110,7 +118,14 @@ namespace Project7.Source.Entities
             Texture2D tex = AnimationController?.GetCurrentFrame();
             if (tex != null)
             {
-                Graphics.Graphics.Instance.DrawTexture(tex, X, Y, ApplyRotationFromLook ? Maths.GetAngle(new PointF(LookX, LookY), false) + MathF.PI / 2F : 0F, 1F, LookX < 0F, 0F, ApplyRotationFromLook ? new Vector2(W / 2f, H / 2f) : null);
+                if (Outlined)
+                {
+                    if(CachedWhiteTex == null)
+                        CachedWhiteTex = graphics.CloneAsWhite(tex);
+                    float thin = 0.01f;
+                    Context.spriteBatch.Draw(CachedWhiteTex, new Vector2(X - W * scale * thin, Y - H * scale * thin), tex.Bounds, Color.White, rotation: 0f, Vector2.Zero, scale * (1F + thin * 4F), SpriteEffects.None, 0f);
+                }
+                Graphics.Graphics.Instance.DrawTexture(tex, X, Y, ApplyRotationFromLook ? Maths.GetAngle(new PointF(LookX, LookY), false) + MathF.PI / 2F : 0F, scale, LookX < 0F, 0F, ApplyRotationFromLook ? new Vector2(W / 2f, H / 2f) : null);
             }
         }
     }
