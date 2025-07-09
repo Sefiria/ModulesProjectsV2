@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Project7.Source.Arcade;
 using SharpDX.Direct3D9;
 using Tools.Inputs;
 
@@ -19,6 +20,28 @@ namespace Project7
         public Texture2D tex_tilemap = null;
         public int ScreenWidth = 1024;
         public int ScreenHeight = 720;
+        public ArcadeMain Arcade;
+
+
+
+        bool arcade_running = false;
+        public void RunArcade()
+        {
+            UserInterface.Active.Root.Visible = false;
+            arcade_running = true;
+            if (Arcade != null)
+                return;
+            Arcade = new ArcadeMain();
+            Arcade.Initialize();
+        }
+        public void ExitArcade()
+        {
+            arcade_running = false;
+            Arcade = null;
+            UserInterface.Active.Root.Visible = true;
+        }
+
+
 
         public Game1()
         {
@@ -56,10 +79,18 @@ namespace Project7
             KB.Update();
             MS.Update();
 
-            Update();
-            UpdateUI();
+            if (arcade_running)
+            {
+                Arcade.Update();
+            }
+            else
+            {
+                Update();
+                UpdateUI();
+            }
 
             UserInterface.Active.Update(gameTime);
+
             base.Update(gameTime);
 
             Ticks++;
@@ -68,20 +99,29 @@ namespace Project7
         {
             UserInterface.Active.Draw(spriteBatch);
 
-            // == AlphaBlend
+            if (arcade_running)
+            {
+                Graphics.Graphics.Instance.BeginDraw(null, BlendState.NonPremultiplied);
+                Arcade.Draw(GraphicsDevice);
+                Graphics.Graphics.Instance.EndDraw();
+            }
+            else
+            {
+                // == AlphaBlend
 
-            Graphics.Graphics.Instance.BeginDraw(Color.Black, BlendState.AlphaBlend);
-            Draw_Tiles();
-            Graphics.Graphics.Instance.EndDraw();
+                Graphics.Graphics.Instance.BeginDraw(Color.Black, BlendState.AlphaBlend);
+                Draw_Tiles();
+                Graphics.Graphics.Instance.EndDraw();
 
-            // == NonPremultiplied
+                // == NonPremultiplied
 
-            Graphics.Graphics.Instance.BeginDraw(null, BlendState.NonPremultiplied);
-            Draw_Entities();
-            Draw_Particles();
-            Draw_Events();
+                Graphics.Graphics.Instance.BeginDraw(null, BlendState.NonPremultiplied);
+                Draw_Entities();
+                Draw_Particles();
+                Draw_Events();
 
-            Graphics.Graphics.Instance.EndDraw();
+                Graphics.Graphics.Instance.EndDraw();
+            }
 
             UserInterface.Active.DrawMainRenderTarget(spriteBatch);
 

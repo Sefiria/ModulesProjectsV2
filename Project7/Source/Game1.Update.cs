@@ -77,7 +77,7 @@ namespace Project7
         void Init_Entities()
         {
             EntityManager = new EntityManager();
-            EntityFactory.CreateArcade(13 * tilesize, 3 * tilesize, "arcade");
+            EntityFactory.CreateArcade(18 * tilesize * scale, 3 * tilesize, "arcade");
         }
         void Init_Particles()
         {

@@ -33,6 +33,8 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Assets\Textures\arcade\space\bullet.png" />
+    <None Remove="Assets\Textures\arcade\space\mobship.png" />
     <None Remove="Assets\Textures\Tilesets\arcade.png" />
   </ItemGroup>
   <ItemGroup>

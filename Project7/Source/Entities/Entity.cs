@@ -4,6 +4,7 @@ using Project7.Source.Entities.Behaviors;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Text;
 using System.Linq;
 using Tooling;
 using Tools;
@@ -26,7 +27,8 @@ namespace Project7.Source.Entities
         public bool HasCollisions = true, ApplyRotationFromLook = false;
         public bool OutlineWhenHover = false, ForceOutline = false;
 
-        private bool Outlined = false;
+        public bool Outlined { get; private set; } = false;
+
         private Texture2D CachedWhiteTex = null;
 
         public float W => AnimationController?.GetCurrentFrame()?.Width * scale ?? 0F;

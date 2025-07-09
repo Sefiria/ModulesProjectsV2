@@ -22,6 +22,12 @@ namespace Project7
             ["ei_heart"] = "Assets/Textures/EI/heart.png",
             ["fly_idle"] = "Assets/Textures/fly_idle.png",
             ["fly_flying"] = "Assets/Textures/fly_flying.png",
+
+            ["arcade/null"] = "Assets/Textures/arcade/null.png",
+            ["arcade/space/starship"] = "Assets/Textures/arcade/space/starship.png",
+            ["arcade/space/mobship"] = "Assets/Textures/arcade/space/mobship.png",
+            ["arcade/space/bullet"] = "Assets/Textures/arcade/space/bullet.png",
+            ["arcade/space/pu_zqsd"] = "Assets/Textures/arcade/space/pu_zqsd.png",
         };
     }
 }

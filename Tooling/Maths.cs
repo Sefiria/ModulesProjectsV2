@@ -414,6 +414,7 @@ namespace Tooling
         public static bool CollisionPointCercle(PointF point, Circle C) => CollisionPointCercle(point.X, point.Y, C);
         public static bool CollisionPointCercle(PointF point, float CX, float CY, float CR) => CollisionPointCercle(point.X, point.Y, CX, CY, CR);
 
+        public static bool CollisionPointBox(Point point, Box box) => CollisionPointBox(point.X, point.Y, box);
         public static bool CollisionPointBox(float curseur_x, float curseur_y, Box box)
         {
             if (curseur_x >= box.x
@@ -424,6 +425,7 @@ namespace Tooling
             else
                 return false;
         }
+        /// <returns>(0)no collision (1)corner top-left (2)corner bottom-left (3)corner top-right (4)corner bottom-right (5)one inside the other (6)segment top (7)segment right (8)segment bottom (9)segment left</returns>
         public static int CollisionCercleBox(Circle C1, Box box)
         {
             Box boxCercle = new Box(C1);  // retourner la bounding box de l'image porteuse, ou calculer la bounding box.
