@@ -10,7 +10,7 @@ namespace Project7.Source.Arcade.scenes.space
     {
         public enum PowerUps
         {
-            Zqsd,
+            Zqsd, Cooldown, Shot
         }
     }
 }

@@ -48,5 +48,10 @@ namespace Tools.Animations
             Animations[AnimationName] = new Animation(graphics, filename, frames_count);
             return true;
         }
+        public void AddAnimation(GraphicsDevice graphics, string AnimationName, List<Texture2D> frames)
+        {
+            if (!Animations.ContainsKey(AnimationName))
+                Animations[AnimationName] = new Animation(graphics, frames);
+        }
     }
 }

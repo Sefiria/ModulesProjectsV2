@@ -74,7 +74,7 @@ namespace Project7.Source.Entities.Behaviors
                         {
                             x = Target.X - 1F * Context.tilesize + 2F * Context.tilesize * (float)Random.Shared.NextDouble();
                             y = Target.Y - 1F * Context.tilesize + 1F * Context.tilesize * (float)Random.Shared.NextDouble();
-                            new Particle(assets_bindings.Resources["ei_heart"], x, y, 1F + (float)Random.Shared.NextDouble());
+                            new Particle(ResourcesLoader.ei_heart, x, y, 1F + (float)Random.Shared.NextDouble());
                         }
                     }
                 }

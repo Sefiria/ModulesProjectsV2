@@ -18,7 +18,9 @@ namespace Project7.Source.Events
         {
             Message = message;
             GiftTexture = giftTexture;
-            Action = (e) => { action(); SFX.SFX.PlaySoundAsync(Game1.Instance.SE_GIFT); Dispose(); };
+            Action = (e) => {
+                
+                action(); System.Threading.Tasks.Task.Run(() => SFX.SFX.PlaySoundAsync(Game1.Instance.SE_GIFT)); Dispose(); };
 
             Initialize(panel_size, dragdrop_panel_size, dragdrop_panel_offset, img_size, img_offset);
 

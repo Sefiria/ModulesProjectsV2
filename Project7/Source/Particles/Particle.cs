@@ -26,6 +26,17 @@ namespace Project7.Source.Entities
             Scale = scale;
             Context.ParticleManager.Particles.Add(this);
         }
+        public Particle(List<Texture2D> frames, float x, float y, float scale = 1F)
+        {
+            Exists = true;
+            AnimationController = new AnimationController(Context.GraphicsDevice);
+            AnimationController.AddAnimation(Context.GraphicsDevice, "anim", frames);
+            AnimationController.CurrentAnimation = "anim";
+            X = x;
+            Y = y;
+            Scale = scale;
+            Context.ParticleManager.Particles.Add(this);
+        }
         public void Update()
         {
             AnimationController?.Update();

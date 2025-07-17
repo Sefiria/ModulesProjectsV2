@@ -66,6 +66,7 @@ namespace Project7
             Graphics.Graphics.Instance.Initialize(GraphicsDevice, spriteBatch);
             base.Initialize();
 
+            ResourcesLoader.Load(GraphicsDevice);
             LoadSFX();
             LoadUpdate();
             LoadDraw();

@@ -1,5 +1,7 @@
 ﻿using Project7.Source.Entities.Behaviors;
 using System;
+using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace Project7.Source.Entities
 {
@@ -14,9 +16,9 @@ namespace Project7.Source.Entities
             pinou.X = x != -1F ? x : Random.Shared.Next(10, context.ScreenWidth - 40);
             pinou.Y = y != -1F ? y : Random.Shared.Next(10, context.ScreenHeight - 40);
             pinou.AnimationController = new Tools.Animations.AnimationController(context.GraphicsDevice);
-            pinou.AnimationController.AddAnimation(context.GraphicsDevice, "idle", assets_bindings.Resources["pinou_idle"]);
-            pinou.AnimationController.AddAnimation(context.GraphicsDevice, "run", assets_bindings.Resources["pinou_run"]);
-            pinou.AnimationController.AddAnimation(context.GraphicsDevice, "hold", assets_bindings.Resources["pinou_hold"]);
+            pinou.AnimationController.AddAnimation(context.GraphicsDevice, "idle", ResourcesLoader.pinou_idle);
+            pinou.AnimationController.AddAnimation(context.GraphicsDevice, "run", ResourcesLoader.pinou_run);
+            pinou.AnimationController.AddAnimation(context.GraphicsDevice, "hold", ResourcesLoader.pinou_hold);
             pinou.AnimationController.CurrentAnimation = "idle";
             pinou.Behaviors.Add(new BehaviorRabbit(pinou,
                 () => pinou.AnimationController.CurrentAnimation = "idle",
@@ -33,8 +35,8 @@ namespace Project7.Source.Entities
             fly.X = x != -1F ? x : Random.Shared.Next(10, context.ScreenWidth - 40);
             fly.Y = y != -1F ? y : Random.Shared.Next(10, context.ScreenHeight - 40);
             fly.AnimationController = new Tools.Animations.AnimationController(context.GraphicsDevice);
-            fly.AnimationController.AddAnimation(context.GraphicsDevice, "idle", assets_bindings.Resources["fly_idle"], 1);
-            fly.AnimationController.AddAnimation(context.GraphicsDevice, "flying", assets_bindings.Resources["fly_flying"]);
+            fly.AnimationController.AddAnimation(context.GraphicsDevice, "idle", ResourcesLoader.fly_idle);
+            fly.AnimationController.AddAnimation(context.GraphicsDevice, "flying", ResourcesLoader.fly_flying);
             fly.AnimationController.CurrentAnimation = "idle";
             fly.Behaviors.Add(new BehaviorFly(fly, "idle", "flying", trigger_dead));
             fly.HasCollisions = false;
@@ -50,7 +52,7 @@ namespace Project7.Source.Entities
             arcade.Y = y != -1F ? y : Random.Shared.Next(10, context.ScreenHeight - 40);
             arcade.scale = Game1.Instance.scale;
             arcade.AnimationController = new Tools.Animations.AnimationController(context.GraphicsDevice);
-            arcade.AnimationController.AddAnimation(context.GraphicsDevice, "idle", assets_bindings.Resources["tilesets/arcade"], 4);
+            arcade.AnimationController.AddAnimation(context.GraphicsDevice, "idle", ResourcesLoader.tilesets_arcade);
             arcade.AnimationController.CurrentAnimation = "idle";
             arcade.Behaviors.Add(new BehaviorArcade(arcade));
             arcade.OutlineWhenHover = true;

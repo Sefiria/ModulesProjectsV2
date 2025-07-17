@@ -18,12 +18,16 @@ namespace Project7.Source.Arcade
         public Starship Starship;
         Dictionary<PowerUps, int> PowerUpsSpawned = new Dictionary<PowerUps, int>();
 
+        int prev_killcount = 0;
+
         public void Initialize()
         {
             ArcadeMain.instance.Textures.Add(Texture2D.FromFile(Game1.Instance.GraphicsDevice, assets_bindings.Resources["arcade/space/starship"]));
             ArcadeMain.instance.Textures.Add(Texture2D.FromFile(Game1.Instance.GraphicsDevice, assets_bindings.Resources["arcade/space/mobship"]));
             ArcadeMain.instance.Textures.Add(Texture2D.FromFile(Game1.Instance.GraphicsDevice, assets_bindings.Resources["arcade/space/bullet"]));
             ArcadeMain.instance.Textures.Add(Texture2D.FromFile(Game1.Instance.GraphicsDevice, assets_bindings.Resources["arcade/space/pu_zqsd"]));
+            ArcadeMain.instance.Textures.Add(Texture2D.FromFile(Game1.Instance.GraphicsDevice, assets_bindings.Resources["arcade/space/pu_cooldown"]));
+            ArcadeMain.instance.Textures.Add(Texture2D.FromFile(Game1.Instance.GraphicsDevice, assets_bindings.Resources["arcade/space/pu_shot"]));
             Starship = new Starship()
             {
                 X = Game1.Instance.ScreenWidth / 2,
@@ -55,13 +59,22 @@ namespace Project7.Source.Arcade
         }
         private void PowerUps()
         {
-            if(Starship.killcount >= 10 && !PowerUpsSpawned.ContainsKey(Enums.PowerUps.Zqsd) && Random.Shared.Next(1000) == 500)
+            void new_pu_rnd_coords(PowerUps pu)
             {
-                PowerUpsSpawned[Enums.PowerUps.Zqsd] = 1;
-                var x = Random.Shared.Next(50, Game1.Instance.ScreenWidth - 50);
-                var y = Random.Shared.Next(50, Game1.Instance.ScreenHeight - 50);
-                new PowerUp(Enums.PowerUps.Zqsd, x, y);
+                if (!PowerUpsSpawned.ContainsKey(pu)) PowerUpsSpawned[pu] = 1; else PowerUpsSpawned[pu]++;
+                var w = Game1.Instance.ScreenWidth;
+                var h = Game1.Instance.ScreenHeight;
+                var x = Random.Shared.Next(64+50, w - 50 - 64);
+                var y = Random.Shared.Next(64 + 50, h - 50 - 64);
+                new PowerUp(pu, x, y);
             }
+            if (Starship.killcount >= 5 && !PowerUpsSpawned.ContainsKey(Enums.PowerUps.Zqsd) && Random.Shared.Next(1000) == 500)
+                new_pu_rnd_coords(Enums.PowerUps.Zqsd);
+            if (prev_killcount != Starship.killcount && Starship.killcount % 10 == 0 && Random.Shared.Next(4) == 0)
+                new_pu_rnd_coords(Enums.PowerUps.Cooldown);
+            if (prev_killcount != Starship.killcount && Starship.killcount % 20 == 0 && Random.Shared.Next(2) == 0)
+                new_pu_rnd_coords(Enums.PowerUps.Shot);
+            prev_killcount = Starship.killcount;
         }
 
         public void Draw(GraphicsDevice graphics)

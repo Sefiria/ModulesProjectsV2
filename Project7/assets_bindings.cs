@@ -28,6 +28,8 @@ namespace Project7
             ["arcade/space/mobship"] = "Assets/Textures/arcade/space/mobship.png",
             ["arcade/space/bullet"] = "Assets/Textures/arcade/space/bullet.png",
             ["arcade/space/pu_zqsd"] = "Assets/Textures/arcade/space/pu_zqsd.png",
+            ["arcade/space/pu_cooldown"] = "Assets/Textures/arcade/space/pu_cooldown.png",
+            ["arcade/space/pu_shot"] = "Assets/Textures/arcade/space/pu_shot.png",
         };
     }
 }

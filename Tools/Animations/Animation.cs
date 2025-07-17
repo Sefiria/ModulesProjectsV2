@@ -18,6 +18,11 @@ namespace Tools.Animations
             Frames = graphics.SplitTexturePerCount(filename, frames_count, 1).ToList();
             FrameIndex = 0F;
         }
+        public Animation(GraphicsDevice graphics, List<Texture2D> frames)
+        {
+            Frames = new List<Texture2D>(frames);
+            FrameIndex = 0F;
+        }
         public void Update()
         {
             FrameIndex += Speed / 100F;

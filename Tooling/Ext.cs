@@ -87,6 +87,10 @@ namespace Tooling
         public static PointF P(this (float X, float Y) data) => new PointF(data.X, data.Y);
         public static PointF P(this float n) => new PointF(n, n);
         public static Point iP(this float n) => new Point((int)n, (int)n);
+        public static PointF Add(this PointF target, PointF other) => new PointF(target.X + other.X, target.Y + other.Y);
+        public static PointF Substract(this PointF target, PointF other) => new PointF(target.X - other.X, target.Y - other.Y);
+        public static PointF Multiply(this PointF target, PointF other) => new PointF(target.X * other.X, target.Y * other.Y);
+        public static PointF Divide(this PointF target, PointF other) => new PointF(target.X / (other.X == 0 ? 1 : other.X), target.Y / (other.Y == 0 ? 1 : other.Y));
         public static float ToAngle(this PointF pt) => Maths.GetAngle(pt);
         public static Size iSz(this (int X, int Y) data) => new Size(data.X, data.Y);
         public static SizeF Sz(this (int X, int Y) data) => new SizeF(data.X, data.Y);
@@ -180,6 +184,13 @@ namespace Tooling
         }
 
         public static Rectangle ToIntRect(this RectangleF rect) => new Rectangle((int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height);
+
+        public static PointF GetRotatedPoint(this PointF origin, float angleDegrees, float distance)
+        {
+            var direction = angleDegrees.AngleToPointF();
+            return new PointF(origin.X + direction.X * distance, origin.Y + direction.Y * distance);
+        }
+
 
 
         public static Color Mod(this Color color, int r, int g, int b) => Color.FromArgb(Tools.Range(0, color.R + r, 255), Tools.Range(0, color.G + g, 255), Tools.Range(0, color.B + b, 255));

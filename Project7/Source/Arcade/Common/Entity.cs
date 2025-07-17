@@ -28,8 +28,12 @@ namespace Project7.Source.Arcade.Common
 
         public float W => Context.Textures[TexId]?.Width ?? 1;
         public float H => Context.Textures[TexId]?.Height ?? 1;
+        public PointF PointF => (X, Y).P();
         public RectangleF Rectangle => new RectangleF(X - W / 2, Y - H / 2, W, H);
         public Box Box => new Box(X - W / 2, Y - H / 2, W, H);
+        public PointF Forward => (X,Y).P().Add(A.AngleToPointF());
+        public PointF Right => (X, Y).P().Add((A + 90F).AngleToPointF());
+
         public static Entity GetByID(Guid id) => Context.EntityManager.Entities.FirstOrDefault(e => e.ID == id);
         public static Entity GetByName(string name) => Context.EntityManager.Entities.FirstOrDefault(e => e.Name == name);
 
