@@ -30,6 +30,8 @@ namespace Project7
             ["arcade/space/pu_zqsd"] = "Assets/Textures/arcade/space/pu_zqsd.png",
             ["arcade/space/pu_cooldown"] = "Assets/Textures/arcade/space/pu_cooldown.png",
             ["arcade/space/pu_shot"] = "Assets/Textures/arcade/space/pu_shot.png",
-        };
+            ["arcade/plateform/tileset"] = "Assets/Textures/arcade/plateform/tileset.png",
+            ["arcade/plateform/files/map"] = "Assets/Files/arcade/plateform/map",
+        }; 
     }
 }

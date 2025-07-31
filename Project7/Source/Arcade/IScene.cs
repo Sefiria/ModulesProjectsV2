@@ -7,11 +7,12 @@ using System.Threading.Tasks;
 
 namespace Project7.Source.Arcade
 {
-    public interface IArcade
+    public interface IScene
     {
         string Name { get; }
         void Initialize();
         void Update();
         void Draw(GraphicsDevice graphics);
+        void Dispose();
     }
 }

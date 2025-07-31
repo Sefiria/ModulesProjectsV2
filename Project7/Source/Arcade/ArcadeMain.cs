@@ -1,7 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project7.Source.Arcade.Common;
+using Project7.Source.Arcade.scenes.menu;
+using Project7.Source.Arcade.scenes.plateform;
+using Project7.Source.Arcade.scenes.space;
 using Project7.Source.Arcade.ui;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,10 +17,11 @@ namespace Project7.Source.Arcade
         public static Graphics.Graphics graphics => Graphics.Graphics.Instance;
 
         public static ArcadeMain instance;
-        public static List<IArcade> Scenes = new List<IArcade>()
+        public static List<IScene> Scenes = new List<IScene>()
         {
             new ArcadeMenu(),
             new ArcadeSpace(),
+            new ArcadePlateform(),
         };
         public List<UI> UI;
         public int prev_scene_index = 0, scene_index = 0;
@@ -24,6 +29,7 @@ namespace Project7.Source.Arcade
         public EntityManager EntityManager;
         public CollisionManager CollisionManager;
 
+        public bool edit = false;
         public ArcadeMain()
         {
             instance = this;
@@ -38,6 +44,8 @@ namespace Project7.Source.Arcade
             Textures.Clear();
             Textures.Add(Texture2D.FromFile(Game1.Instance.GraphicsDevice, assets_bindings.Resources["arcade/null"]));
             Scenes[scene_index].Initialize();
+            if (scene_index != 0)
+                UI.Add(new Button(80, 80, "Retour", () => { Scene_DisposeCommon(); scene_index = 0; }));
         }
         public void Update()
         {
@@ -67,8 +75,14 @@ namespace Project7.Source.Arcade
             new List<UI>(UI).Where(ui => ui.exists).ToList().ForEach(ui => ui.draw(gd));
 
             for (int i = 0; i < context.ScreenHeight; i += 16)
-                graphics.DrawLine(0, i, context.ScreenWidth, i, new Color(Color.DimGray, 50), 4);
+                graphics.DrawLine(0, i, context.ScreenWidth, i, new Color(Color.DimGray, (byte)(30 * (Random.Shared.Next(10)) / 10F)), 4);
             graphics.DrawRectangle(0, 0, context.ScreenWidth, context.ScreenHeight, new Color(30, 30, 30), 64);
+        }
+
+        public void Scene_DisposeCommon()
+        {
+            Scenes[scene_index].Dispose();
+            EntityManager.Entities.Clear();
         }
     }
 }

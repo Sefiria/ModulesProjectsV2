@@ -1,14 +1,13 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Project7.Source.Arcade.Common;
-using Project7.Source.Arcade.scenes.space;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using static Project7.Source.Arcade.scenes.space.Enums;
 
-namespace Project7.Source.Arcade
+namespace Project7.Source.Arcade.scenes.space
 {
-    public class ArcadeSpace : IArcade
+    public class ArcadeSpace : IScene
     {
         public static ArcadeMain Context => ArcadeMain.instance;
         public static List<Entity> Entities => Context.EntityManager.Entities;
@@ -64,7 +63,7 @@ namespace Project7.Source.Arcade
                 if (!PowerUpsSpawned.ContainsKey(pu)) PowerUpsSpawned[pu] = 1; else PowerUpsSpawned[pu]++;
                 var w = Game1.Instance.ScreenWidth;
                 var h = Game1.Instance.ScreenHeight;
-                var x = Random.Shared.Next(64+50, w - 50 - 64);
+                var x = Random.Shared.Next(64 + 50, w - 50 - 64);
                 var y = Random.Shared.Next(64 + 50, h - 50 - 64);
                 new PowerUp(pu, x, y);
             }
@@ -78,6 +77,10 @@ namespace Project7.Source.Arcade
         }
 
         public void Draw(GraphicsDevice graphics)
+        {
+        }
+
+        public void Dispose()
         {
         }
     }

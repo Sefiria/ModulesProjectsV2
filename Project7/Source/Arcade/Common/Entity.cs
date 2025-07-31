@@ -1,15 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Project7.Source.Arcade.scenes.space;
-using Project7.Source.Entities.Behaviors;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using Tooling;
-using Tools;
-using AnimationController = Tools.Animations.AnimationController;
-using Color = Microsoft.Xna.Framework.Color;
 
 namespace Project7.Source.Arcade.Common
 {
@@ -22,15 +16,15 @@ namespace Project7.Source.Arcade.Common
         public string Name;
         public bool Exists;
         public float X, Y, A;
-        public float Velocity;
         public byte TexId;
         public float Scale = 2F;
+        public bool Centered = true;
 
         public float W => Context.Textures[TexId]?.Width ?? 1;
         public float H => Context.Textures[TexId]?.Height ?? 1;
         public PointF PointF => (X, Y).P();
-        public RectangleF Rectangle => new RectangleF(X - W / 2, Y - H / 2, W, H);
-        public Box Box => new Box(X - W / 2, Y - H / 2, W, H);
+        public RectangleF Rectangle => new RectangleF(X - (Centered ? W / 2 : 0), Y - (Centered ? H / 2 : 0), W, H);
+        public Box Box => new Box(X - (Centered ? W / 2 : 0), Y - (Centered ? H / 2 : 0), W, H);
         public PointF Forward => (X,Y).P().Add(A.AngleToPointF());
         public PointF Right => (X, Y).P().Add((A + 90F).AngleToPointF());
 
@@ -45,16 +39,14 @@ namespace Project7.Source.Arcade.Common
             Exists = true;
             X = Y = 0F;
             A = -90F;
-            Velocity = 0F;
             Context.EntityManager.Entities.Add(this);
         }
         public virtual void Update()
         {
-            //Maths.CollisionPointBox(Game1.MS.X, Game1.MS.Y, Box)}
         }
         public virtual void Draw(GraphicsDevice graphics)
         {
-            Graphics.Graphics.Instance.DrawTexture(Context.Textures[TexId], X, Y, A.ToRadians() + 90F.ToRadians(), Scale, false, 0F, new Vector2(W / 2f, H / 2f));
+            Graphics.Graphics.Instance.DrawTexture(Context.Textures[TexId], X, Y, A.ToRadians() + 90F.ToRadians(), Scale, false, 0F, Centered ? new Vector2(W / 2f, H / 2f) : null);
         }
 
         public virtual Collider GetCollider()

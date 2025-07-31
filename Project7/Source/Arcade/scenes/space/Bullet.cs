@@ -1,23 +1,19 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Project7.Source.Arcade.Common;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tooling;
 using static Project7.Source.Arcade.Common.Collider;
 using Collider = Project7.Source.Arcade.Common.Collider;
 
 namespace Project7.Source.Arcade.scenes.space
 {
-    internal class Bullet : Entity
+    internal class Bullet : EntitySpace
     {
         float prev_look_x, prev_look_y;
         float look_x, look_y;
-        public Entity Owner;
+        public EntitySpace Owner;
 
-        public Bullet(Entity owner, float look_angle) : base()
+        public Bullet(EntitySpace owner, float look_angle) : base()
         {
             Owner = owner;
             TexId = 3;

@@ -7,7 +7,8 @@ namespace Project7.Source.Arcade.ui
     public class Button : UI
     {
         public string text;
-        public Action callback;
+        public Action callback, alt_callback;
+        public Color BackColor = Color.Black;
 
         public bool IsHover { get; private set; }
 
@@ -29,12 +30,18 @@ namespace Project7.Source.Arcade.ui
         public override void update()
         {
             IsHover = GetBounds().Contains(Game1.MS.X, Game1.MS.Y);
-            if (IsHover && Game1.MS.IsLeftPressed)
-                callback?.Invoke();
+            if (IsHover)
+            {
+                if (Game1.MS.IsLeftPressed)
+                    callback?.Invoke();
+                if (Game1.MS.IsRightPressed)
+                    alt_callback?.Invoke();
+            }
         }
         public override void draw(GraphicsDevice gd)
         {
             var c = IsHover ? Color.White : Color.Gray;
+            graphics.FillRectangle(GetBounds(), BackColor);
             graphics.DrawRectangle(GetBounds(), c);
             graphics.DrawString(text, x + padding, y + padding, font, c);
         }

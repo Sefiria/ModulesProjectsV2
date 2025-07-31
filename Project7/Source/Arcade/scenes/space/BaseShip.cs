@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Project7.Source.Arcade.scenes.space
 {
-    public class BaseShip : Entity
+    public class BaseShip : EntitySpace
     {
         public Dictionary<PowerUps, int> PowerUps = new Dictionary<PowerUps, int>();
 

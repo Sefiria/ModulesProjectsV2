@@ -9,7 +9,7 @@ using Tooling;
 
 namespace Project7.Source.Arcade.scenes.space
 {
-    public class PowerUp : Entity
+    public class PowerUp : EntitySpace
     {
         public Enums.PowerUps Kind;
 

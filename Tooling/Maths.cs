@@ -462,6 +462,7 @@ namespace Tooling
         }
 
         public static int Diff(int a, int b) => Math.Max(a, b) - Math.Min(a, b);
+        public static float Diff(float a, float b) => Math.Max(a, b) - Math.Min(a, b);
 
         public static PointF ProjectionSurRectangle(Rectangle rect, PointF pt)
         {

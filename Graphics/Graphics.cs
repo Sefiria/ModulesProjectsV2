@@ -47,7 +47,7 @@ namespace Graphics
         {
             if(clear_color != null)
                 GraphicsDevice.Clear(clear_color.Value);
-            SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState);
+            SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState, SamplerState.PointWrap);
         }
         public void EndDraw()
         {
