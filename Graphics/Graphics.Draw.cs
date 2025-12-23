@@ -43,11 +43,11 @@ namespace Graphics
 
         public void DrawTexture(string name, float x, float y, float rotation, float scale, bool flipX, float depth = 0f, Vector2? origin = null) => DrawTexture(Textures[name], new Vector2(x, y), rotation, scale, flipX, depth, origin);
         public void DrawTexture(string name, Vector2 position, float rotation, float scale, bool flipX, float depth = 0f, Vector2? origin = null) => DrawTexture(Textures[name], position, rotation, scale, flipX, depth, origin);
-        public void DrawTexture(Texture2D texture, float x, float y, float rotation, float scale, bool flipX, float depth = 0f, Vector2? origin = null, Color? color = null) => DrawTexture(texture, new Vector2(x, y), rotation, scale, flipX, depth, origin, color);
-        public void DrawTexture(Texture2D texture, Vector2 position, float rotation, float scale, bool flipX, float depth = 0f, Vector2? origin = null, Color? color = null)
+        public void DrawTexture(Texture2D texture, float x, float y, float rotation, float scale, bool flipX, float depth = 0f, Vector2? origin = null, Color? color = null, Rectangle? source = null) => DrawTexture(texture, new Vector2(x, y), rotation, scale, flipX, depth, origin, color, source);
+        public void DrawTexture(Texture2D texture, Vector2 position, float rotation, float scale, bool flipX, float depth = 0f, Vector2? origin = null, Color? color = null, Rectangle? source = null)
         {
             SpriteEffects effects = flipX ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
-            SpriteBatch.Draw(texture, position, null, color ?? Color.White, rotation, origin ?? Vector2.Zero, scale, effects, depth);
+            SpriteBatch.Draw(texture, position, source, color ?? Color.White, rotation, origin ?? Vector2.Zero, scale, effects, depth);
         }
     }
 }

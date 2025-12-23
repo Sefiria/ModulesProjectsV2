@@ -45,7 +45,7 @@ namespace Tooling
         public static float Distance(int x1, int y1, float x2, float y2) => Distance((float)x1, (float)y1, x2, y2);
         public static float Distance(int x1, int y1, int x2, int y2) => Distance((float)x1, (float)y1, (float)x2, (float)y2);
         public static float Distance(PointF a, PointF b) => Distance(a.X, a.Y, b.X, b.Y);
-        public static float Distance(this Point3D a, Point3D b) => Distance((float)a.X, (float)a.Y, (float)a.Z, (float)b.X, (float)b.Y, (float)b.Z);
+        //public static float Distance(this Point3D a, Point3D b) => Distance((float)a.X, (float)a.Y, (float)a.Z, (float)b.X, (float)b.Y, (float)b.Z);
         public static float Distance(PointF pt_to_center) => Distance(0, 0, pt_to_center.X, pt_to_center.Y);
         public static float Distance(vec a, vec b) => Distance(a.x, a.y, b.x, b.y);
         public static float Distance(vecf a, vecf b) => Distance(a.x, a.y, b.x, b.y);

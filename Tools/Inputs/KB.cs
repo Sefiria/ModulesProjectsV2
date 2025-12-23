@@ -56,7 +56,9 @@ namespace Tools.Inputs
                     }
                 }
             });
-
+        }
+        public void CheckReleases()
+        {
             KeysReleased.Keys.ToList().ForEach(key => KeysReleased[key] = !State.IsKeyDown(key));
         }
         public char ConvertKeyToChar(Keys key) => keyMap.ContainsKey(key) ? keyMap[key] : '\0';

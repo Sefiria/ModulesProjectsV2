@@ -33,10 +33,19 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Remove="Assets\Textures\arcade\space\bullet.png" />
-    <None Remove="Assets\Textures\arcade\space\mobship.png" />
-    <None Remove="Assets\Textures\arcade\space\pu_cooldown.png" />
-    <None Remove="Assets\Textures\Tilesets\arcade.png" />
+    <None Remove="Assets\Data\tileset.json" />
+    <None Remove="Assets\Textures\Entities\test_idle.png" />
+    <None Remove="Assets\Textures\missing.png" />
+    <None Remove="Assets\Textures\Tilesets\entities\global.png" />
+    <None Remove="Assets\Textures\Tilesets\grassA.png" />
+    <None Remove="Assets\Textures\Tilesets\grassB.png" />
+    <None Remove="Assets\Textures\Tilesets\grassC.png" />
+    <None Remove="Assets\Textures\Tilesets\wood\crate.png" />
+    <None Remove="Assets\Textures\Tilesets\wood\plank.png" />
+    <None Remove="Assets\Textures\Tilesets\stoneA.png" />
+    <None Remove="Assets\Textures\Tilesets\stoneB.png" />
+    <None Remove="Assets\UI\cursor.png" />
+    <None Remove="Assets\UI\play_stop_button.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Assets\SFX\" />

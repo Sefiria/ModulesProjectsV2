@@ -4,6 +4,7 @@ using Project7.Source.Arcade.Common;
 using Project7.Source.Arcade.scenes.space;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Tools;
 
 namespace Project7.Source.Arcade.scenes.plateform
@@ -57,9 +58,12 @@ namespace Project7.Source.Arcade.scenes.plateform
         {
             graphics.Clear(new Color(123, 150, 155));
 
-            for (int i = 0; i < map.w; i++)
-                for (int j = 0; j < map.h; j++)
-                    Graphics.Graphics.Instance.DrawTexture(Context.Textures[map.Tiles[i][j] + 1], 64 + i * TSZ_SCALED, 64 + j * TSZ_SCALED, rotation: 0F, scale: SCALE, flipX: false);
+            if (map != null)
+            {
+                for (int i = 0; i < map.w; i++)
+                    for (int j = 0; j < map.h; j++)
+                        Graphics.Graphics.Instance.DrawTexture(Context.Textures[map.Tiles[i][j] + 1], 64 + i * TSZ_SCALED, 64 + j * TSZ_SCALED, rotation: 0F, scale: SCALE, flipX: false);
+            }
 
             if (ArcadeMain.instance.edit)
             {
