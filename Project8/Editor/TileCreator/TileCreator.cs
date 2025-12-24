@@ -104,10 +104,6 @@ namespace Project8.Editor.TileCreator
             Render.Image = Image.ResizeExact((int)(16 * scale), (int)(16 * scale));
         }
 
-        private void color_Click(object sender, EventArgs e)
-        {
-        }
-
         private void color8_MouseClick(object sender, MouseEventArgs e)
         {
             if (sender == color1) colorDialog1.Color = color1.BackColor;
@@ -141,6 +137,18 @@ namespace Project8.Editor.TileCreator
                     if (sender == color6) usedColor.BackColor = color6.BackColor;
                     if (sender == color7) usedColor.BackColor = color7.BackColor;
                     if (sender == color8) usedColor.BackColor = color8.BackColor;
+                    using (System.Drawing.Graphics _g = System.Drawing.Graphics.FromImage(usedColor.Image)) _g.Clear(usedColor.BackColor);
+                }
+                else if (e.Button == MouseButtons.Middle)
+                {
+                    if (sender == color1) { color1.BackColor = usedColor.BackColor; using (System.Drawing.Graphics _g = System.Drawing.Graphics.FromImage(color1.Image)) _g.Clear(color1.BackColor); }
+                    if (sender == color2) { color2.BackColor = usedColor.BackColor; using (System.Drawing.Graphics _g = System.Drawing.Graphics.FromImage(color2.Image)) _g.Clear(color2.BackColor); }
+                    if (sender == color3) { color3.BackColor = usedColor.BackColor; using (System.Drawing.Graphics _g = System.Drawing.Graphics.FromImage(color3.Image)) _g.Clear(color3.BackColor); }
+                    if (sender == color4) { color4.BackColor = usedColor.BackColor; using (System.Drawing.Graphics _g = System.Drawing.Graphics.FromImage(color4.Image)) _g.Clear(color4.BackColor); }
+                    if (sender == color5) { color5.BackColor = usedColor.BackColor; using (System.Drawing.Graphics _g = System.Drawing.Graphics.FromImage(color5.Image)) _g.Clear(color5.BackColor); }
+                    if (sender == color6) { color6.BackColor = usedColor.BackColor; using (System.Drawing.Graphics _g = System.Drawing.Graphics.FromImage(color6.Image)) _g.Clear(color6.BackColor); }
+                    if (sender == color7) { color7.BackColor = usedColor.BackColor; using (System.Drawing.Graphics _g = System.Drawing.Graphics.FromImage(color7.Image)) _g.Clear(color7.BackColor); }
+                    if (sender == color8) { color8.BackColor = usedColor.BackColor; using (System.Drawing.Graphics _g = System.Drawing.Graphics.FromImage(color8.Image)) _g.Clear(color8.BackColor); }
                     using (System.Drawing.Graphics _g = System.Drawing.Graphics.FromImage(usedColor.Image)) _g.Clear(usedColor.BackColor);
                 }
             }
