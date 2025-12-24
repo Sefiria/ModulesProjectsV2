@@ -34,6 +34,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Assets\Data\tileset.json" />
+    <None Remove="Assets\Data\tileset.json.backup" />
     <None Remove="Assets\Textures\Entities\test_idle.png" />
     <None Remove="Assets\Textures\missing.png" />
     <None Remove="Assets\Textures\Tilesets\entities\global.png" />

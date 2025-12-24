@@ -75,6 +75,9 @@ namespace Project8
         }
         protected override void Draw(GameTime gameTime)
         {
+            if (EditorManager.OtherEditor)
+                return;
+
             UserInterface.Active.Draw(spriteBatch);
 
             // == AlphaBlend

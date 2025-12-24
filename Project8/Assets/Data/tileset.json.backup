@@ -1,0 +1,25 @@
+﻿{
+  "tiles": [
+    {
+      "id": 255,
+      "name": "missing",
+      "filename": [ "Assets/Textures/missing.png" ]
+    },
+    {
+      "id": 0,
+      "name": "grass",
+      "filename": [ "Assets/Textures/Tilesets/grass/grassA.png", "Assets/Textures/Tilesets/grass/grassB.png", "Assets/Textures/Tilesets/grass/grassC.png" ],
+      "Mode": "Autotile"
+    },
+    {
+      "id": 1,
+      "name": "stone",
+      "filename": [ "Assets/Textures/Tilesets/stone/stoneA.png", "Assets/Textures/Tilesets/stone/stoneB.png" ],
+      "Mode": "Autotile"
+    },
+    { "id": 2, "name": "plank",   "filename": [ "Assets/Textures/Tilesets/wood/plank.png" ] },
+    { "id": 3, "name": "crate",   "filename": [ "Assets/Textures/Tilesets/wood/crate.png" ] },
+    { "id": 4, "name": "player",  "filename": [ "Assets/Textures/Tilesets/entities/global.png" ], "Mode": "MultiTile",  "MultiTileIndex": 0 },
+    { "id": 5, "name": "mob",     "filename": [ "Assets/Textures/Tilesets/entities/global.png" ], "Mode": "MultiTile",  "MultiTileIndex": 1 }
+  ]
+}

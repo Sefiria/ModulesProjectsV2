@@ -11,7 +11,9 @@ using Tooling;
 using Tools.Inputs;
 using KB = Tools.Inputs.KB;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.VisualBasic.Devices;
+using System.Threading;
+using System.Windows.Forms;
+using Keys = Microsoft.Xna.Framework.Input.Keys;
 
 namespace Project8.Editor
 {
@@ -25,7 +27,7 @@ namespace Project8.Editor
         }
 
         public static Rectangle EditorUIBox => new(0, GameMain.ScreenHeight, GameMain.ScreenWidth, 200);
-        public static bool IsPlaying = false, TabMenu = false;
+        public static bool IsPlaying = false, TabMenu = false, OtherEditor = false;
         public static Texture2D play_stop_button_tex;
         public static Dictionary<string, UIButton> UIButtons;
         public static int SelectedLayer = 0;
@@ -36,9 +38,38 @@ namespace Project8.Editor
             play_stop_button_tex = Texture2D.FromFile(GraphicsDevice, "Assets/UI/play_stop_button.png");
             UIButtons = new Dictionary<string, UIButton>()
             {
-                ["playstop"] = new UIButton(new Rectangle(16, EditorUIBox.Y + 48, 32, 32), () => { if(IsPlaying) DisposeTest(); else LoadTest(); IsPlaying = !IsPlaying; })
+                ["playstop"] = new UIButton(new Rectangle(16, EditorUIBox.Y + 48, 32, 32), () => { if(IsPlaying) DisposeTest(); else LoadTest(); IsPlaying = !IsPlaying; }),
+                ["TileEditor"] = new UIButton(new Rectangle(16, EditorUIBox.Y + 48 + 32, 130, 32), () => OpenFormWithOwner<TileEditor.TileEditor>()),
+                ["TileCreator"] = new UIButton(new Rectangle(16 + 146 * 1, EditorUIBox.Y + 48 + 32, 130, 32), () => OpenFormWithOwner<TileCreator.TileCreator>()),
             };
         }
+        sealed class WindowHandleWrapper : IWin32Window
+        {
+            public WindowHandleWrapper(IntPtr handle) => Handle = handle;
+            public IntPtr Handle { get; }
+        }
+        static void OpenFormWithOwner<T>() where T:Form
+        {
+            var t = new Thread(() =>
+            {
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+
+                var ownerForm = new Form { Opacity = 0, ShowInTaskbar = false };
+                ownerForm.Load += (s, e) =>
+                {
+                    OtherEditor = true;
+                    using (var dlg = Activator.CreateInstance<T>())
+                        dlg.ShowDialog(ownerForm);
+                    ownerForm.Close();
+                    OtherEditor = false;
+                };
+                Application.Run(ownerForm);
+            });
+            t.SetApartmentState(ApartmentState.STA);
+            t.Start();
+        }
+
 
         public static Graphics.Graphics g => Graphics.Graphics.Instance;
         public static int TSZ => (int)(GlobalVariables.tilesize * GlobalVariables.scale);
@@ -76,10 +107,17 @@ namespace Project8.Editor
                 double period = 100D;
                 float sin = (float)Math.Sin(ticks % period * 2 * Math.PI / period);
                 g.DrawString($"Tile :               Layer : {SelectedLayer}", 16, EditorUIBox.Y + 16, GameMain.Instance.font, Color.White);
-                g.DrawTexture(tex[tile.Mode == Tile.Modes.Autotile ? tile_id : 0], GameMain.Instance.font.MeasureString("Tile :").X + 16, EditorUIBox.Y + 16 - 3 + sin * 4F, GameMain.Instance.scale, new Rectangle(tile.Mode == Tile.Modes.MultiTile ? tile.MultiTileIndex * 16 : 0, 0, 16, 16));
+                g.DrawTexture(tex[0], GameMain.Instance.font.MeasureString("Tile :").X + 16, EditorUIBox.Y + 16 - 3 + sin * 4F, GameMain.Instance.scale, new Rectangle(tile.Mode == Tile.Modes.MultiTile ? tile.MultiTileIndex * 16 : 0, 0, 16, 16));
 
-                // Play/Stop button
+                // buttons
+                // -- Play/Stop
                 g.DrawTexture(play_stop_button_tex, 16, EditorUIBox.Y + 48, 1F, new Rectangle(IsPlaying ? 32 : 0, 0, 32, 32));
+                // -- buttons
+                foreach (var b in UIButtons.Skip(1))
+                {
+                    g.DrawString(b.Key, b.Value.Collider.X, b.Value.Collider.Y, GameMain.Instance.font, Color.White);
+                    g.DrawRectangle(UIButtons[b.Key].Collider, Color.White, 1);
+                }
 
                 // PlayTest part
                 if (IsPlaying)
@@ -96,6 +134,9 @@ namespace Project8.Editor
         static bool rTab;
         public static void Update()
         {
+            if (OtherEditor)
+                return;
+
             if (TabMenu)
             {
                 if (MS.IsLeftDown)
