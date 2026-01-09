@@ -21,8 +21,8 @@ namespace Project8.Editor.TileSetCreator
         Bitmap BaseImage = null, ImageCopy = null;
         Timer timerDraw = new Timer() { Enabled = true, Interval = 10 };
         G g;
-        float scale = 20F;
-        List<Image> Parts = new List<Image>();
+        float scale = 10F;
+        List<Bitmap> Parts = new List<Bitmap>();
         List<PictureBox> Renders;
         Font bigfont = new Font("SegoeUI", 32F);
 
@@ -40,7 +40,7 @@ namespace Project8.Editor.TileSetCreator
             g.Clear(Color.White);
             timerDraw.Tick += DrawRender;
 
-            var colorsbtn = new List<PictureBox>() { usedColor, color1, color2, color3, color4, color5, color6, color7, color8 };
+            var colorsbtn = new List<PictureBox>() { usedColor, color1, color2, color3, color4, color5, color6, color7, color8, colorBuffer };
             foreach (var c in colorsbtn)
             {
                 c.Image = new Bitmap(c == usedColor ? 64 : 32, c == usedColor ? 64 : 32);
@@ -51,6 +51,7 @@ namespace Project8.Editor.TileSetCreator
             PopulateTree(tv, "Assets\\Textures\\Tilesets");
             ContextMenuStrip cms = new ContextMenuStrip();
             cms.Items.Add("Renommer", null, RenameNode_Click);
+            cms.Items.Add("Duplicate", null, DuplicateNode_Click);
             cms.Items.Add("Delete", null, DeleteNode_Click);
             tv.ContextMenuStrip = cms;
         }
@@ -99,6 +100,41 @@ namespace Project8.Editor.TileSetCreator
                     // Mettre à jour le TreeNode
                     tv.SelectedNode.Text = newName;
                     tv.SelectedNode.Tag = newPath;
+                }
+            }
+        }
+        private void DuplicateNode_Click(object sender, EventArgs e)
+        {
+            var node = tv.SelectedNode;
+            if (node == null) return;
+            var path = node.Tag?.ToString();
+            if (string.IsNullOrWhiteSpace(path)) return;
+            if (!File.Exists(path)) return;
+
+            using (var dlg = new RenameDialog(Path.GetFileNameWithoutExtension(path)))
+            {
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    string newName = dlg.NewName.Trim();
+                    if (string.IsNullOrWhiteSpace(newName)) return;
+
+                    string dir = Path.GetDirectoryName(path);
+                    string ext = Path.GetExtension(path);
+                    string newPath = Path.Combine(dir, newName + ext);
+
+                    // Vérifier collision
+                    if (File.Exists(newPath))
+                    {
+                        MessageBox.Show("Un fichier avec ce nom existe déjà.");
+                        return;
+                    }
+
+                    // Copier le fichier
+                    File.Copy(path, newPath);
+
+                    // Créer un nouveau TreeNode
+                    var newNode = new TreeNode(newName) { Tag = newPath };
+                    node.Parent.Nodes.Add(newNode);
                 }
             }
         }
@@ -158,21 +194,12 @@ namespace Project8.Editor.TileSetCreator
             bool IsRight = e.Button == MouseButtons.Right;
             bool IsMiddle = e.Button == MouseButtons.Middle;
 
-            if (BaseImage == null) return;
-
-            int tilesX = BaseImage.Width / sz;
-            int tilesY = BaseImage.Height / sz;
-            if (currentIdx < 0 || currentIdx >= tilesX * tilesY) return;
-
-            int ti = currentIdx % tilesX;
-            int tj = currentIdx / tilesX;
-            int ox = ti * sz;
-            int oy = tj * sz;
+            if (currentIdx < 0 || currentIdx >= Parts.Count) return;
 
             int tx = Math.Clamp((int)(ms.X / scale), 0, sz - 1);
             int ty = Math.Clamp((int)(ms.Y / scale), 0, sz - 1);
 
-            var tileRect = new Rectangle(ox, oy, sz, sz);
+            var part = Parts[currentIdx];
 
             if (IsLeft || IsRight)
             {
@@ -180,38 +207,33 @@ namespace Project8.Editor.TileSetCreator
                 {
                     if (ImageCopy != null)
                     {
-                        using (var g = G.FromImage(BaseImage))
+                        using (var g = G.FromImage(part))
                         {
                             g.InterpolationMode = InterpolationMode.NearestNeighbor;
                             g.PixelOffsetMode = PixelOffsetMode.Half;
                             g.SmoothingMode = SmoothingMode.None;
-                            g.DrawImage(ImageCopy, tileRect,
+                            g.DrawImage(ImageCopy,
+                                new Rectangle(0, 0, sz, sz),
                                 new Rectangle(0, 0, ImageCopy.Width, ImageCopy.Height),
                                 GraphicsUnit.Pixel);
                         }
                     }
-                    UpdatePreview(BaseImage, tileRect, currentIdx, Render);
+                    UpdatePreviewFromPart(currentIdx, Render);
                     return;
                 }
+
                 if (KB.IsKeyDown(KB.Key.LeftAlt))
                 {
-                    using (var img = new Bitmap(BaseImage.Clone(tileRect, BaseImage.PixelFormat)))
-                    {
-                        if (IsLeft)
-                            img.RotateFlip(RotateFlipType.RotateNoneFlipX);
-                        else
-                            img.RotateFlip(RotateFlipType.RotateNoneFlipY);
+                    // Détecte l’état courant des boutons, pas seulement l’événement
+                    bool leftHeld = Control.MouseButtons.HasFlag(MouseButtons.Left);
+                    bool rightHeld = Control.MouseButtons.HasFlag(MouseButtons.Right);
 
-                        for (int y = 0; y < sz; y++)
-                        {
-                            for (int x = 0; x < sz; x++)
-                            {
-                                BaseImage.SetPixel(ox + x, oy + y, img.GetPixel(x, y));
-                            }
-                        }
-                    }
+                    if (leftHeld)
+                        Parts[currentIdx].RotateFlip(RotateFlipType.RotateNoneFlipX);
+                    else if (rightHeld)
+                        Parts[currentIdx].RotateFlip(RotateFlipType.RotateNoneFlipY);
 
-                    UpdatePreview(BaseImage, tileRect, currentIdx, Render);
+                    UpdatePreviewFromPart(currentIdx, Render);
                     return;
                 }
 
@@ -223,58 +245,54 @@ namespace Project8.Editor.TileSetCreator
                     int px = (int)(p.X / scale);
                     int py = (int)(p.Y / scale);
                     if (px >= 0 && py >= 0 && px < sz && py < sz)
-                        BaseImage.SetPixel(ox + px, oy + py, IsLeft ? usedColor.BackColor : Color.White);
+                        part.SetPixel(px, py, IsLeft ? usedColor.BackColor : Color.White);
                 }
-                BaseImage.SetPixel(ox + tx, oy + ty, IsLeft ? usedColor.BackColor : Color.White);
-                UpdatePreview(BaseImage, tileRect, currentIdx, Render);
+                part.SetPixel(tx, ty, IsLeft ? usedColor.BackColor : Color.White);
+
+                UpdatePreviewFromPart(currentIdx, Render);
                 return;
             }
             else if (IsMiddle)
             {
                 if (KB.IsKeyDown(KB.Key.LeftCtrl))
                 {
-                    ImageCopy = new Bitmap(BaseImage.Clone(tileRect, BaseImage.PixelFormat));
+                    ImageCopy = new Bitmap(part); // copie du tile courant
                 }
                 else
                 {
-                    usedColor.BackColor = BaseImage.GetPixel(ox + tx, oy + ty);
-                    color1.BackColor = usedColor.BackColor;
-                    usedColor.BackColor = color1.BackColor;
+                    usedColor.BackColor = part.GetPixel(tx, ty);
+                    colorBuffer.BackColor = usedColor.BackColor;
+                    usedColor.BackColor = colorBuffer.BackColor;
+
                     if (usedColor.Image == null)
                         usedColor.Image = new Bitmap(usedColor.Width, usedColor.Height);
-                    using (G _g = G.FromImage(color1.Image)) _g.Clear(color1.BackColor);
+                    using (G _g = G.FromImage(colorBuffer.Image)) _g.Clear(colorBuffer.BackColor);
                     using (G _g = G.FromImage(usedColor.Image)) _g.Clear(usedColor.BackColor);
-                    color1.Refresh();
+                    colorBuffer.Refresh();
                     usedColor.Refresh();
                 }
             }
         }
-
-        private void UpdatePreview(Bitmap baseImg, Rectangle tileRect, int idx, PictureBox render)
+        private void UpdatePreviewFromPart(int idx, PictureBox render)
         {
-            using (var tileCopy = baseImg.Clone(tileRect, baseImg.PixelFormat))
-            {
-                var preview = ResizeExact(tileCopy, (int)(sz * scale), (int)(sz * scale), InterpolationMode.NearestNeighbor);
-                Parts[idx]?.Dispose();
-                Parts[idx] = preview;
-
-                var old = render.Image;
-                render.Image = new Bitmap(preview);
-                old?.Dispose();
-
-                render.Refresh();
-            }
+            var preview = ResizeExact(Parts[idx], (int)(sz * scale), (int)(sz * scale), InterpolationMode.NearestNeighbor);
+            var old = render.Image;
+            render.Image = preview;
+            old?.Dispose();
+            render.Refresh();
         }
-
-
 
         private void DrawRender(object sender, EventArgs e)
         {
             for (int i = 0; i < Renders.Count && i < Parts.Count; i++)
             {
-                if (IsDisposed)
-                    return;
-                Renders[i].Image = new Bitmap(Parts[i]);
+                if (IsDisposed) return;
+
+                var preview = ResizeExact(Parts[i], (int)(sz * scale), (int)(sz * scale), InterpolationMode.NearestNeighbor);
+                var old = Renders[i].Image;
+                Renders[i].Image = preview;
+                old?.Dispose();
+
                 var ms = Cursor.Position;
                 if (radAtutotile.Checked && !Renders[i].ClientRectangle.Contains(Renders[i].PointToClient(ms)))
                 {
@@ -328,7 +346,7 @@ namespace Project8.Editor.TileSetCreator
 
         private void color_MouseClick(object sender, MouseEventArgs e)
         {
-            var colorsbtn = new List<PictureBox>() { color1, color2, color3, color4, color5, color6, color7, color8 };
+            var colorsbtn = new List<PictureBox>() { color1, color2, color3, color4, color5, color6, color7, color8, colorBuffer };
             var c = colorsbtn.First(c => sender == c);
 
             if (e.Button == MouseButtons.Left)
@@ -362,73 +380,57 @@ namespace Project8.Editor.TileSetCreator
 
         private void btLoad_Click(object sender, EventArgs e)
         {
-            if (tv.SelectedNode != null)
-            {
-                var path = tv.SelectedNode.Tag.ToString();
-                if (File.Exists(path))
-                {
-                    var img = Image.FromFile(path);
-                    if (img.Width != sz * 4 || img.Height != sz * 4)
-                    {
-                        MessageBox.Show(this, $"Failed during load file : image size should be exactly {sz * 4}x{sz * 4}");
-                        return;
-                    }
-                    BaseImage = new Bitmap(img);
-                    Parts.Clear();
-                    var tileRect = new Rectangle(0, 0, sz, sz);
-                    for (int j = 0; j < 4; j++)
-                    {
-                        for (int i = 0; i < 4; i++)
-                        {
-                            using (var tileCopy = BaseImage.Clone(new Rectangle(i * sz, j * sz, sz, sz), BaseImage.PixelFormat).ResizeExact(160, 160))
-                            {
-                                var preview = ResizeExact(tileCopy, (int)(sz * scale), (int)(sz * scale), InterpolationMode.NearestNeighbor);
-                                Parts.Add(preview);
-                                Renders[Parts.Count - 1].Image = preview;
-                                Renders[Parts.Count - 1].Invalidate();
-                            }
-                        }
-                    }
-                }
-            }
-        }
+            if (tv.SelectedNode == null) return;
+            var path = tv.SelectedNode.Tag?.ToString();
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path)) return;
 
+            using var img = Image.FromFile(path);
+            if (img.Width != sz * 4 || img.Height != sz * 4)
+            {
+                MessageBox.Show(this, $"Failed during load file : image size should be exactly {sz * 4}x{sz * 4}");
+                return;
+            }
+
+            BaseImage = new Bitmap(img);
+            Parts.Clear();
+
+            for (int j = 0; j < 4; j++)
+                for (int i = 0; i < 4; i++)
+                {
+                    using var tileCopy = BaseImage.Clone(new Rectangle(i * sz, j * sz, sz, sz), BaseImage.PixelFormat);
+                    Parts.Add(new Bitmap(tileCopy));
+                    UpdatePreviewFromPart(Parts.Count - 1, Renders[Parts.Count - 1]);
+                }
+        }
         private void btSave_Click(object sender, EventArgs e)
         {
-            if (tv.SelectedNode != null)
+            if (tv.SelectedNode == null) return;
+            var path = tv.SelectedNode.Tag?.ToString();
+            if (string.IsNullOrWhiteSpace(path)) return;
+
+            int tilesX = 4, tilesY = 4;
+            using var composed = new Bitmap(sz * tilesX, sz * tilesY, PixelFormat.Format32bppArgb);
+
+            using (var g = G.FromImage(composed))
             {
-                var path = tv.SelectedNode.Tag.ToString();
+                g.InterpolationMode = InterpolationMode.NearestNeighbor;
+                g.PixelOffsetMode = PixelOffsetMode.Half;
+                g.SmoothingMode = SmoothingMode.None;
 
-                int tilesX = BaseImage.Width / sz;
-                int tilesY = BaseImage.Height / sz;
-                using var composed = new Bitmap(BaseImage.Width, BaseImage.Height, PixelFormat.Format32bppArgb);
-
-                using (var g = G.FromImage(composed))
-                {
-                    g.InterpolationMode = InterpolationMode.NearestNeighbor; // préserve le pixel-art
-                    g.PixelOffsetMode = PixelOffsetMode.Half;
-                    g.SmoothingMode = SmoothingMode.None;
-
-                    for (int j = 0; j < tilesY; j++)
+                for (int j = 0; j < tilesY; j++)
+                    for (int i = 0; i < tilesX; i++)
                     {
-                        for (int i = 0; i < tilesX; i++)
-                        {
-                            int idx = j * tilesX + i;
-                            var part = Parts[idx]; // 160×160
-
-                            // Redescend la vignette vers sz×sz pour recoller dans l'image composée
-                            using var tileSz = ResizeExact(part, sz, sz, InterpolationMode.NearestNeighbor);
-                            g.DrawImage(tileSz,
-                                new Rectangle(i * sz, j * sz, sz, sz),
-                                new Rectangle(0, 0, sz, sz),
-                                GraphicsUnit.Pixel);
-                        }
+                        int idx = j * tilesX + i;
+                        var part = Parts[idx]; // sz×sz
+                        g.DrawImage(part,
+                            new Rectangle(i * sz, j * sz, sz, sz),
+                            new Rectangle(0, 0, sz, sz),
+                            GraphicsUnit.Pixel);
                     }
-                }
-                if (File.Exists(path))
-                    File.Delete(path);
-                composed.Save(path, ImageFormat.Png);
             }
+
+            if (File.Exists(path)) File.Delete(path);
+            composed.Save(path, ImageFormat.Png);
         }
         static Bitmap ResizeExact(Image src, int w, int h, InterpolationMode mode = InterpolationMode.NearestNeighbor)
         {
@@ -440,8 +442,6 @@ namespace Project8.Editor.TileSetCreator
             g.DrawImage(src, new Rectangle(0, 0, w, h), new Rectangle(0, 0, src.Width, src.Height), GraphicsUnit.Pixel);
             return dst;
         }
-
-
 
 
         private void btNew_Click(object sender, EventArgs e)
@@ -490,8 +490,6 @@ Alt+Right_Click : Flip image vertically");
     }
 
 
-
-
     public class RenameDialog : Form
     {
         public string NewName => tb.Text;
@@ -508,5 +506,4 @@ Alt+Right_Click : Flip image vertically");
             AcceptButton = ok;
         }
     }
-
 }
