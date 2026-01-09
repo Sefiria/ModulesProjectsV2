@@ -1,5 +1,9 @@
-﻿using Project8.Source.Entities;
+﻿using Microsoft.Xna.Framework.Graphics;
+using Project8.Source.Entities;
 using Project8.Source.TiledMap;
+using System.Drawing;
+using System.IO;
+using System.Linq;
 using Tooling;
 
 namespace Project8.Source.Map
@@ -41,5 +45,46 @@ namespace Project8.Source.Map
             Tile.Tiles[-1] = new Tile() { Characteristics = "", id = -1 };
         }
         public object Collider(Entity obj, vecf offset = null, bool isJump = false) => CollisionsManager.Collider(obj, offset, isJump);
+
+        public void Update()
+        {
+            var sz = GlobalVariables.tilesize;
+            var scale = GlobalVariables.scale;
+            var positions = Enumerable.Range(0, Tiles.GetLength(0))
+                .SelectMany(l => Enumerable.Range(0, Tiles.GetLength(1))
+                .SelectMany(x => Enumerable.Range(0, Tiles.GetLength(2))
+                .Where(y => Tile.Tiles[Tiles[l, x, y]].IsGravityApplies)
+                .Select(y => (l, x, y))))
+                .ToList();
+            foreach (var block in positions)
+            {
+                var e = new Entity() { X = block.x * sz * scale, Y = block.y * sz * scale, LookX = 0F, LookY = 1F, Velocity = 1F };
+                e.UserData["layer"] = block.l;
+                var tile = Tile.Tiles[Tiles[block.l, block.x, block.y]];
+                using (var bmp = new Bitmap(tile.Filename[0]))
+                {
+                    using (var cropped = bmp.Clone(new Rectangle(sz * tile.MultiTileIndex, 0, sz, sz), bmp.PixelFormat))
+                    using (var scaled = new Bitmap((int)(sz * scale), (int)(sz * scale)))
+                    using (var g = System.Drawing.Graphics.FromImage(scaled))
+                    {
+                        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+                        g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+                        g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
+
+                        g.DrawImage(cropped, new Rectangle(0, 0, scaled.Width, scaled.Height),
+                                    new Rectangle(0, 0, cropped.Width, cropped.Height),
+                                    GraphicsUnit.Pixel);
+
+                        using (var ms = new MemoryStream())
+                        {
+                            scaled.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                            ms.Seek(0, SeekOrigin.Begin);
+                            e.Texture = Texture2D.FromStream(GameMain.Instance.GraphicsDevice, ms);
+                        }
+                    }
+                }
+                Tiles[block.l, block.x, block.y] = -1;
+            }
+        }
     }
 }

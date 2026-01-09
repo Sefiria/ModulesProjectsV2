@@ -45,5 +45,6 @@ namespace Project8.Source.TiledMap
         public Tile() { }
 
         public bool IsSolid => Characteristics.Contains('s');
+        public bool IsGravityApplies => Characteristics.Contains('g');
     }
 }

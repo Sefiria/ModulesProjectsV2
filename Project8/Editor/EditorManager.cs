@@ -135,6 +135,9 @@ namespace Project8.Editor
         static bool rTab;
         public static void Update()
         {
+            if (!GameMain.Instance.IsActive)
+                return;
+
             if (OtherEditor)
                 return;
 
@@ -253,6 +256,8 @@ namespace Project8.Editor
         }
         public static void UpdateTest()
         {
+            Map.Update();
+
             if (MS.IsLeftPressed)
             {
                 var hit = (from x in Enumerable.Range(0, Map.Tiles.GetLength(1))

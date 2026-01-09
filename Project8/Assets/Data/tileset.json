@@ -18,7 +18,7 @@
       "Mode": "Autotile"
     },
     { "id": 2, "name": "plank",   "filename": [ "Assets/Textures/Tilesets/wood/wood.png" ], "Mode": "MultiTile",  "MultiTileIndex": 0 },
-    { "id": 3, "name": "crate",   "filename": [ "Assets/Textures/Tilesets/wood/wood.png" ], "Mode": "MultiTile",  "MultiTileIndex": 1 },
+    { "id": 3, "name": "crate",   "filename": [ "Assets/Textures/Tilesets/wood/wood.png" ], "Mode": "MultiTile",  "MultiTileIndex": 1, "Characteristics": "sg" },
     { "id": 4, "name": "player",  "filename": [ "Assets/Textures/Tilesets/entities/global.png" ], "Mode": "MultiTile",  "MultiTileIndex": 0 },
     { "id": 5, "name": "mob",     "filename": [ "Assets/Textures/Tilesets/entities/global.png" ], "Mode": "MultiTile",  "MultiTileIndex": 1 }
   ]

@@ -21,11 +21,14 @@ namespace Project8.Source.Entities
         public string Name;
         public bool Exists;
         public Animation2D Animation;
+        public Texture2D Texture = null;
         public List<Behavior> Behaviors;
         public float X, Y, scale = 1F;
         public float LookX, LookY, Velocity;
         public bool HasCollisions = true, ApplyRotationFromLook = false;
         public bool OutlineWhenHover = false, ForceOutline = false;
+
+        public Dictionary<object, object> UserData = new Dictionary<object, object>();
 
         public bool draw_from_center = true;
         public vecf displayed_vec => draw_from_center ? new vecf(X - W / 2F, Y - H / 2F) : new vecf(X, Y);
@@ -121,7 +124,7 @@ namespace Project8.Source.Entities
 
         public void Draw(GraphicsDevice graphics)
         {
-            Texture2D tex = Animation?.Texture;
+            Texture2D tex = Texture ?? Animation?.Texture;
             if (tex != null)
             {
                 if (Outlined)
@@ -131,7 +134,15 @@ namespace Project8.Source.Entities
                     float thin = 0.01f;
                     Context.spriteBatch.Draw(CachedWhiteTex, new Vector2(X - W * scale * thin, Y - H * scale * thin), Animation.Get(), Color.White, rotation: 0f, Vector2.Zero, scale * (1F + thin * 4F), SpriteEffects.None, 0f);
                 }
-                Graphics.Graphics.Instance.DrawTexture(tex, X, Y, ApplyRotationFromLook ? Maths.GetAngle(new PointF(LookX, LookY), false) + MathF.PI / 2F : 0F, scale, LookX < 0F, 0F, ApplyRotationFromLook ? new Vector2(W / 2f, H / 2f) : null, null, Animation.Get());
+                Graphics.Graphics.Instance.DrawTexture(
+                    tex,
+                    X, Y,
+                    ApplyRotationFromLook ? Maths.GetAngle(new PointF(LookX, LookY), false) + MathF.PI / 2F : 0F,
+                    scale * 2F,
+                    LookX < 0F, 0F,
+                    ApplyRotationFromLook ? new Vector2(W / 2f, H / 2f) : null,
+                    null,
+                    Animation?.Get() ?? new Microsoft.Xna.Framework.Rectangle(0, 0, (int)(GlobalVariables.tilesize * scale), (int)(GlobalVariables.tilesize * scale)));
             }
         }
     }
