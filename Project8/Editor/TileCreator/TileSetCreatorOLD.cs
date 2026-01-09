@@ -1,15 +1,17 @@
-﻿using Project8.Source.TiledMap;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Tooling;
+using KB = Tooling.KB;
+using MS = Tooling.MouseStates;
 
-namespace Project8.Editor.TileCreator
+namespace Project8.Editor.TileSetCreator
 {
-    public partial class TileCreator : Form
+    public partial class TileSetCreatorOLD : Form
     {
         bool IsMouseDown = false;
         Point ms_old, ms;
@@ -18,26 +20,12 @@ namespace Project8.Editor.TileCreator
         System.Drawing.Graphics g;
         float scale = 20F;
 
-        public TileCreator()
+        public TileSetCreatorOLD()
         {
             InitializeComponent();
         }
         private void TileCreator_Load(object sender, EventArgs e)
         {
-            cbbMode.Items.Clear();
-            cbbMode.Items.AddRange(Enum.GetNames<Tile.Modes>());
-            cbbMode.SelectedIndex = 0;
-
-            int id = 0;
-            var ids = Tile.Tiles.Values.Select(x => x.id).OrderBy(x => x).ToList();
-            while (ids.Contains(id)) id++;
-            numID.Value = id;
-
-            tbCharacteristics.Text = "s";
-
-            label6.Visible = numMultiTileID.Visible = cbbMode.SelectedText == Enum.GetName(Tile.Modes.MultiTile);
-            cbbMode.SelectedIndexChanged += (s, e) => label6.Visible = numMultiTileID.Visible = cbbMode.SelectedIndex == Enum.GetNames<Tile.Modes>().ToList().IndexOf(Enum.GetName(Tile.Modes.MultiTile));
-
             Image = new Bitmap(16, 16);
             g = System.Drawing.Graphics.FromImage(Image);
             g.Clear(Color.White);
@@ -50,7 +38,36 @@ namespace Project8.Editor.TileCreator
                 g = System.Drawing.Graphics.FromImage(c.Image);
                 g.Clear(Color.White);
             }
+
+
+            PopulateTree(tv, "Assets\\Textures\\Tilesets");
         }
+
+        void PopulateTree(TreeView tv, string rootPath)
+        {
+            tv.BeginUpdate();
+            try
+            {
+                tv.Nodes.Clear();
+                var rootDir = new DirectoryInfo(rootPath);
+                var rootNode = CreateDirectoryNode(rootDir);
+                tv.Nodes.Add(rootNode);
+            }
+            finally { tv.EndUpdate(); }
+        }
+
+        TreeNode CreateDirectoryNode(DirectoryInfo dir)
+        {
+            var node = new TreeNode(dir.Name) { Tag = dir.FullName };
+            // Dossiers
+            foreach (var sub in dir.EnumerateDirectories())
+                node.Nodes.Add(CreateDirectoryNode(sub));
+            // Fichiers .png
+            foreach (var file in dir.EnumerateFiles("*.png"))
+                node.Nodes.Add(new TreeNode(Path.GetFileName(file.Name)) { Tag = file.FullName });
+            return node;
+        }
+
 
         private void Render_MouseDown(object sender, MouseEventArgs e)
         {
@@ -69,7 +86,6 @@ namespace Project8.Editor.TileCreator
         {
             IsMouseDown = false;
         }
-
         private void ManageMouse(MouseEventArgs e)
         {
             ms_old = ms;
@@ -86,13 +102,20 @@ namespace Project8.Editor.TileCreator
                     for (double t = 0.0; t <= 1.0; t += 1 / d)
                     {
                         PointF p = Maths.Lerp(ms_old, ms, t);
-                        if (p.X >= 0 && p.Y >= 0 && p.X < Render.Width && p.Y < Render.Height)
-                            Image.SetPixel((int)(p.X / scale), (int)(p.Y / scale), IsLeft ? usedColor.BackColor : Color.White);
+                        if (p.X >= 0 && p.Y >= 0 &&
+                            p.X < Math.Min(Render.Width, Image.Width * scale) &&
+                            p.Y < Math.Min(Render.Height, Image.Height * scale))
+                        {
+                            int ix = (int)(X + Math.Floor(p.X / scale));
+                            int iy = (int)(Y + Math.Floor(p.Y / scale));
+                            if (ix >= 0 && iy >= 0 && ix < Image.Width && iy < Image.Height)
+                                Image.SetPixel(ix, iy, IsLeft ? usedColor.BackColor : Color.White);
+                        }
                     }
-                    //g.DrawLine(IsLeft ? new Pen(usedColor.BackColor) : Pens.White, (ms_old.vecf() / scale).pt, (ms.vecf() / scale).pt);
-                    int x = (int)(ms.X / scale), y = (int)(ms.Y / scale);
+                    int x = (int)(X + ms.X / scale), y = (int)(Y + ms.Y / scale);
                     if (x >= 0 && y >= 0 && x < 16 && y < 16)
                         Image.SetPixel(x, y, IsLeft ? usedColor.BackColor : Color.White);
+                    invalidate = true;
                 }
                 else if (IsMiddle)
                 {
@@ -105,9 +128,43 @@ namespace Project8.Editor.TileCreator
             }
         }
 
+        Bitmap renderimage;
+        float X, Y, oldX, oldY, oldScale;
+        bool invalidate = false;
         private void DrawRender(object sender, EventArgs e)
         {
-            Render.Image = Image.ResizeExact((int)(16 * scale), (int)(16 * scale));
+            if (KB.IsKeyDown(KB.Key.A) || KB.IsKeyDown(KB.Key.E))
+            {
+                if (KB.IsKeyDown(KB.Key.A))
+                    scale -= 1F;
+                if (KB.IsKeyDown(KB.Key.E))
+                    scale += 1F;
+                scale = Math.Max(0.1F, Math.Min(scale, 20F));
+            }
+            if (KB.IsKeyDown(KB.Key.Z)) Y -= scale / 2;
+            if (KB.IsKeyDown(KB.Key.S)) Y += scale / 2;
+            if (KB.IsKeyDown(KB.Key.Q)) X -= scale / 2;
+            if (KB.IsKeyDown(KB.Key.D)) X += scale / 2;
+            KB.Update();
+
+            if (invalidate || oldScale != scale || oldX != X || oldY != Y)
+            {
+                invalidate = false;
+                oldScale = scale;
+                oldX = X;
+                oldY = Y;
+
+                X = Math.Max(0, Math.Min(X, Image.Width - 1));
+                Y = Math.Max(0, Math.Min(Y, Image.Height - 1));
+                int sx = (int)Math.Floor(X);
+                int sy = (int)Math.Floor(Y);
+                int srcW = Math.Max(1, Math.Min(Image.Width - sx, (int)Math.Ceiling(Render.Width / scale)));
+                int srcH = Math.Max(1, Math.Min(Image.Height - sy, (int)Math.Ceiling(Render.Height / scale)));
+                var img = Image.Clone(new Rectangle(sx, sy, srcW, srcH), Image.PixelFormat);
+                renderimage = img.ResizeExact((int)Math.Max(1, Math.Round(srcW * scale)),
+                                               (int)Math.Max(1, Math.Round(srcH * scale)));
+            }
+            Render.Image = renderimage;
         }
 
         private void color_MouseClick(object sender, MouseEventArgs e)
@@ -144,22 +201,26 @@ namespace Project8.Editor.TileCreator
 
         private void btLoad_Click(object sender, EventArgs e)
         {
-            var dial = new FormLoadTile();
-            if (dial.ShowDialog(this) == DialogResult.OK)
-            {
-                Tile tile = Tile.Tiles[dial.SelectedTileIndex];
-                numID.Value = tile.id;
-                tbCharacteristics.Text = tile.Characteristics;
-                cbbMode.SelectedIndex = Enum.GetNames<Tile.Modes>().ToList().IndexOf(tile.Mode.ToString());
-                numMultiTileID.Value = tile.MultiTileIndex;
-                Image = (Bitmap)System.Drawing.Image.FromFile(tile.Filename[0]);
-                g = System.Drawing.Graphics.FromImage(Image);
-                DrawRender(null, null);
-
+            if(tv.SelectedNode != null)
+                {
+                var path = tv.SelectedNode.Tag.ToString();
+                if (File.Exists(path))
+                {
+                    var img = System.Drawing.Image.FromFile(path);
+                    Image = new Bitmap(img);
+                    g = System.Drawing.Graphics.FromImage(Image);
+                    DrawRender(null, null);
+                    invalidate = true;
+                }
             }
         }
 
         private void btSave_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btNew_Click(object sender, EventArgs e)
         {
 
         }

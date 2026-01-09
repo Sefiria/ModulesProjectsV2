@@ -10,6 +10,7 @@
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
     <Message Text="Restoring dotnet tools" Importance="High" />
@@ -50,5 +51,13 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Assets\SFX\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Editor\TileCreator\TileSetCreatorOLD.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Editor\TileCreator\TileSetCreator.cs">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
 </Project>

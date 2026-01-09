@@ -14,6 +14,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Threading;
 using System.Windows.Forms;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
+using Project8.Editor.TileCreator;
 
 namespace Project8.Editor
 {
@@ -38,9 +39,10 @@ namespace Project8.Editor
             play_stop_button_tex = Texture2D.FromFile(GraphicsDevice, "Assets/UI/play_stop_button.png");
             UIButtons = new Dictionary<string, UIButton>()
             {
-                ["playstop"] = new UIButton(new Rectangle(16, EditorUIBox.Y + 48, 32, 32), () => { if(IsPlaying) DisposeTest(); else LoadTest(); IsPlaying = !IsPlaying; }),
-                ["TileEditor"] = new UIButton(new Rectangle(16, EditorUIBox.Y + 48 + 32, 130, 32), () => OpenFormWithOwner<TileEditor.TileEditor>()),
-                ["TileCreator"] = new UIButton(new Rectangle(16 + 146 * 1, EditorUIBox.Y + 48 + 32, 130, 32), () => OpenFormWithOwner<TileCreator.TileCreator>()),
+                ["playstop"]         = new UIButton(new Rectangle(16, EditorUIBox.Y + 48, 32, 32), () => { if(IsPlaying) DisposeTest(); else LoadTest(); IsPlaying = !IsPlaying; }),
+                ["TileEditor"]       = new UIButton(new Rectangle(16, EditorUIBox.Y + 48 + 32, 130, 32), OpenFormWithOwner<TileEditor.TileEditor>),
+                ["TileCreator"]      = new UIButton(new Rectangle(16 + 146 * 1, EditorUIBox.Y + 48 + 32, 130, 32), OpenFormWithOwner<TileCreator.TileCreator>),
+                ["TilesetCreator"]   = new UIButton(new Rectangle(16 + 146 * 2, EditorUIBox.Y + 48 + 32, 130, 32), OpenFormWithOwner<TileSetCreator.TileSetCreator>),
             };
         }
         sealed class WindowHandleWrapper : IWin32Window

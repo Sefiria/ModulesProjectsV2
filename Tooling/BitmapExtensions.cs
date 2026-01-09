@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Drawing;
 using System.Drawing.Imaging;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace Tooling
 {
@@ -34,6 +30,17 @@ namespace Tooling
                     0, 0, bitmap.Width, bitmap.Height, GraphicsUnit.Pixel, attributes);
                 return bmp;
             }
+        }
+
+        public static Bitmap Crop(this Bitmap b, int sq_sz, int sq_resz = 0, int offset_index_x = 0, int offset_index_y = 0) => b.Crop(sq_sz, sq_sz, sq_resz, sq_resz, offset_index_x, offset_index_y);
+        public static Bitmap Crop(this Bitmap b, int sz_x, int sz_y, int resz_x, int resz_y, int offset_index_x = 0, int offset_index_y = 0)
+        {
+            var nb = new Bitmap(resz_x == 0 ? sz_x : resz_x, resz_y== 0 ? sz_y : resz_y);
+            using (Graphics g = Graphics.FromImage(nb))
+            {
+                g.DrawImage(b, new Rectangle(0, 0, resz_x == 0 ? sz_x : resz_x, resz_y == 0 ? sz_y : resz_y), new Rectangle(offset_index_x * sz_x, offset_index_y * sz_y, sz_x, sz_y), GraphicsUnit.Pixel);
+            }
+            return nb;
         }
     }
 }

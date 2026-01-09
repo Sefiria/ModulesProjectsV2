@@ -54,7 +54,7 @@ namespace Tooling
                 return;
             Delta = 0;
             foreach (MouseButtons b in Enum.GetValues(typeof(MouseButtons)))
-                ReleasedButtons[b] = !ButtonsDown[b];
+                ReleasedButtons[b] = !ButtonsDown.ContainsKey(b) || !ButtonsDown[b];
             OldPosition = Position;
         }
         public static void ForceReleaseAllButtons()
