@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Tooling;
@@ -18,6 +19,7 @@ namespace Project8.Editor.TileCreator
         Timer timerDraw = new Timer() { Enabled = true, Interval = 10 };
         System.Drawing.Graphics g;
         float scale = 10F;
+        Tile tile;
 
         public TileCreator()
         {
@@ -75,7 +77,7 @@ namespace Project8.Editor.TileCreator
             var dial = new FormLoadTile();
             if (dial.ShowDialog(this) == DialogResult.OK)
             {
-                Tile tile = Tile.Tiles[dial.SelectedTileIndex];
+                tile = Tile.Tiles[dial.SelectedTileIndex];
                 numID.Value = tile.id;
                 tbFileNameA.Text = tile.Filename.Length > 0 ? tile.Filename[0] : "";
                 tbFileNameB.Text = tile.Filename.Length > 1 ? tile.Filename[1] : "";
@@ -84,7 +86,7 @@ namespace Project8.Editor.TileCreator
                 tbCharacteristics.Text = tile.Characteristics;
                 cbbMode.SelectedIndex = Enum.GetNames<Tile.Modes>().ToList().IndexOf(tile.Mode.ToString());
                 numMultiTileID.Value = tile.MultiTileIndex;
-                Image = (Bitmap)System.Drawing.Image.FromFile(tile.Filename[0]);
+                DefineImage();
                 g = System.Drawing.Graphics.FromImage(Image);
                 DrawRender(null, null);
             }
@@ -95,7 +97,7 @@ namespace Project8.Editor.TileCreator
             if (Image == null) return;
 
             // Récupère le tile par l’ID affiché (inverse du Load)
-            var tile = Tile.Tiles.FirstOrDefault(t => t.Value.id == (int)numID.Value).Value;
+            tile = Tile.Tiles.FirstOrDefault(t => t.Value.id == (int)numID.Value).Value;
             if (tile == null) return;
 
             // Met à jour les métadonnées depuis la UI
@@ -113,6 +115,27 @@ namespace Project8.Editor.TileCreator
             if (!string.IsNullOrWhiteSpace(fA)) Image.Save(fA, ImageFormat.Png);
             if (!string.IsNullOrWhiteSpace(fB)) Image.Save(fB, ImageFormat.Png);
             if (!string.IsNullOrWhiteSpace(fC)) Image.Save(fC, ImageFormat.Png);
+        }
+
+        private void btManage_Click(object sender, EventArgs e)
+        {
+            new TileEditor.TileEditor().ShowDialog(this);
+        }
+
+        private void radFileName_CheckedChanged(object sender, EventArgs e)
+        {
+            DefineImage();
+        }
+        void DefineImage()
+        {
+            if (radFileNameA.Checked && tile.Filename.Length > 0 && File.Exists(tile.Filename[0]))
+                Image = (Bitmap)System.Drawing.Image.FromFile(tile.Filename[0]);
+            else if (radFileNameB.Checked && tile.Filename.Length > 1 && File.Exists(tile.Filename[1]))
+                Image = (Bitmap)System.Drawing.Image.FromFile(tile.Filename[1]);
+            else if (radFileNameC.Checked && tile.Filename.Length > 2 && File.Exists(tile.Filename[2]))
+                Image = (Bitmap)System.Drawing.Image.FromFile(tile.Filename[2]);
+            else
+                Image = new Bitmap(16, 16);
         }
     }
 }

@@ -34,7 +34,6 @@
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             tbFileNameA = new System.Windows.Forms.TextBox();
-            label3 = new System.Windows.Forms.Label();
             numID = new System.Windows.Forms.NumericUpDown();
             label4 = new System.Windows.Forms.Label();
             tbCharacteristics = new System.Windows.Forms.TextBox();
@@ -44,14 +43,16 @@
             numMultiTileID = new System.Windows.Forms.NumericUpDown();
             Render = new System.Windows.Forms.PictureBox();
             panel_props = new System.Windows.Forms.Panel();
+            radFileNameC = new System.Windows.Forms.RadioButton();
+            radFileNameB = new System.Windows.Forms.RadioButton();
+            radFileNameA = new System.Windows.Forms.RadioButton();
+            tbFileNameC = new System.Windows.Forms.TextBox();
+            tbFileNameB = new System.Windows.Forms.TextBox();
             btSave = new System.Windows.Forms.Button();
             btLoad = new System.Windows.Forms.Button();
             colorDialog1 = new System.Windows.Forms.ColorDialog();
             panel_render = new System.Windows.Forms.Panel();
-            tbFileNameB = new System.Windows.Forms.TextBox();
-            label7 = new System.Windows.Forms.Label();
-            tbFileNameC = new System.Windows.Forms.TextBox();
-            label8 = new System.Windows.Forms.Label();
+            btManage = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)numID).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numMultiTileID).BeginInit();
             ((System.ComponentModel.ISupportInitialize)Render).BeginInit();
@@ -99,15 +100,6 @@
             tbFileNameA.Name = "tbFileNameA";
             tbFileNameA.Size = new System.Drawing.Size(333, 29);
             tbFileNameA.TabIndex = 1;
-            // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Location = new System.Drawing.Point(43, 124);
-            label3.Name = "label3";
-            label3.Size = new System.Drawing.Size(86, 21);
-            label3.TabIndex = 2;
-            label3.Text = "FileNameA";
             // 
             // numID
             // 
@@ -173,10 +165,11 @@
             // panel_props
             // 
             panel_props.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            panel_props.Controls.Add(radFileNameC);
+            panel_props.Controls.Add(radFileNameB);
+            panel_props.Controls.Add(radFileNameA);
             panel_props.Controls.Add(tbFileNameC);
-            panel_props.Controls.Add(label8);
             panel_props.Controls.Add(tbFileNameB);
-            panel_props.Controls.Add(label7);
             panel_props.Controls.Add(btSave);
             panel_props.Controls.Add(btLoad);
             panel_props.Controls.Add(cbbMode);
@@ -190,11 +183,61 @@
             panel_props.Controls.Add(label4);
             panel_props.Controls.Add(label2);
             panel_props.Controls.Add(label5);
-            panel_props.Controls.Add(label3);
-            panel_props.Location = new System.Drawing.Point(724, 12);
+            panel_props.Location = new System.Drawing.Point(724, 64);
             panel_props.Name = "panel_props";
-            panel_props.Size = new System.Drawing.Size(467, 610);
+            panel_props.Size = new System.Drawing.Size(467, 558);
             panel_props.TabIndex = 5;
+            // 
+            // radFileNameC
+            // 
+            radFileNameC.AutoSize = true;
+            radFileNameC.Location = new System.Drawing.Point(18, 191);
+            radFileNameC.Name = "radFileNameC";
+            radFileNameC.Size = new System.Drawing.Size(104, 25);
+            radFileNameC.TabIndex = 9;
+            radFileNameC.TabStop = true;
+            radFileNameC.Text = "FileNameC";
+            radFileNameC.UseVisualStyleBackColor = true;
+            radFileNameC.CheckedChanged += radFileName_CheckedChanged;
+            // 
+            // radFileNameB
+            // 
+            radFileNameB.AutoSize = true;
+            radFileNameB.Location = new System.Drawing.Point(18, 156);
+            radFileNameB.Name = "radFileNameB";
+            radFileNameB.Size = new System.Drawing.Size(103, 25);
+            radFileNameB.TabIndex = 9;
+            radFileNameB.TabStop = true;
+            radFileNameB.Text = "FileNameB";
+            radFileNameB.UseVisualStyleBackColor = true;
+            radFileNameB.CheckedChanged += radFileName_CheckedChanged;
+            // 
+            // radFileNameA
+            // 
+            radFileNameA.AutoSize = true;
+            radFileNameA.Checked = true;
+            radFileNameA.Location = new System.Drawing.Point(18, 122);
+            radFileNameA.Name = "radFileNameA";
+            radFileNameA.Size = new System.Drawing.Size(104, 25);
+            radFileNameA.TabIndex = 9;
+            radFileNameA.TabStop = true;
+            radFileNameA.Text = "FileNameA";
+            radFileNameA.UseVisualStyleBackColor = true;
+            radFileNameA.CheckedChanged += radFileName_CheckedChanged;
+            // 
+            // tbFileNameC
+            // 
+            tbFileNameC.Location = new System.Drawing.Point(128, 191);
+            tbFileNameC.Name = "tbFileNameC";
+            tbFileNameC.Size = new System.Drawing.Size(333, 29);
+            tbFileNameC.TabIndex = 7;
+            // 
+            // tbFileNameB
+            // 
+            tbFileNameB.Location = new System.Drawing.Point(127, 156);
+            tbFileNameB.Name = "tbFileNameB";
+            tbFileNameB.Size = new System.Drawing.Size(333, 29);
+            tbFileNameB.TabIndex = 5;
             // 
             // btSave
             // 
@@ -224,43 +267,22 @@
             panel_render.Size = new System.Drawing.Size(706, 610);
             panel_render.TabIndex = 7;
             // 
-            // tbFileNameB
+            // btManage
             // 
-            tbFileNameB.Location = new System.Drawing.Point(127, 156);
-            tbFileNameB.Name = "tbFileNameB";
-            tbFileNameB.Size = new System.Drawing.Size(333, 29);
-            tbFileNameB.TabIndex = 5;
-            // 
-            // label7
-            // 
-            label7.AutoSize = true;
-            label7.Location = new System.Drawing.Point(43, 159);
-            label7.Name = "label7";
-            label7.Size = new System.Drawing.Size(85, 21);
-            label7.TabIndex = 6;
-            label7.Text = "FileNameB";
-            // 
-            // tbFileNameC
-            // 
-            tbFileNameC.Location = new System.Drawing.Point(128, 191);
-            tbFileNameC.Name = "tbFileNameC";
-            tbFileNameC.Size = new System.Drawing.Size(333, 29);
-            tbFileNameC.TabIndex = 7;
-            // 
-            // label8
-            // 
-            label8.AutoSize = true;
-            label8.Location = new System.Drawing.Point(44, 194);
-            label8.Name = "label8";
-            label8.Size = new System.Drawing.Size(86, 21);
-            label8.TabIndex = 8;
-            label8.Text = "FileNameC";
+            btManage.Location = new System.Drawing.Point(724, 12);
+            btManage.Name = "btManage";
+            btManage.Size = new System.Drawing.Size(467, 46);
+            btManage.TabIndex = 9;
+            btManage.Text = "Manage";
+            btManage.UseVisualStyleBackColor = true;
+            btManage.Click += btManage_Click;
             // 
             // TileCreator
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(9F, 21F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(1203, 634);
+            Controls.Add(btManage);
             Controls.Add(panel_render);
             Controls.Add(panel_props);
             Font = new System.Drawing.Font("Segoe UI", 12F);
@@ -285,7 +307,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox tbFileNameA;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.NumericUpDown numID;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox tbCharacteristics;
@@ -300,8 +321,10 @@
         private System.Windows.Forms.Button btSave;
         private System.Windows.Forms.Button btLoad;
         private System.Windows.Forms.TextBox tbFileNameC;
-        private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TextBox tbFileNameB;
-        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Button btManage;
+        private System.Windows.Forms.RadioButton radFileNameC;
+        private System.Windows.Forms.RadioButton radFileNameB;
+        private System.Windows.Forms.RadioButton radFileNameA;
     }
 }

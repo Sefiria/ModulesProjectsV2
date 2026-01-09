@@ -40,9 +40,8 @@ namespace Project8.Editor
             UIButtons = new Dictionary<string, UIButton>()
             {
                 ["playstop"]         = new UIButton(new Rectangle(16, EditorUIBox.Y + 48, 32, 32), () => { if(IsPlaying) DisposeTest(); else LoadTest(); IsPlaying = !IsPlaying; }),
-                ["TileEditor"]       = new UIButton(new Rectangle(16, EditorUIBox.Y + 48 + 32, 130, 32), OpenFormWithOwner<TileEditor.TileEditor>),
-                ["TileCreator"]      = new UIButton(new Rectangle(16 + 146 * 1, EditorUIBox.Y + 48 + 32, 130, 32), OpenFormWithOwner<TileCreator.TileCreator>),
-                ["TilesetCreator"]   = new UIButton(new Rectangle(16 + 146 * 2, EditorUIBox.Y + 48 + 32, 130, 32), OpenFormWithOwner<TileSetCreator.TileSetCreator>),
+                ["Tile Creator"]      = new UIButton(new Rectangle(16 + 160 * 0, EditorUIBox.Y + 48 + 32, 155, 32), OpenFormWithOwner<TileCreator.TileCreator>),
+                ["TileSet Creator"]   = new UIButton(new Rectangle(16 + 160 * 1, EditorUIBox.Y + 48 + 32, 190, 32), OpenFormWithOwner<TileSetCreator.TileSetCreator>),
             };
         }
         sealed class WindowHandleWrapper : IWin32Window
