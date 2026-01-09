@@ -4,7 +4,7 @@ namespace Project8.Source.Map
 {
     public class Autotile
     {
-        public static string DefaultPattern = "a,z,q,s,d,h,v,zq,zd,sq,sd,f,ns,nz,nd,nq";
+        public static string DefaultPattern = "a,f,h,v,z,q,s,d,zq,zd,sq,sd,ns,nz,nd,nq";
 
 
         public bool UseDefaultPattern { get; set; } = true;
@@ -56,7 +56,7 @@ namespace Project8.Source.Map
 
             return -1;
         }
-        public int Calculate(TiledMap map, int layer, int x, int y)
+        public (int, int) Calculate(TiledMap map, int layer, int x, int y)
         {
             int v = map[layer, x, y];
             bool z = map[layer, x, y - 1] == v;
@@ -91,10 +91,10 @@ namespace Project8.Source.Map
             for (int i = 0; i < patterns.Length; i++)
             {
                 if (patterns[i] == key)
-                    return i;
+                    return (i % 4, i / 4);
             }
 
-            return -1;
+            return (-1, -1);
         }
     }
 }

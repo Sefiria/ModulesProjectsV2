@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Windows.Forms;
 using Tooling;
@@ -16,7 +17,7 @@ namespace Project8.Editor.TileCreator
         Bitmap Image;
         Timer timerDraw = new Timer() { Enabled = true, Interval = 10 };
         System.Drawing.Graphics g;
-        float scale = 20F;
+        float scale = 10F;
 
         public TileCreator()
         {
@@ -35,111 +36,38 @@ namespace Project8.Editor.TileCreator
 
             tbCharacteristics.Text = "s";
 
-            label6.Visible = numMultiTileID.Visible = cbbMode.SelectedText == Enum.GetName(Tile.Modes.MultiTile);
+            label6.Visible = numMultiTileID.Visible = cbbMode.SelectedItem.ToString() == Enum.GetName(Tile.Modes.MultiTile);
             cbbMode.SelectedIndexChanged += (s, e) => label6.Visible = numMultiTileID.Visible = cbbMode.SelectedIndex == Enum.GetNames<Tile.Modes>().ToList().IndexOf(Enum.GetName(Tile.Modes.MultiTile));
 
             Image = new Bitmap(16, 16);
             g = System.Drawing.Graphics.FromImage(Image);
             g.Clear(Color.White);
             timerDraw.Tick += DrawRender;
-
-            var colorsbtn = new List<PictureBox>() { usedColor, color1, color2, color3, color4, color5, color6, color7, color8 };
-            foreach (var c in colorsbtn)
-            {
-                c.Image = new Bitmap(c == usedColor ? 64 : 32, c == usedColor ? 64 : 32);
-                g = System.Drawing.Graphics.FromImage(c.Image);
-                g.Clear(Color.White);
-            }
-        }
-
-        private void Render_MouseDown(object sender, MouseEventArgs e)
-        {
-            IsMouseDown = true;
-            ManageMouse(e);
-        }
-        private void Render_MouseLeave(object sender, EventArgs e)
-        {
-            IsMouseDown = false;
-        }
-        private void Render_MouseMove(object sender, MouseEventArgs e)
-        {
-            ManageMouse(e);
-        }
-        private void Render_MouseUp(object sender, MouseEventArgs e)
-        {
-            IsMouseDown = false;
-        }
-
-        private void ManageMouse(MouseEventArgs e)
-        {
-            ms_old = ms;
-            ms = Render.PointToClient(MousePosition);
-
-            if (IsMouseDown)
-            {
-                bool IsLeft = e.Button == MouseButtons.Left;
-                bool IsRight = e.Button == MouseButtons.Right;
-                bool IsMiddle = e.Button == MouseButtons.Middle;
-                if (IsLeft || IsRight)
-                {
-                    double d = Maths.Distance(ms_old, ms);
-                    for (double t = 0.0; t <= 1.0; t += 1 / d)
-                    {
-                        PointF p = Maths.Lerp(ms_old, ms, t);
-                        if (p.X >= 0 && p.Y >= 0 && p.X < Render.Width && p.Y < Render.Height)
-                            Image.SetPixel((int)(p.X / scale), (int)(p.Y / scale), IsLeft ? usedColor.BackColor : Color.White);
-                    }
-                    //g.DrawLine(IsLeft ? new Pen(usedColor.BackColor) : Pens.White, (ms_old.vecf() / scale).pt, (ms.vecf() / scale).pt);
-                    int x = (int)(ms.X / scale), y = (int)(ms.Y / scale);
-                    if (x >= 0 && y >= 0 && x < 16 && y < 16)
-                        Image.SetPixel(x, y, IsLeft ? usedColor.BackColor : Color.White);
-                }
-                else if (IsMiddle)
-                {
-                    int x = (int)(ms.X / scale), y = (int)(ms.Y / scale);
-                    if (x >= 0 && y >= 0 && x < 16 && y < 16)
-                        usedColor.BackColor = Image.GetPixel(x, y);
-                    using (System.Drawing.Graphics _g = System.Drawing.Graphics.FromImage(usedColor.Image))
-                        _g.Clear(usedColor.BackColor);
-                }
-            }
         }
 
         private void DrawRender(object sender, EventArgs e)
         {
-            Render.Image = Image.ResizeExact((int)(16 * scale), (int)(16 * scale));
-        }
+            int rw = Render.ClientSize.Width, rh = Render.ClientSize.Height;
+            float f = Math.Min((float)rw / Image.Width, (float)rh / Image.Height);
+            int w = (int)(Image.Width * f), h = (int)(Image.Height * f);
 
-        private void color_MouseClick(object sender, MouseEventArgs e)
-        {
-            var colorsbtn = new List<PictureBox>() { color1, color2, color3, color4, color5, color6, color7, color8 };
-            var c = colorsbtn.First(c => sender == c);
+            var bmp = new Bitmap(w, h);
+            using (var g = System.Drawing.Graphics.FromImage(bmp))
+            {
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+                g.DrawImage(Image, 0, 0, w, h);
 
-            if (e.Button == MouseButtons.Left)
-            {
-                usedColor.BackColor = c.BackColor;
-                using (System.Drawing.Graphics _g = System.Drawing.Graphics.FromImage(usedColor.Image)) _g.Clear(usedColor.BackColor);
-            }
-            else if (e.Button == MouseButtons.Middle)
-            {
-                c.BackColor = Color.White;
-                usedColor.BackColor = c.BackColor;
-                using (System.Drawing.Graphics _g = System.Drawing.Graphics.FromImage(c.Image)) _g.Clear(c.BackColor);
-                using (System.Drawing.Graphics _g = System.Drawing.Graphics.FromImage(usedColor.Image)) _g.Clear(usedColor.BackColor);
-            }
-            else
-            {
-                colorDialog1.Color = c.BackColor;
-                if (colorDialog1.ShowDialog(this) == DialogResult.OK)
+                if (cbbMode.SelectedItem.ToString() == Enum.GetName(typeof(Tile.Modes), Tile.Modes.MultiTile))
                 {
-                    if (e.Button == MouseButtons.Right)
-                    {
-                        c.BackColor = colorDialog1.Color;
-                        using (System.Drawing.Graphics _g = System.Drawing.Graphics.FromImage(c.Image)) _g.Clear(c.BackColor);
-                        usedColor.BackColor = c.BackColor;
-                    }
+                    int tileId = (int)numMultiTileID.Value;
+                    int tilesX = Image.Width / 16;
+                    int tileW = (int)(16 * f);
+                    int tx = tileId % tilesX;
+                    int ty = tileId / tilesX;
+                    g.DrawRectangle(new Pen(Color.Black, 2), tx * tileW, ty * tileW, tileW, tileW);
                 }
             }
+            Render.Image = bmp;
         }
 
         private void btLoad_Click(object sender, EventArgs e)
@@ -149,19 +77,42 @@ namespace Project8.Editor.TileCreator
             {
                 Tile tile = Tile.Tiles[dial.SelectedTileIndex];
                 numID.Value = tile.id;
+                tbFileNameA.Text = tile.Filename.Length > 0 ? tile.Filename[0] : "";
+                tbFileNameB.Text = tile.Filename.Length > 1 ? tile.Filename[1] : "";
+                tbFileNameC.Text = tile.Filename.Length > 2 ? tile.Filename[2] : "";
+                tbName.Text = tile.Name;
                 tbCharacteristics.Text = tile.Characteristics;
                 cbbMode.SelectedIndex = Enum.GetNames<Tile.Modes>().ToList().IndexOf(tile.Mode.ToString());
                 numMultiTileID.Value = tile.MultiTileIndex;
                 Image = (Bitmap)System.Drawing.Image.FromFile(tile.Filename[0]);
                 g = System.Drawing.Graphics.FromImage(Image);
                 DrawRender(null, null);
-
             }
         }
 
         private void btSave_Click(object sender, EventArgs e)
         {
+            if (Image == null) return;
 
+            // Récupère le tile par l’ID affiché (inverse du Load)
+            var tile = Tile.Tiles.FirstOrDefault(t => t.Value.id == (int)numID.Value).Value;
+            if (tile == null) return;
+
+            // Met à jour les métadonnées depuis la UI
+            tile.Name = tbName.Text;
+            tile.Characteristics = tbCharacteristics.Text;
+            tile.Mode = (Tile.Modes)Enum.Parse(typeof(Tile.Modes), cbbMode.SelectedItem.ToString());
+            tile.MultiTileIndex = (int)numMultiTileID.Value;
+
+            var fA = tbFileNameA.Text?.Trim();
+            var fB = tbFileNameB.Text?.Trim();
+            var fC = tbFileNameC.Text?.Trim();
+            tile.Filename = new[] { fA, fB, fC }.Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
+
+            // Sauvegarde l’image affichée (inverse du Load qui lit fA)
+            if (!string.IsNullOrWhiteSpace(fA)) Image.Save(fA, ImageFormat.Png);
+            if (!string.IsNullOrWhiteSpace(fB)) Image.Save(fB, ImageFormat.Png);
+            if (!string.IsNullOrWhiteSpace(fC)) Image.Save(fC, ImageFormat.Png);
         }
     }
 }

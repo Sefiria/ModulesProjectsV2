@@ -46,7 +46,7 @@ namespace Project8
                 return;
 
             Texture2D tex = null;
-            int index = -2;
+            (int i, int j) index = (-2, -2);
             DrawStyle drawstyle = DrawStyle.Static;
             int w = 16, h = 16;
 
@@ -54,11 +54,11 @@ namespace Project8
             if (tex == null)
                 return;
             var tile = Tile.Tiles[Map[z, x, y]];
-            index = tile.Autotile?.Calculate(Map, z, x, y) ?? (tile.Mode == Tile.Modes.MultiTile ? tile .MultiTileIndex: 0);
-            if (index == -2)
+            index = tile.Autotile?.Calculate(Map, z, x, y) ?? (tile.Mode == Tile.Modes.MultiTile ? (tile.MultiTileIndex%4, tile.MultiTileIndex/4) : (0, 0));
+            if (index == (-2, -2))
                 draw(tex, x * tilesize * scale, y * tilesize * scale, z, w, h, drawstyle);
-            else if (index > -1)
-                draw(tex, x * tilesize * scale, y * tilesize * scale, z, w, h, drawstyle, index);
+            else if (index.i > -1 && index.j > -1)
+                draw(tex, x * tilesize * scale, y * tilesize * scale, z, w, h, drawstyle, index.i, index.j);
         }
 
         private Texture2D GetTexByLayer(int x, int y, int z)

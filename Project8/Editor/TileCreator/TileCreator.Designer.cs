@@ -33,7 +33,7 @@
             tbName = new System.Windows.Forms.TextBox();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
-            tbFileName = new System.Windows.Forms.TextBox();
+            tbFileNameA = new System.Windows.Forms.TextBox();
             label3 = new System.Windows.Forms.Label();
             numID = new System.Windows.Forms.NumericUpDown();
             label4 = new System.Windows.Forms.Label();
@@ -46,32 +46,16 @@
             panel_props = new System.Windows.Forms.Panel();
             btSave = new System.Windows.Forms.Button();
             btLoad = new System.Windows.Forms.Button();
-            panel_colors = new System.Windows.Forms.Panel();
-            usedColor = new System.Windows.Forms.PictureBox();
-            color8 = new System.Windows.Forms.PictureBox();
-            color4 = new System.Windows.Forms.PictureBox();
-            color6 = new System.Windows.Forms.PictureBox();
-            color2 = new System.Windows.Forms.PictureBox();
-            color7 = new System.Windows.Forms.PictureBox();
-            color3 = new System.Windows.Forms.PictureBox();
-            color5 = new System.Windows.Forms.PictureBox();
-            color1 = new System.Windows.Forms.PictureBox();
             colorDialog1 = new System.Windows.Forms.ColorDialog();
             panel_render = new System.Windows.Forms.Panel();
+            tbFileNameB = new System.Windows.Forms.TextBox();
+            label7 = new System.Windows.Forms.Label();
+            tbFileNameC = new System.Windows.Forms.TextBox();
+            label8 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)numID).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numMultiTileID).BeginInit();
             ((System.ComponentModel.ISupportInitialize)Render).BeginInit();
             panel_props.SuspendLayout();
-            panel_colors.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)usedColor).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)color8).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)color4).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)color6).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)color2).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)color7).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)color3).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)color5).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)color1).BeginInit();
             panel_render.SuspendLayout();
             SuspendLayout();
             // 
@@ -109,25 +93,25 @@
             label2.TabIndex = 2;
             label2.Text = "Name";
             // 
-            // tbFileName
+            // tbFileNameA
             // 
-            tbFileName.Location = new System.Drawing.Point(127, 121);
-            tbFileName.Name = "tbFileName";
-            tbFileName.Size = new System.Drawing.Size(155, 29);
-            tbFileName.TabIndex = 1;
+            tbFileNameA.Location = new System.Drawing.Point(127, 121);
+            tbFileNameA.Name = "tbFileNameA";
+            tbFileNameA.Size = new System.Drawing.Size(333, 29);
+            tbFileNameA.TabIndex = 1;
             // 
             // label3
             // 
             label3.AutoSize = true;
             label3.Location = new System.Drawing.Point(43, 124);
             label3.Name = "label3";
-            label3.Size = new System.Drawing.Size(76, 21);
+            label3.Size = new System.Drawing.Size(86, 21);
             label3.TabIndex = 2;
-            label3.Text = "FileName";
+            label3.Text = "FileNameA";
             // 
             // numID
             // 
-            numID.Location = new System.Drawing.Point(127, 156);
+            numID.Location = new System.Drawing.Point(128, 226);
             numID.Maximum = new decimal(new int[] { 255, 0, 0, 0 });
             numID.Minimum = new decimal(new int[] { 1, 0, 0, int.MinValue });
             numID.Name = "numID";
@@ -137,7 +121,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new System.Drawing.Point(94, 158);
+            label4.Location = new System.Drawing.Point(95, 228);
             label4.Name = "label4";
             label4.Size = new System.Drawing.Size(25, 21);
             label4.TabIndex = 2;
@@ -145,7 +129,7 @@
             // 
             // tbCharacteristics
             // 
-            tbCharacteristics.Location = new System.Drawing.Point(128, 191);
+            tbCharacteristics.Location = new System.Drawing.Point(129, 261);
             tbCharacteristics.Name = "tbCharacteristics";
             tbCharacteristics.Size = new System.Drawing.Size(155, 29);
             tbCharacteristics.TabIndex = 1;
@@ -153,7 +137,7 @@
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new System.Drawing.Point(8, 194);
+            label5.Location = new System.Drawing.Point(9, 264);
             label5.Name = "label5";
             label5.Size = new System.Drawing.Size(111, 21);
             label5.TabIndex = 2;
@@ -163,7 +147,7 @@
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new System.Drawing.Point(32, 228);
+            label6.Location = new System.Drawing.Point(33, 298);
             label6.Name = "label6";
             label6.Size = new System.Drawing.Size(89, 21);
             label6.TabIndex = 2;
@@ -171,7 +155,7 @@
             // 
             // numMultiTileID
             // 
-            numMultiTileID.Location = new System.Drawing.Point(127, 226);
+            numMultiTileID.Location = new System.Drawing.Point(128, 296);
             numMultiTileID.Maximum = new decimal(new int[] { 255, 0, 0, 0 });
             numMultiTileID.Name = "numMultiTileID";
             numMultiTileID.Size = new System.Drawing.Size(156, 29);
@@ -179,25 +163,26 @@
             // 
             // Render
             // 
-            Render.Location = new System.Drawing.Point(192, 84);
+            Render.Dock = System.Windows.Forms.DockStyle.Fill;
+            Render.Location = new System.Drawing.Point(0, 0);
             Render.Name = "Render";
-            Render.Size = new System.Drawing.Size(320, 320);
+            Render.Size = new System.Drawing.Size(706, 610);
             Render.TabIndex = 4;
             Render.TabStop = false;
-            Render.MouseDown += Render_MouseDown;
-            Render.MouseLeave += Render_MouseLeave;
-            Render.MouseMove += Render_MouseMove;
-            Render.MouseUp += Render_MouseUp;
             // 
             // panel_props
             // 
             panel_props.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            panel_props.Controls.Add(tbFileNameC);
+            panel_props.Controls.Add(label8);
+            panel_props.Controls.Add(tbFileNameB);
+            panel_props.Controls.Add(label7);
             panel_props.Controls.Add(btSave);
             panel_props.Controls.Add(btLoad);
             panel_props.Controls.Add(cbbMode);
             panel_props.Controls.Add(tbName);
             panel_props.Controls.Add(numMultiTileID);
-            panel_props.Controls.Add(tbFileName);
+            panel_props.Controls.Add(tbFileNameA);
             panel_props.Controls.Add(label6);
             panel_props.Controls.Add(tbCharacteristics);
             panel_props.Controls.Add(numID);
@@ -208,7 +193,7 @@
             panel_props.Controls.Add(label3);
             panel_props.Location = new System.Drawing.Point(724, 12);
             panel_props.Name = "panel_props";
-            panel_props.Size = new System.Drawing.Size(290, 610);
+            panel_props.Size = new System.Drawing.Size(467, 610);
             panel_props.TabIndex = 5;
             // 
             // btSave
@@ -231,118 +216,52 @@
             btLoad.UseVisualStyleBackColor = true;
             btLoad.Click += btLoad_Click;
             // 
-            // panel_colors
-            // 
-            panel_colors.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            panel_colors.Controls.Add(usedColor);
-            panel_colors.Controls.Add(color8);
-            panel_colors.Controls.Add(color4);
-            panel_colors.Controls.Add(color6);
-            panel_colors.Controls.Add(color2);
-            panel_colors.Controls.Add(color7);
-            panel_colors.Controls.Add(color3);
-            panel_colors.Controls.Add(color5);
-            panel_colors.Controls.Add(color1);
-            panel_colors.Location = new System.Drawing.Point(12, 12);
-            panel_colors.Name = "panel_colors";
-            panel_colors.Size = new System.Drawing.Size(706, 104);
-            panel_colors.TabIndex = 6;
-            // 
-            // usedColor
-            // 
-            usedColor.Location = new System.Drawing.Point(17, 21);
-            usedColor.Name = "usedColor";
-            usedColor.Size = new System.Drawing.Size(58, 58);
-            usedColor.TabIndex = 1;
-            usedColor.TabStop = false;
-            // 
-            // color8
-            // 
-            color8.Location = new System.Drawing.Point(177, 53);
-            color8.Name = "color8";
-            color8.Size = new System.Drawing.Size(26, 26);
-            color8.TabIndex = 0;
-            color8.TabStop = false;
-            color8.MouseClick += color_MouseClick;
-            // 
-            // color4
-            // 
-            color4.Location = new System.Drawing.Point(177, 21);
-            color4.Name = "color4";
-            color4.Size = new System.Drawing.Size(26, 26);
-            color4.TabIndex = 0;
-            color4.TabStop = false;
-            color4.MouseClick += color_MouseClick;
-            // 
-            // color6
-            // 
-            color6.Location = new System.Drawing.Point(113, 53);
-            color6.Name = "color6";
-            color6.Size = new System.Drawing.Size(26, 26);
-            color6.TabIndex = 0;
-            color6.TabStop = false;
-            color6.MouseClick += color_MouseClick;
-            // 
-            // color2
-            // 
-            color2.Location = new System.Drawing.Point(113, 21);
-            color2.Name = "color2";
-            color2.Size = new System.Drawing.Size(26, 26);
-            color2.TabIndex = 0;
-            color2.TabStop = false;
-            color2.MouseClick += color_MouseClick;
-            // 
-            // color7
-            // 
-            color7.Location = new System.Drawing.Point(145, 53);
-            color7.Name = "color7";
-            color7.Size = new System.Drawing.Size(26, 26);
-            color7.TabIndex = 0;
-            color7.TabStop = false;
-            color7.MouseClick += color_MouseClick;
-            // 
-            // color3
-            // 
-            color3.Location = new System.Drawing.Point(145, 21);
-            color3.Name = "color3";
-            color3.Size = new System.Drawing.Size(26, 26);
-            color3.TabIndex = 0;
-            color3.TabStop = false;
-            color3.MouseClick += color_MouseClick;
-            // 
-            // color5
-            // 
-            color5.Location = new System.Drawing.Point(81, 53);
-            color5.Name = "color5";
-            color5.Size = new System.Drawing.Size(26, 26);
-            color5.TabIndex = 0;
-            color5.TabStop = false;
-            color5.MouseClick += color_MouseClick;
-            // 
-            // color1
-            // 
-            color1.Location = new System.Drawing.Point(81, 21);
-            color1.Name = "color1";
-            color1.Size = new System.Drawing.Size(26, 26);
-            color1.TabIndex = 0;
-            color1.TabStop = false;
-            color1.MouseClick += color_MouseClick;
-            // 
             // panel_render
             // 
             panel_render.Controls.Add(Render);
-            panel_render.Location = new System.Drawing.Point(12, 124);
+            panel_render.Location = new System.Drawing.Point(12, 12);
             panel_render.Name = "panel_render";
-            panel_render.Size = new System.Drawing.Size(706, 498);
+            panel_render.Size = new System.Drawing.Size(706, 610);
             panel_render.TabIndex = 7;
+            // 
+            // tbFileNameB
+            // 
+            tbFileNameB.Location = new System.Drawing.Point(127, 156);
+            tbFileNameB.Name = "tbFileNameB";
+            tbFileNameB.Size = new System.Drawing.Size(333, 29);
+            tbFileNameB.TabIndex = 5;
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new System.Drawing.Point(43, 159);
+            label7.Name = "label7";
+            label7.Size = new System.Drawing.Size(85, 21);
+            label7.TabIndex = 6;
+            label7.Text = "FileNameB";
+            // 
+            // tbFileNameC
+            // 
+            tbFileNameC.Location = new System.Drawing.Point(128, 191);
+            tbFileNameC.Name = "tbFileNameC";
+            tbFileNameC.Size = new System.Drawing.Size(333, 29);
+            tbFileNameC.TabIndex = 7;
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new System.Drawing.Point(44, 194);
+            label8.Name = "label8";
+            label8.Size = new System.Drawing.Size(86, 21);
+            label8.TabIndex = 8;
+            label8.Text = "FileNameC";
             // 
             // TileCreator
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(9F, 21F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(1026, 634);
+            ClientSize = new System.Drawing.Size(1203, 634);
             Controls.Add(panel_render);
-            Controls.Add(panel_colors);
             Controls.Add(panel_props);
             Font = new System.Drawing.Font("Segoe UI", 12F);
             Margin = new System.Windows.Forms.Padding(4);
@@ -355,16 +274,6 @@
             ((System.ComponentModel.ISupportInitialize)Render).EndInit();
             panel_props.ResumeLayout(false);
             panel_props.PerformLayout();
-            panel_colors.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)usedColor).EndInit();
-            ((System.ComponentModel.ISupportInitialize)color8).EndInit();
-            ((System.ComponentModel.ISupportInitialize)color4).EndInit();
-            ((System.ComponentModel.ISupportInitialize)color6).EndInit();
-            ((System.ComponentModel.ISupportInitialize)color2).EndInit();
-            ((System.ComponentModel.ISupportInitialize)color7).EndInit();
-            ((System.ComponentModel.ISupportInitialize)color3).EndInit();
-            ((System.ComponentModel.ISupportInitialize)color5).EndInit();
-            ((System.ComponentModel.ISupportInitialize)color1).EndInit();
             panel_render.ResumeLayout(false);
             ResumeLayout(false);
         }
@@ -375,7 +284,7 @@
         private System.Windows.Forms.TextBox tbName;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox tbFileName;
+        private System.Windows.Forms.TextBox tbFileNameA;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.NumericUpDown numID;
         private System.Windows.Forms.Label label4;
@@ -386,19 +295,13 @@
         private System.Windows.Forms.NumericUpDown numMultiTileID;
         private System.Windows.Forms.PictureBox Render;
         private System.Windows.Forms.Panel panel_props;
-        private System.Windows.Forms.Panel panel_colors;
-        private System.Windows.Forms.PictureBox color1;
         private System.Windows.Forms.ColorDialog colorDialog1;
-        private System.Windows.Forms.PictureBox color8;
-        private System.Windows.Forms.PictureBox color4;
-        private System.Windows.Forms.PictureBox color6;
-        private System.Windows.Forms.PictureBox color2;
-        private System.Windows.Forms.PictureBox color7;
-        private System.Windows.Forms.PictureBox color3;
-        private System.Windows.Forms.PictureBox color5;
-        private System.Windows.Forms.PictureBox usedColor;
         private System.Windows.Forms.Panel panel_render;
         private System.Windows.Forms.Button btSave;
         private System.Windows.Forms.Button btLoad;
+        private System.Windows.Forms.TextBox tbFileNameC;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.TextBox tbFileNameB;
+        private System.Windows.Forms.Label label7;
     }
 }
