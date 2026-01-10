@@ -42,6 +42,7 @@ namespace Project8.Editor
                 ["playstop"]         = new UIButton(new Rectangle(16, EditorUIBox.Y + 48, 32, 32), () => { if(IsPlaying) DisposeTest(); else LoadTest(); IsPlaying = !IsPlaying; }),
                 ["Tile Creator"]      = new UIButton(new Rectangle(16 + 160 * 0, EditorUIBox.Y + 48 + 32, 155, 32), OpenFormWithOwner<TileCreator.TileCreator>),
                 ["TileSet Creator"]   = new UIButton(new Rectangle(16 + 160 * 1, EditorUIBox.Y + 48 + 32, 190, 32), OpenFormWithOwner<TileSetCreator.TileSetCreator>),
+                ["TileSet Generator"]   = new UIButton(new Rectangle(16 + 177 * 2, EditorUIBox.Y + 48 + 32, 215, 32), OpenFormWithOwner<TileSetCreator.TileSetGenerator>),
             };
         }
         sealed class WindowHandleWrapper : IWin32Window

@@ -53,6 +53,9 @@
     <Folder Include="Assets\SFX\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Editor\TileCreator\TileSetGenerator.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Editor\TileCreator\TileSetCreator.cs">
       <SubType>Form</SubType>
     </Compile>
