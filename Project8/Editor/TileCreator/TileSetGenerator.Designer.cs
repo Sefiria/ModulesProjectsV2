@@ -30,6 +30,7 @@
         {
             components = new System.ComponentModel.Container();
             toolTip1 = new System.Windows.Forms.ToolTip(components);
+            btRetro = new System.Windows.Forms.Button();
             panel_colors = new System.Windows.Forms.Panel();
             btSave = new System.Windows.Forms.Button();
             btNew = new System.Windows.Forms.Button();
@@ -46,8 +47,8 @@
             colorDialog1 = new System.Windows.Forms.ColorDialog();
             panel_render = new System.Windows.Forms.Panel();
             render_preview = new System.Windows.Forms.PictureBox();
-            render = new System.Windows.Forms.PictureBox();
             btPreview = new System.Windows.Forms.Button();
+            render = new System.Windows.Forms.PictureBox();
             panel_colors.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)colorBuffer).BeginInit();
             ((System.ComponentModel.ISupportInitialize)usedColor).BeginInit();
@@ -64,10 +65,22 @@
             ((System.ComponentModel.ISupportInitialize)render).BeginInit();
             SuspendLayout();
             // 
+            // btRetro
+            // 
+            btRetro.Location = new System.Drawing.Point(589, 3);
+            btRetro.Name = "btRetro";
+            btRetro.Size = new System.Drawing.Size(68, 33);
+            btRetro.TabIndex = 6;
+            btRetro.Text = "Retro";
+            toolTip1.SetToolTip(btRetro, "Load a tile from the 'Alone' (no connection) part.");
+            btRetro.UseVisualStyleBackColor = true;
+            btRetro.Click += btRetro_Click;
+            // 
             // panel_colors
             // 
             panel_colors.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             panel_colors.Controls.Add(btSave);
+            panel_colors.Controls.Add(btRetro);
             panel_colors.Controls.Add(btNew);
             panel_colors.Controls.Add(colorBuffer);
             panel_colors.Controls.Add(usedColor);
@@ -96,7 +109,7 @@
             // 
             // btNew
             // 
-            btNew.Location = new System.Drawing.Point(589, 3);
+            btNew.Location = new System.Drawing.Point(515, 3);
             btNew.Name = "btNew";
             btNew.Size = new System.Drawing.Size(68, 33);
             btNew.TabIndex = 6;
@@ -111,6 +124,7 @@
             colorBuffer.Size = new System.Drawing.Size(26, 26);
             colorBuffer.TabIndex = 5;
             colorBuffer.TabStop = false;
+            colorBuffer.MouseClick += color_MouseClick;
             // 
             // usedColor
             // 
@@ -216,6 +230,16 @@
             render_preview.MouseMove += Render_MouseMove;
             render_preview.MouseUp += Render_MouseUp;
             // 
+            // btPreview
+            // 
+            btPreview.Location = new System.Drawing.Point(19, 362);
+            btPreview.Name = "btPreview";
+            btPreview.Size = new System.Drawing.Size(141, 257);
+            btPreview.TabIndex = 6;
+            btPreview.Text = "PREVIEW";
+            btPreview.UseVisualStyleBackColor = true;
+            btPreview.Click += btPreview_Click;
+            // 
             // render
             // 
             render.BackColor = System.Drawing.Color.White;
@@ -229,16 +253,6 @@
             render.MouseMove += Render_MouseMove;
             render.MouseUp += Render_MouseUp;
             // 
-            // btPreview
-            // 
-            btPreview.Location = new System.Drawing.Point(19, 362);
-            btPreview.Name = "btPreview";
-            btPreview.Size = new System.Drawing.Size(141, 257);
-            btPreview.TabIndex = 6;
-            btPreview.Text = "PREVIEW";
-            btPreview.UseVisualStyleBackColor = true;
-            btPreview.Click += btPreview_Click;
-            // 
             // TileSetGenerator
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(9F, 21F);
@@ -249,7 +263,7 @@
             Font = new System.Drawing.Font("Segoe UI", 12F);
             Margin = new System.Windows.Forms.Padding(4);
             Name = "TileSetGenerator";
-            StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             Text = "TileSetCreator";
             Load += TileCreator_Load;
             panel_colors.ResumeLayout(false);
@@ -289,5 +303,6 @@
         private System.Windows.Forms.Button btSave;
         private System.Windows.Forms.Button btNew;
         private System.Windows.Forms.Button btPreview;
+        private System.Windows.Forms.Button btRetro;
     }
 }

@@ -11,6 +11,7 @@ using Tooling;
 using KB = Tooling.KB;
 using MS = Tooling.MouseStates;
 using G = System.Drawing.Graphics;
+using Project8.Source.TiledMap;
 
 namespace Project8.Editor.TileSetCreator
 {
@@ -326,7 +327,7 @@ namespace Project8.Editor.TileSetCreator
                 12, 13, 14, 15
             };
 
-            Bitmap final = new Bitmap(sz*4, sz*4);
+            Bitmap final = new Bitmap(sz * 4, sz * 4);
 
             using (G g = G.FromImage(final))
             {
@@ -359,6 +360,24 @@ namespace Project8.Editor.TileSetCreator
             }
 
             final.Dispose();
+        }
+
+        private void btRetro_Click(object sender, EventArgs e)
+        {
+            var dial = new OpenFileDialog();
+            dial.InitialDirectory = Directory.GetCurrentDirectory() + @"\Assets\Textures\Tilesets";
+            dial.Title = "Retrocharger un tileset pour génération";
+            dial.Filter = "PNG Image|*.png";
+            if (dial.ShowDialog(this) == DialogResult.OK)
+            {
+                if (!string.IsNullOrWhiteSpace(dial.FileName))
+                {
+                    render.Image = ResizeExact(new Bitmap(dial.FileName).Crop(16), sz * scale, sz * scale);
+                    render_preview.Image = new Bitmap(sz * scale, sz * scale);
+                    render.Refresh();
+                    GeneratePreview();
+                }
+            }
         }
     }
 }
