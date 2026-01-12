@@ -176,6 +176,7 @@ namespace Project8.Editor.TileEditor
                 Tile.Tiles = tilesList.ToDictionary(t => t.id, t => t);
                 foreach (Tile tile in Tile.Tiles.Values)
                 {
+                    if (tile.Filename.Length == 0) continue;
                     tile.Tex = new Texture2D[tile.Filename.Length];
                     if (tile.Mode == Tile.Modes.Autotile && tile.Autotile == null)
                         tile.Autotile = new Autotile();

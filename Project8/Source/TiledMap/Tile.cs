@@ -46,5 +46,6 @@ namespace Project8.Source.TiledMap
 
         public bool IsSolid => Characteristics.Contains('s');
         public bool IsGravityApplies => Characteristics.Contains('g');
+        public bool IsConnectingToAllSolid => Characteristics.Contains('c');
     }
 }

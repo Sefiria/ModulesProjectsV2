@@ -66,7 +66,7 @@ namespace Project8.Editor.TileSetCreator
             bool IsLeft = e.Button == MouseButtons.Left;
             bool IsRight = e.Button == MouseButtons.Right;
             bool IsMiddle = e.Button == MouseButtons.Middle;
-            bool IsFill = IsLeft && ModifierKeys.HasFlag(Keys.Control);
+            bool IsFill = IsLeft && ModifierKeys.HasFlag(Keys.Shift) && ModifierKeys.HasFlag(Keys.Control);
 
             int tx = Math.Clamp((int)(ms.X / scale), 0, sz - 1);
             int ty = Math.Clamp((int)(ms.Y / scale), 0, sz - 1);

@@ -39,7 +39,11 @@ namespace Project8.Editor.TileCreator
             tbCharacteristics.Text = "s";
 
             label6.Visible = numMultiTileID.Visible = cbbMode.SelectedItem.ToString() == Enum.GetName(Tile.Modes.MultiTile);
-            cbbMode.SelectedIndexChanged += (s, e) => label6.Visible = numMultiTileID.Visible = cbbMode.SelectedIndex == Enum.GetNames<Tile.Modes>().ToList().IndexOf(Enum.GetName(Tile.Modes.MultiTile));
+            cbbMode.SelectedIndexChanged += (s, e) =>
+            {
+                label6.Visible = numMultiTileID.Visible = cbbMode.SelectedIndex == Enum.GetNames<Tile.Modes>().ToList().IndexOf(Enum.GetName(Tile.Modes.MultiTile));
+                label3.Visible = tbPattern.Visible = cbbMode.SelectedIndex == Enum.GetNames<Tile.Modes>().ToList().IndexOf(Enum.GetName(Tile.Modes.Autotile));
+            };
 
             Image = new Bitmap(16, 16);
             g = System.Drawing.Graphics.FromImage(Image);
@@ -86,6 +90,7 @@ namespace Project8.Editor.TileCreator
                 tbCharacteristics.Text = tile.Characteristics;
                 cbbMode.SelectedIndex = Enum.GetNames<Tile.Modes>().ToList().IndexOf(tile.Mode.ToString());
                 numMultiTileID.Value = tile.MultiTileIndex;
+                tbPattern.Text = tile.Autotile.Pattern;
                 DefineImage();
                 g = System.Drawing.Graphics.FromImage(Image);
                 DrawRender(null, null);
@@ -105,16 +110,17 @@ namespace Project8.Editor.TileCreator
             tile.Characteristics = tbCharacteristics.Text;
             tile.Mode = (Tile.Modes)Enum.Parse(typeof(Tile.Modes), cbbMode.SelectedItem.ToString());
             tile.MultiTileIndex = (int)numMultiTileID.Value;
+            if(tile.Mode == Tile.Modes.Autotile)
+            {
+                if (tile.Autotile == null)
+                    tile.Autotile = new Source.Map.Autotile();
+                tile.Autotile.Pattern = tbPattern.Text;
+            }
 
             var fA = tbFileNameA.Text?.Trim();
             var fB = tbFileNameB.Text?.Trim();
             var fC = tbFileNameC.Text?.Trim();
             tile.Filename = new[] { fA, fB, fC }.Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
-
-            // Sauvegarde l’image affichée (inverse du Load qui lit fA)
-            if (!string.IsNullOrWhiteSpace(fA)) Image.Save(fA, ImageFormat.Png);
-            if (!string.IsNullOrWhiteSpace(fB)) Image.Save(fB, ImageFormat.Png);
-            if (!string.IsNullOrWhiteSpace(fC)) Image.Save(fC, ImageFormat.Png);
         }
 
         private void btManage_Click(object sender, EventArgs e)

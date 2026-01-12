@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using Project8.Source.TiledMap;
+using System.Text.Json.Serialization;
 
 namespace Project8.Source.Map
 {
@@ -59,10 +60,11 @@ namespace Project8.Source.Map
         public (int, int) Calculate(TiledMap map, int layer, int x, int y)
         {
             int v = map[layer, x, y];
-            bool z = map[layer, x, y - 1] == v;
-            bool q = map[layer, x - 1, y] == v;
-            bool s = map[layer, x, y + 1] == v;
-            bool d = map[layer, x + 1, y] == v;
+            bool connect_to_all = Tile.Tiles[v].IsConnectingToAllSolid;
+            bool z = connect_to_all ? Tile.Tiles[map[layer, x, y - 1]].IsSolid : map[layer, x, y - 1] == v;
+            bool q = connect_to_all ? Tile.Tiles[map[layer, x - 1, y]].IsSolid : map[layer, x - 1, y] == v;
+            bool s = connect_to_all ? Tile.Tiles[map[layer, x, y + 1]].IsSolid : map[layer, x, y + 1] == v;
+            bool d = connect_to_all ? Tile.Tiles[map[layer, x + 1, y]].IsSolid : map[layer, x + 1, y] == v;
 
             string key = "";
 

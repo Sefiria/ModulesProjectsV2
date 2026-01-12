@@ -1,49 +1,131 @@
 ﻿{
   "tiles": [
     {
-      "id": 255,
-      "name": "missing",
-      "filename": [ "Assets/Textures/missing.png" ]
+      "Name": "",
+      "Filename": [],
+      "id": -1,
+      "Mode": "Single",
+      "Characteristics": "",
+      "Autotile": null,
+      "MultiTileIndex": 0,
+      "IsSolid": false,
+      "IsGravityApplies": false
     },
     {
+      "Name": "grass",
+      "Filename": [
+        "Assets/Textures/Tilesets/grass/grassA.png",
+        "Assets/Textures/Tilesets/grass/grassB.png",
+        "Assets/Textures/Tilesets/grass/grassC.png"
+      ],
       "id": 0,
-      "name": "grass",
-      "filename": [ "Assets/Textures/Tilesets/grass/grassA.png", "Assets/Textures/Tilesets/grass/grassB.png", "Assets/Textures/Tilesets/grass/grassC.png" ],
-      "Mode": "Autotile"
+      "Mode": "Autotile",
+      "Characteristics": "s",
+      "Autotile": {
+        "UseDefaultPattern": true,
+        "Pattern": ""
+      },
+      "MultiTileIndex": 0,
+      "IsSolid": true,
+      "IsGravityApplies": false
     },
     {
+      "Name": "stone",
+      "Filename": [
+        "Assets/Textures/Tilesets/stone/stoneA.png",
+        "Assets/Textures/Tilesets/stone/stoneB.png"
+      ],
       "id": 1,
-      "name": "stone",
-      "filename": [ "Assets/Textures/Tilesets/stone/stoneA.png", "Assets/Textures/Tilesets/stone/stoneB.png" ],
-      "Mode": "Autotile"
+      "Mode": "Autotile",
+      "Characteristics": "s",
+      "Autotile": {
+        "UseDefaultPattern": true,
+        "Pattern": ""
+      },
+      "MultiTileIndex": 0,
+      "IsSolid": true,
+      "IsGravityApplies": false
     },
     {
+      "Name": "plank",
+      "Filename": [
+        "Assets/Textures/Tilesets/wood/wood.png"
+      ],
       "id": 2,
-      "name": "plank",
-      "filename": [ "Assets/Textures/Tilesets/wood/wood.png" ],
       "Mode": "MultiTile",
-      "MultiTileIndex": 0
+      "Characteristics": "s",
+      "Autotile": null,
+      "MultiTileIndex": 0,
+      "IsSolid": true,
+      "IsGravityApplies": false
     },
     {
+      "Name": "crate",
+      "Filename": [
+        "Assets/Textures/Tilesets/wood/wood.png"
+      ],
       "id": 3,
-      "name": "crate",
-      "filename": [ "Assets/Textures/Tilesets/wood/wood.png" ],
       "Mode": "MultiTile",
-      "MultiTileIndex": 1
+      "Characteristics": "sg",
+      "Autotile": null,
+      "MultiTileIndex": 1,
+      "IsSolid": true,
+      "IsGravityApplies": true
     },
     {
+      "Name": "player",
+      "Filename": [
+        "Assets/Textures/Tilesets/entities/global.png"
+      ],
       "id": 4,
-      "name": "player",
-      "filename": [ "Assets/Textures/Tilesets/entities/global.png" ],
       "Mode": "MultiTile",
-      "MultiTileIndex": 0
+      "Characteristics": "s",
+      "Autotile": null,
+      "MultiTileIndex": 0,
+      "IsSolid": true,
+      "IsGravityApplies": false
     },
     {
+      "Name": "mob",
+      "Filename": [
+        "Assets/Textures/Tilesets/entities/global.png"
+      ],
       "id": 5,
-      "name": "mob",
-      "filename": [ "Assets/Textures/Tilesets/entities/global.png" ],
       "Mode": "MultiTile",
-      "MultiTileIndex": 1
+      "Characteristics": "s",
+      "Autotile": null,
+      "MultiTileIndex": 1,
+      "IsSolid": true,
+      "IsGravityApplies": false
+    },
+    {
+      "Name": "button",
+      "Filename": [
+        "Assets/Textures/Tilesets/props/buttons.png"
+      ],
+      "id": 6,
+      "Mode": "Autotile",
+      "Characteristics": "s",
+      "Autotile": {
+        "UseDefaultPattern": true,
+        "Pattern": ""
+      },
+      "MultiTileIndex": 0,
+      "IsSolid": true,
+      "IsGravityApplies": false
+    },
+    {
+      "Name": "missing",
+      "Filename": [
+        "Assets/Textures/missing.png"
+      ],
+      "id": 255,
+      "Mode": "Single",
+      "Characteristics": "s",
+      "Autotile": null,
+      "MultiTileIndex": 0,
+      "IsSolid": true,
+      "IsGravityApplies": false
     }
   ]
 }

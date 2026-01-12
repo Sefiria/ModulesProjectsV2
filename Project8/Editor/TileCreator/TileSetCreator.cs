@@ -193,6 +193,7 @@ namespace Project8.Editor.TileSetCreator
             bool IsLeft = e.Button == MouseButtons.Left;
             bool IsRight = e.Button == MouseButtons.Right;
             bool IsMiddle = e.Button == MouseButtons.Middle;
+            bool IsFill = IsLeft && ModifierKeys.HasFlag(Keys.Shift) && ModifierKeys.HasFlag(Keys.Control);
 
             if (currentIdx < 0 || currentIdx >= Parts.Count) return;
 
@@ -200,6 +201,18 @@ namespace Project8.Editor.TileSetCreator
             int ty = Math.Clamp((int)(ms.Y / scale), 0, sz - 1);
 
             var part = Parts[currentIdx];
+
+            if (IsFill)
+            {
+                Color target = part.GetPixel(tx, ty);
+                Color replacement = usedColor.BackColor;
+
+                if (target != replacement)
+                    FloodFill(part, tx, ty, target, replacement);
+
+                UpdatePreviewFromPart(currentIdx, Render);
+                return;
+            }
 
             if (IsLeft || IsRight)
             {
@@ -224,14 +237,27 @@ namespace Project8.Editor.TileSetCreator
 
                 if (KB.IsKeyDown(KB.Key.LeftAlt))
                 {
-                    // Détecte l’état courant des boutons, pas seulement l’événement
-                    bool leftHeld = Control.MouseButtons.HasFlag(MouseButtons.Left);
-                    bool rightHeld = Control.MouseButtons.HasFlag(MouseButtons.Right);
+                    bool leftHeld = MouseButtons.HasFlag(MouseButtons.Left);
+                    bool rightHeld = MouseButtons.HasFlag(MouseButtons.Right);
 
                     if (leftHeld)
                         Parts[currentIdx].RotateFlip(RotateFlipType.RotateNoneFlipX);
                     else if (rightHeld)
                         Parts[currentIdx].RotateFlip(RotateFlipType.RotateNoneFlipY);
+
+                    UpdatePreviewFromPart(currentIdx, Render);
+                    return;
+                }
+
+                if (KB.IsKeyDown(KB.Key.LeftShift))
+                {
+                    bool leftHeld = MouseButtons.HasFlag(MouseButtons.Left);
+                    bool rightHeld = MouseButtons.HasFlag(MouseButtons.Right);
+
+                    if (leftHeld)
+                        Parts[currentIdx].RotateFlip(RotateFlipType.Rotate90FlipNone);
+                    else if (rightHeld)
+                        Parts[currentIdx].RotateFlip(RotateFlipType.Rotate270FlipNone);
 
                     UpdatePreviewFromPart(currentIdx, Render);
                     return;
@@ -280,6 +306,34 @@ namespace Project8.Editor.TileSetCreator
             render.Image = preview;
             old?.Dispose();
             render.Refresh();
+        }
+        private void FloodFill(Bitmap bmp, int x, int y, Color target, Color replacement)
+        {
+            int w = bmp.Width;
+            int h = bmp.Height;
+
+            Stack<Point> stack = new Stack<Point>();
+            stack.Push(new Point(x, y));
+
+            while (stack.Count > 0)
+            {
+                Point p = stack.Pop();
+                int px = p.X;
+                int py = p.Y;
+
+                if (px < 0 || py < 0 || px >= w || py >= h)
+                    continue;
+
+                if (bmp.GetPixel(px, py) != target)
+                    continue;
+
+                bmp.SetPixel(px, py, replacement);
+
+                stack.Push(new Point(px + 1, py));
+                stack.Push(new Point(px - 1, py));
+                stack.Push(new Point(px, py + 1));
+                stack.Push(new Point(px, py - 1));
+            }
         }
 
         private void DrawRender(object sender, EventArgs e)

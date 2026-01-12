@@ -4,11 +4,9 @@ using Project8.Source.Entities.Behaviors;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Text;
 using System.Linq;
 using Tooling;
 using Tools;
-using AnimationController = Tools.Animations.AnimationController;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace Project8.Source.Entities

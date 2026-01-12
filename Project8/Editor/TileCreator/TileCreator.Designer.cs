@@ -43,6 +43,8 @@
             numMultiTileID = new System.Windows.Forms.NumericUpDown();
             Render = new System.Windows.Forms.PictureBox();
             panel_props = new System.Windows.Forms.Panel();
+            tbPattern = new System.Windows.Forms.TextBox();
+            label3 = new System.Windows.Forms.Label();
             radFileNameC = new System.Windows.Forms.RadioButton();
             radFileNameB = new System.Windows.Forms.RadioButton();
             radFileNameA = new System.Windows.Forms.RadioButton();
@@ -134,7 +136,7 @@
             label5.Size = new System.Drawing.Size(111, 21);
             label5.TabIndex = 2;
             label5.Text = "Characteristics";
-            toolTip1.SetToolTip(label5, "s: solid");
+            toolTip1.SetToolTip(label5, "s: solid | g: gravity applies | c:connect to all solids");
             // 
             // label6
             // 
@@ -165,6 +167,8 @@
             // panel_props
             // 
             panel_props.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            panel_props.Controls.Add(tbPattern);
+            panel_props.Controls.Add(label3);
             panel_props.Controls.Add(radFileNameC);
             panel_props.Controls.Add(radFileNameB);
             panel_props.Controls.Add(radFileNameA);
@@ -187,6 +191,22 @@
             panel_props.Name = "panel_props";
             panel_props.Size = new System.Drawing.Size(467, 558);
             panel_props.TabIndex = 5;
+            // 
+            // tbPattern
+            // 
+            tbPattern.Location = new System.Drawing.Point(127, 331);
+            tbPattern.Name = "tbPattern";
+            tbPattern.Size = new System.Drawing.Size(333, 29);
+            tbPattern.TabIndex = 11;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new System.Drawing.Point(4, 334);
+            label3.Name = "label3";
+            label3.Size = new System.Drawing.Size(117, 21);
+            label3.TabIndex = 10;
+            label3.Text = "Autotile Pattern";
             // 
             // radFileNameC
             // 
@@ -326,5 +346,7 @@
         private System.Windows.Forms.RadioButton radFileNameC;
         private System.Windows.Forms.RadioButton radFileNameB;
         private System.Windows.Forms.RadioButton radFileNameA;
+        private System.Windows.Forms.TextBox tbPattern;
+        private System.Windows.Forms.Label label3;
     }
 }
