@@ -9,7 +9,8 @@
       "Autotile": null,
       "MultiTileIndex": 0,
       "IsSolid": false,
-      "IsGravityApplies": false
+      "IsGravityApplies": false,
+      "IsConnectingToAllSolid": false
     },
     {
       "Name": "grass",
@@ -27,7 +28,8 @@
       },
       "MultiTileIndex": 0,
       "IsSolid": true,
-      "IsGravityApplies": false
+      "IsGravityApplies": false,
+      "IsConnectingToAllSolid": false
     },
     {
       "Name": "stone",
@@ -44,7 +46,8 @@
       },
       "MultiTileIndex": 0,
       "IsSolid": true,
-      "IsGravityApplies": false
+      "IsGravityApplies": false,
+      "IsConnectingToAllSolid": false
     },
     {
       "Name": "plank",
@@ -57,7 +60,8 @@
       "Autotile": null,
       "MultiTileIndex": 0,
       "IsSolid": true,
-      "IsGravityApplies": false
+      "IsGravityApplies": false,
+      "IsConnectingToAllSolid": false
     },
     {
       "Name": "crate",
@@ -70,7 +74,8 @@
       "Autotile": null,
       "MultiTileIndex": 1,
       "IsSolid": true,
-      "IsGravityApplies": true
+      "IsGravityApplies": true,
+      "IsConnectingToAllSolid": false
     },
     {
       "Name": "player",
@@ -83,7 +88,8 @@
       "Autotile": null,
       "MultiTileIndex": 0,
       "IsSolid": true,
-      "IsGravityApplies": false
+      "IsGravityApplies": false,
+      "IsConnectingToAllSolid": false
     },
     {
       "Name": "mob",
@@ -96,7 +102,8 @@
       "Autotile": null,
       "MultiTileIndex": 1,
       "IsSolid": true,
-      "IsGravityApplies": false
+      "IsGravityApplies": false,
+      "IsConnectingToAllSolid": false
     },
     {
       "Name": "button",
@@ -108,11 +115,29 @@
       "Characteristics": "s,c",
       "Autotile": {
         "UseDefaultPattern": true,
-        "Pattern": "z,q,s,d"
+        "Pattern": ""
       },
       "MultiTileIndex": 0,
       "IsSolid": true,
-      "IsGravityApplies": false
+      "IsGravityApplies": false,
+      "IsConnectingToAllSolid": true
+    },
+    {
+      "Name": "ladder",
+      "Filename": [
+        "Assets/Textures/Tilesets/props/ladder.png"
+      ],
+      "id": 7,
+      "Mode": "Autotile",
+      "Characteristics": "c",
+      "Autotile": {
+        "UseDefaultPattern": true,
+        "Pattern": ""
+      },
+      "MultiTileIndex": 0,
+      "IsSolid": false,
+      "IsGravityApplies": false,
+      "IsConnectingToAllSolid": true
     },
     {
       "Name": "missing",
@@ -125,7 +150,8 @@
       "Autotile": null,
       "MultiTileIndex": 0,
       "IsSolid": true,
-      "IsGravityApplies": false
+      "IsGravityApplies": false,
+      "IsConnectingToAllSolid": false
     }
   ]
 }
