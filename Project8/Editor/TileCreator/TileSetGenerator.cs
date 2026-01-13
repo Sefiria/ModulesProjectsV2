@@ -12,6 +12,7 @@ using KB = Tooling.KB;
 using MS = Tooling.MouseStates;
 using G = System.Drawing.Graphics;
 using Project8.Source.TiledMap;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace Project8.Editor.TileSetCreator
 {
@@ -20,6 +21,7 @@ namespace Project8.Editor.TileSetCreator
         bool IsMouseDown = false;
         Point ms_old, ms;
         int scale = 20;
+        Bitmap Image;
 
         public static int sz = GlobalVariables.tilesize;
 
@@ -29,6 +31,7 @@ namespace Project8.Editor.TileSetCreator
         }
         private void TileCreator_Load(object sender, EventArgs e)
         {
+            Image = new Bitmap(sz, sz);
             var colorsbtn = new List<PictureBox>() { usedColor, color1, color2, color3, color4, color5, color6, color7, color8, colorBuffer };
             foreach (var c in colorsbtn)
             {
@@ -60,7 +63,6 @@ namespace Project8.Editor.TileSetCreator
         {
             ms_old = ms;
             ms = render.PointToClient(MousePosition);
-            var img = ResizeExact(render.Image, sz, sz);
             if (!IsMouseDown) return;
 
             bool IsLeft = e.Button == MouseButtons.Left;
@@ -73,14 +75,13 @@ namespace Project8.Editor.TileSetCreator
 
             if (IsFill)
             {
-                Color target = img.GetPixel(tx, ty);
+                Color target = Image.GetPixel(tx, ty);
                 Color replacement = usedColor.BackColor;
 
                 if (target != replacement)
-                    FloodFill(img, tx, ty, target, replacement);
+                    FloodFill(Image, tx, ty, target, replacement);
 
-                render.Image = ResizeExact(img, sz * scale, sz * scale);
-                render.Refresh();
+                UpdateRender();
                 return;
             }
 
@@ -94,16 +95,15 @@ namespace Project8.Editor.TileSetCreator
                     int px = (int)(p.X / scale);
                     int py = (int)(p.Y / scale);
                     if (px >= 0 && py >= 0 && px < sz && py < sz)
-                        img.SetPixel(px, py, IsLeft ? usedColor.BackColor : Color.White);
+                        Image.SetPixel(px, py, IsLeft ? usedColor.BackColor : Color.White);
                 }
-                img.SetPixel(tx, ty, IsLeft ? usedColor.BackColor : Color.White);
-                render.Image = ResizeExact(img, sz * scale, sz * scale);
-                render.Refresh();
+                Image.SetPixel(tx, ty, IsLeft ? usedColor.BackColor : Color.White);
+                UpdateRender();
                 return;
             }
             else if (IsMiddle)
             {
-                usedColor.BackColor = img.GetPixel(tx, ty);
+                usedColor.BackColor = Image.GetPixel(tx, ty);
                 colorBuffer.BackColor = usedColor.BackColor;
                 usedColor.BackColor = colorBuffer.BackColor;
 
@@ -115,6 +115,22 @@ namespace Project8.Editor.TileSetCreator
                 usedColor.Refresh();
             }
         }
+
+        private void UpdateRender()
+        {
+            var img = new Bitmap(sz * scale / 2, sz * scale / 2);
+            using (G g = G.FromImage(img))
+            {
+                g.Clear(Color.Black);
+                g.SmoothingMode = SmoothingMode.None; g.InterpolationMode = InterpolationMode.NearestNeighbor; g.CompositingQuality = CompositingQuality.HighSpeed;
+                using var hb = new HatchBrush(HatchStyle.LargeCheckerBoard, Color.DarkGray, Color.LightGray);
+                g.FillRectangle(hb, 0, 0, img.Width, img.Height);
+                g.DrawImage(ResizeExact(Image, img.Width, img.Height), 0, 0);
+            }
+            render.Image = ResizeExact(img, sz * scale, sz * scale);
+            render.Refresh();
+        }
+
         private void FloodFill(Bitmap bmp, int x, int y, Color target, Color replacement)
         {
             int w = bmp.Width;
@@ -307,8 +323,9 @@ namespace Project8.Editor.TileSetCreator
 
         private void btNew_Click(object sender, EventArgs e)
         {
-            render.Image = new Bitmap(sz * scale, sz * scale);
             render_preview.Image = new Bitmap(sz * scale, sz * scale);
+            Image = new Bitmap(sz, sz);
+            UpdateRender();
         }
         private void btSave_Click(object sender, EventArgs e)
         {

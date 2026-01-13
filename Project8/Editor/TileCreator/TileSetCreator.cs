@@ -11,6 +11,7 @@ using Tooling;
 using KB = Tooling.KB;
 using MS = Tooling.MouseStates;
 using G = System.Drawing.Graphics;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace Project8.Editor.TileSetCreator
 {
@@ -230,6 +231,10 @@ namespace Project8.Editor.TileSetCreator
                                 new Rectangle(0, 0, ImageCopy.Width, ImageCopy.Height),
                                 GraphicsUnit.Pixel);
                         }
+                        for (int y = 0; y < part.Height; y++)
+                            for (int x = 0; x < part.Width; x++)
+                                if (ImageCopy.GetPixel(x, y).A == 0)
+                                    part.SetPixel(x, y, Color.Transparent);
                     }
                     UpdatePreviewFromPart(currentIdx, Render);
                     return;
@@ -271,9 +276,9 @@ namespace Project8.Editor.TileSetCreator
                     int px = (int)(p.X / scale);
                     int py = (int)(p.Y / scale);
                     if (px >= 0 && py >= 0 && px < sz && py < sz)
-                        part.SetPixel(px, py, IsLeft ? usedColor.BackColor : Color.White);
+                        part.SetPixel(px, py, IsLeft ? usedColor.BackColor : Color.Transparent);
                 }
-                part.SetPixel(tx, ty, IsLeft ? usedColor.BackColor : Color.White);
+                part.SetPixel(tx, ty, IsLeft ? usedColor.BackColor : Color.Transparent);
 
                 UpdatePreviewFromPart(currentIdx, Render);
                 return;

@@ -208,7 +208,7 @@
             // 
             // panel_render
             // 
-            panel_render.BackColor = System.Drawing.Color.Silver;
+            panel_render.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             panel_render.Controls.Add(render_preview);
             panel_render.Controls.Add(btPreview);
             panel_render.Controls.Add(render);

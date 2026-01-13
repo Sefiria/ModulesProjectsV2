@@ -128,6 +128,7 @@
             colorBuffer.Size = new System.Drawing.Size(26, 26);
             colorBuffer.TabIndex = 5;
             colorBuffer.TabStop = false;
+            colorBuffer.MouseClick += color_MouseClick;
             // 
             // btHelp
             // 
