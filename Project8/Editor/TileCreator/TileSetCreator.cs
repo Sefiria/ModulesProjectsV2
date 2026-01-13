@@ -303,7 +303,15 @@ namespace Project8.Editor.TileSetCreator
         {
             var preview = ResizeExact(Parts[idx], (int)(sz * scale), (int)(sz * scale), InterpolationMode.NearestNeighbor);
             var old = render.Image;
-            render.Image = preview;
+            var img = new Bitmap(preview.Width, preview.Height);
+            using (G g = G.FromImage(img))
+            {
+                g.SmoothingMode = SmoothingMode.None; g.InterpolationMode = InterpolationMode.NearestNeighbor; g.CompositingQuality = CompositingQuality.HighSpeed;
+                using var hb = new HatchBrush(HatchStyle.LargeCheckerBoard, Color.DarkGray, Color.LightGray);
+                g.FillRectangle(hb, 0, 0, img.Width, img.Height);
+                g.DrawImage(preview, 0, 0);
+            }
+            render.Image = img;
             old?.Dispose();
             render.Refresh();
         }
@@ -344,7 +352,15 @@ namespace Project8.Editor.TileSetCreator
 
                 var preview = ResizeExact(Parts[i], (int)(sz * scale), (int)(sz * scale), InterpolationMode.NearestNeighbor);
                 var old = Renders[i].Image;
-                Renders[i].Image = preview;
+                var img = new Bitmap(preview.Width, preview.Height);
+                using (G g = G.FromImage(img))
+                {
+                    g.SmoothingMode = SmoothingMode.None; g.InterpolationMode = InterpolationMode.NearestNeighbor; g.CompositingQuality = CompositingQuality.HighSpeed;
+                    using var hb = new HatchBrush(HatchStyle.LargeCheckerBoard, Color.DarkGray, Color.LightGray);
+                    g.FillRectangle(hb, 0, 0, img.Width, img.Height);
+                    g.DrawImage(preview, 0, 0);
+                }
+                Renders[i].Image = img;
                 old?.Dispose();
 
                 var ms = Cursor.Position;

@@ -31,6 +31,7 @@
             components = new System.ComponentModel.Container();
             toolTip1 = new System.Windows.Forms.ToolTip(components);
             panel_colors = new System.Windows.Forms.Panel();
+            colorBuffer = new System.Windows.Forms.PictureBox();
             btHelp = new System.Windows.Forms.Button();
             groupAffichage = new System.Windows.Forms.GroupBox();
             radTransparent = new System.Windows.Forms.RadioButton();
@@ -68,8 +69,8 @@
             panel_props = new System.Windows.Forms.Panel();
             tv = new System.Windows.Forms.TreeView();
             btNew = new System.Windows.Forms.Button();
-            colorBuffer = new System.Windows.Forms.PictureBox();
             panel_colors.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)colorBuffer).BeginInit();
             groupAffichage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)usedColor).BeginInit();
             ((System.ComponentModel.ISupportInitialize)color8).BeginInit();
@@ -98,7 +99,6 @@
             ((System.ComponentModel.ISupportInitialize)r_zq).BeginInit();
             ((System.ComponentModel.ISupportInitialize)r_a).BeginInit();
             panel_props.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)colorBuffer).BeginInit();
             SuspendLayout();
             // 
             // panel_colors
@@ -120,6 +120,14 @@
             panel_colors.Name = "panel_colors";
             panel_colors.Size = new System.Drawing.Size(664, 104);
             panel_colors.TabIndex = 6;
+            // 
+            // colorBuffer
+            // 
+            colorBuffer.Location = new System.Drawing.Point(209, 37);
+            colorBuffer.Name = "colorBuffer";
+            colorBuffer.Size = new System.Drawing.Size(26, 26);
+            colorBuffer.TabIndex = 5;
+            colorBuffer.TabStop = false;
             // 
             // btHelp
             // 
@@ -260,7 +268,7 @@
             // 
             // panel_render
             // 
-            panel_render.BackColor = System.Drawing.Color.Silver;
+            panel_render.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             panel_render.Controls.Add(r_nq);
             panel_render.Controls.Add(r_d);
             panel_render.Controls.Add(r_sd);
@@ -539,14 +547,6 @@
             btNew.UseVisualStyleBackColor = true;
             btNew.Click += btNew_Click;
             // 
-            // colorBuffer
-            // 
-            colorBuffer.Location = new System.Drawing.Point(209, 37);
-            colorBuffer.Name = "colorBuffer";
-            colorBuffer.Size = new System.Drawing.Size(26, 26);
-            colorBuffer.TabIndex = 5;
-            colorBuffer.TabStop = false;
-            // 
             // TileSetCreator
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(9F, 21F);
@@ -562,6 +562,7 @@
             Text = "TileSetCreator";
             Load += TileCreator_Load;
             panel_colors.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)colorBuffer).EndInit();
             groupAffichage.ResumeLayout(false);
             groupAffichage.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)usedColor).EndInit();
@@ -591,7 +592,6 @@
             ((System.ComponentModel.ISupportInitialize)r_zq).EndInit();
             ((System.ComponentModel.ISupportInitialize)r_a).EndInit();
             panel_props.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)colorBuffer).EndInit();
             ResumeLayout(false);
         }
 
