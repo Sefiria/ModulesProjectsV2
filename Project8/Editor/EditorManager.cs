@@ -270,15 +270,15 @@ namespace Project8.Editor
                            select new { x, y, tileIndex })
                     .FirstOrDefault();
                 var e = GameMain.Instance.EntityManager.Entities.FirstOrDefault(e => e is Entitytest);
-                if (hit != null && (e == null ? true : (hit.x != e.X / TSZ && e.Y / TSZ != hit.y)))
+                if (hit != null && (e == null ? true : (hit.x != e.X / TSZ || e.Y / TSZ != hit.y)))
                 {
                     if (e != null)
                     {
-                        Map.Tiles[0, (int)(e.X / TSZ), (int)(e.Y / TSZ)] = 4;
+                        Map.Tiles[0, (int)((e.X + 16) / TSZ), (int)((e.Y + 16) / TSZ)] = 4;
                         e.Exists = false;
                     }
                     Map.Tiles[0, hit.x, hit.y] = -1;
-                    new Entitytest { X = hit.x * TSZ, Y = hit.y * TSZ };
+                    new Entitytest(hit.x * TSZ, hit.y * TSZ);
                 }
             }
         }

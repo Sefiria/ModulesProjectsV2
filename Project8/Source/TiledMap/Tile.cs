@@ -45,6 +45,7 @@ namespace Project8.Source.TiledMap
         public Tile() { }
 
         public bool IsSolid => Characteristics.Contains('s');
+        public bool IsLadder => Characteristics.Contains('l');
         public bool IsGravityApplies => Characteristics.Contains('g');
         public bool IsConnectingToAllSolid => Characteristics.Contains('c');
     }

@@ -7,9 +7,9 @@ namespace Project8.Source
     public class Animation2D
     {
         public static Dictionary<string, Animation2D> Animations = new Dictionary<string, Animation2D>();
-        public static float Speed = 10F;
 
         public string Name, Filename;
+        public float Speed = 10F;
 
         public int rFramesCount { get; private set; }
         public Texture2D Texture;

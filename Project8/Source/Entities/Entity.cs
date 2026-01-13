@@ -13,6 +13,8 @@ namespace Project8.Source.Entities
 {
     public class Entity
     {
+        public enum Alignments { center, bottom, top, left, right }
+
         GameMain Context => GameMain.Instance;
 
         public Guid ID;
@@ -25,12 +27,21 @@ namespace Project8.Source.Entities
         public float LookX, LookY, Velocity;
         public bool HasCollisions = true, ApplyRotationFromLook = false;
         public bool OutlineWhenHover = false, ForceOutline = false;
+        public Alignments Alignment = Alignments.center;
 
         public Dictionary<object, object> UserData = new Dictionary<object, object>();
 
-        public bool draw_from_center = true;
-        public vecf displayed_vec => draw_from_center ? new vecf(X - W / 2F, Y - H / 2F) : new vecf(X, Y);
-        public RectangleF DisplayedBounds => draw_from_center ? new RectangleF(X - W / 2F, Y - H / 2F, W, H) : GetTextureBounds();
+        public vecf displayed_vec => Alignment switch
+
+        {
+            Alignments.center => new vecf(X - W / 2F, Y - H / 2F),
+            Alignments.bottom => new vecf(X - W / 2F, Y - H),
+            Alignments.top => new vecf(X - W / 2F, Y + H),
+            Alignments.left => new vecf(X + W, Y - H / 2F),
+            Alignments.right => new vecf(X - W, Y - H / 2F),
+            _ => new vecf(X, Y)
+        };
+        public RectangleF DisplayedBounds => new RectangleF(X - W / 2F, Y - H / 2, W, H);
 
         public bool Outlined { get; private set; } = false;
 
@@ -41,6 +52,9 @@ namespace Project8.Source.Entities
         public RectangleF GetTextureBounds() => new RectangleF(X, Y, W, H);
         public int TileX => (int)((X + W / 2f) / Context.scale / Context.tilesize);
         public int TileY => (int)((Y + H / 2f) / Context.scale / Context.tilesize);
+        public int GetTileX(int offset_in_pixels) => (int)((X + W / 2f + offset_in_pixels) / Context.scale / Context.tilesize);
+        public int GetTileY(int offset_in_pixels) => (int)((Y + H / 2f + offset_in_pixels) / Context.scale / Context.tilesize);
+
         public static Entity GetByID(Guid id) => GameMain.Instance.EntityManager.Entities.FirstOrDefault(e => e.ID == id);
         public static Entity GetByName(string name) => GameMain.Instance.EntityManager.Entities.FirstOrDefault(e => e.Name == name);
 
@@ -58,7 +72,6 @@ namespace Project8.Source.Entities
         }
         public void Update()
         {
-            Animation?.Update();
             Behaviors.ForEach(b => b.Update());
 
             Outlined = ForceOutline || (OutlineWhenHover && Maths.CollisionPointBox(GameMain.MS.X, GameMain.MS.Y, new Box(X, Y, W, H)));
@@ -120,6 +133,8 @@ namespace Project8.Source.Entities
         /// </summary>
         private bool CheckMapTilesCollisions(int x, int y) => Context.Map[1, x, y] != -1;
 
+        Vector2 vec_center => new Vector2(W / 2f, H / 2f);
+        Vector2 vec_bottom => new Vector2(W / 2f, H);
         public void Draw(GraphicsDevice graphics)
         {
             Texture2D tex = Texture ?? Animation?.Texture;
@@ -133,14 +148,15 @@ namespace Project8.Source.Entities
                     Context.spriteBatch.Draw(CachedWhiteTex, new Vector2(X - W * scale * thin, Y - H * scale * thin), Animation.Get(), Color.White, rotation: 0f, Vector2.Zero, scale * (1F + thin * 4F), SpriteEffects.None, 0f);
                 }
                 Graphics.Graphics.Instance.DrawTexture(
-                    tex,
-                    X, Y,
-                    ApplyRotationFromLook ? Maths.GetAngle(new PointF(LookX, LookY), false) + MathF.PI / 2F : 0F,
-                    scale * 2F,
-                    LookX < 0F, 0F,
-                    ApplyRotationFromLook ? new Vector2(W / 2f, H / 2f) : null,
-                    null,
-                    Animation?.Get() ?? new Microsoft.Xna.Framework.Rectangle(0, 0, (int)(GlobalVariables.tilesize * scale), (int)(GlobalVariables.tilesize * scale)));
+                    texture:    tex,
+                                X, Y,
+                    rotation:   ApplyRotationFromLook ? Maths.GetAngle(new PointF(LookX, LookY), false) + MathF.PI / 2F : 0F,
+                    scale:      scale * 2F,
+                    flipX:      LookX < 0F,
+                    depth:      0F,
+                    origin:     ApplyRotationFromLook ? new Vector2(W / 2f, H / 2f) : null,
+                    color:      null,
+                    source:     Animation?.Get() ?? new Microsoft.Xna.Framework.Rectangle(0, 0, (int)(GlobalVariables.tilesize * scale), (int)(GlobalVariables.tilesize * scale)));
             }
         }
     }

@@ -5,6 +5,7 @@ using Project8.Source.Runtime;
 using Project8.Source.TiledMap;
 using System;
 using System.Collections.Generic;
+using System.DirectoryServices.ActiveDirectory;
 using System.Drawing;
 using System.Linq;
 using Tooling;
@@ -36,10 +37,12 @@ namespace Project8
             offset ??= vecf.Zero;
             List<Tile> corners_tiles = new();
             Tile t;
-            if (!corners_tiles.Contains(t = Tile.GetTile(map[0, (int)((obj.X + 0 + offset.x) / TSZ), (int)((obj.Y + 0 + offset.y) / TSZ)]))) corners_tiles.Add(t);
-            if (!corners_tiles.Contains(t = Tile.GetTile(map[0, (int)((obj.X + obj.W + offset.x) / TSZ), (int)((obj.Y + obj.H + 0 + offset.y) / TSZ)]))) corners_tiles.Add(t);
-            if (!isJump && !corners_tiles.Contains(t = Tile.GetTile(map[0, (int)((obj.X + 0 + offset.x) / TSZ), (int)((obj.Y + obj.H + offset.y - 1) / TSZ)]))) corners_tiles.Add(t);
-            if (!isJump && !corners_tiles.Contains(t = Tile.GetTile(map[0, (int)((obj.X + obj.W + offset.x) / TSZ), (int)((obj.Y + obj.H + offset.y - 1) / TSZ)]))) corners_tiles.Add(t);
+            int w = (int)(obj.W * GlobalVariables.scale);
+            int h = (int)(obj.H * GlobalVariables.scale);
+            if (!corners_tiles.Contains(t = Tile.GetTile(map[0, (int)((obj.X + offset.x) / TSZ), (int)((obj.Y + offset.y) / TSZ)]))) corners_tiles.Add(t);
+            if (!corners_tiles.Contains(t = Tile.GetTile(map[0, (int)((obj.X + w + offset.x) / TSZ), (int)((obj.Y + offset.y) / TSZ)]))) corners_tiles.Add(t);
+            if (!isJump && !corners_tiles.Contains(t = Tile.GetTile(map[0, (int)((obj.X + offset.x) / TSZ), (int)((obj.Y + h + offset.y - 1) / TSZ)]))) corners_tiles.Add(t);
+            if (!isJump && !corners_tiles.Contains(t = Tile.GetTile(map[0, (int)((obj.X + w + offset.x) / TSZ), (int)((obj.Y + h + offset.y - 1) / TSZ)]))) corners_tiles.Add(t);
 
             if (corners_tiles.All(ct => map.isout(new vec((int)((obj.displayed_vec.x + 0) / TSZ), (int)((obj.displayed_vec.y + 0) / TSZ)).f)))
                 return null;

@@ -129,7 +129,7 @@
       ],
       "id": 7,
       "Mode": "Autotile",
-      "Characteristics": "c",
+      "Characteristics": "c,l",
       "Autotile": {
         "UseDefaultPattern": true,
         "Pattern": ""

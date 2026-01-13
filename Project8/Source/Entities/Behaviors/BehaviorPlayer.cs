@@ -1,5 +1,9 @@
 ﻿using Tooling;
 using Microsoft.Xna.Framework.Input;
+using System.Linq;
+using System;
+using Tools.Animations;
+using Project8.Source.TiledMap;
 
 namespace Project8.Source.Entities.Behaviors
 {
@@ -9,7 +13,7 @@ namespace Project8.Source.Entities.Behaviors
         GameMain Context => GameMain.Instance;
         static Map.TiledMap map => GameMain.Instance.Map;
 
-        bool is_on_ground = false;
+        bool is_on_ground = false, is_on_ladder = false;
         float jump_look_y = 0F;
 
         public BehaviorPlayer(Entity e)
@@ -19,19 +23,26 @@ namespace Project8.Source.Entities.Behaviors
         }
         public override string Update()
         {
+            float oldX = Target.X, oldY = Target.Y;
             bool Q = GameMain.KB.IsKeyDown(Keys.Q);
             bool D = GameMain.KB.IsKeyDown(Keys.D);
+            bool Z = GameMain.KB.IsKeyDown(Keys.Z);
+            bool S = GameMain.KB.IsKeyDown(Keys.S);
             bool Space = GameMain.KB.IsKeyDown(Keys.Space);
 
             vecf last_vec = new(Target.X, Target.Y);
             vec last_tile = new(new(Target.TileX, Target.TileY));
 
-            is_on_ground = map.Collider(Target, (0F, 5F).Vf()) != null;
-
+            is_on_ladder = Tile.Tiles[map.Tiles[0, Target.TileX, Target.TileY]].IsLadder || Tile.Tiles[map.Tiles[0, Target.TileX, Target.GetTileY((int)(Target.H / 2 + 2))]].IsLadder;
+            is_on_ground = map.Collider(Target, (0F, 5F).Vf()) != null || is_on_ladder;
             float speed = 1.5F;
             float speed_jump = 1.0F;
             float jump_force = 2.0F;
             float input_look_x = (Q ? -1F : 0F) + (D ? 1F : 0F);
+            if(is_on_ladder && (Z||S))
+            {
+                move(new vecf(0F, 1F * (Z?-1:1)), speed);
+            }
             if (jump_look_y == 0F)
             {
                 if (Q)
@@ -94,6 +105,9 @@ namespace Project8.Source.Entities.Behaviors
             //    }
             //}
 
+            if (oldX != Target.X || oldY != Target.Y)
+                Target.Animation?.Update();
+
             return "";
         }
 
@@ -101,6 +115,8 @@ namespace Project8.Source.Entities.Behaviors
         private bool move(vecf look, float speed, bool isJump = false)
         {
             bool collides;
+            Target.LookX = look.x;
+            Target.LookY = look.y;
 
             // y
             if (!(collides = map.Collider(Target, (0F, look.y * speed).Vf(), isJump) != null))
