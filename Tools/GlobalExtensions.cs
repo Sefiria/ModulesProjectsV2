@@ -126,6 +126,20 @@ namespace Tools
 
             return whiteTexture;
         }
+        public static Texture2D ResizeTexture(this GraphicsDevice graphicsDevice, Texture2D source, int newWidth, int newHeight)
+        {
+            RenderTarget2D rt = new RenderTarget2D(graphicsDevice, newWidth, newHeight);
+            graphicsDevice.SetRenderTarget(rt);
+            graphicsDevice.Clear(Color.Transparent);
+
+            SpriteBatch sb = new SpriteBatch(graphicsDevice);
+            sb.Begin();
+            sb.Draw(source, new Rectangle(0, 0, newWidth, newHeight), Color.White);
+            sb.End();
+
+            graphicsDevice.SetRenderTarget(null);
+            return rt;
+        }
 
     }
 

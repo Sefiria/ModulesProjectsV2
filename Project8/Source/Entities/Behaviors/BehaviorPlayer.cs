@@ -13,14 +13,16 @@ namespace Project8.Source.Entities.Behaviors
         GameMain Context => GameMain.Instance;
         static Map.TiledMap map => GameMain.Instance.Map;
 
-        bool is_on_ground = false, is_on_ladder = false;
+        bool is_on_ground = false, is_on_ladder = false, is_crouching = false;
         float jump_look_y = 0F;
 
         public BehaviorPlayer(Entity e)
             : base()
         {
             Target = e;
+            e.AnimationController.CurrentAnimation = Enum.GetName(AnimationsNeeds.Idle);
         }
+        float test = 0F;
         public override string Update()
         {
             float oldX = Target.X, oldY = Target.Y;
@@ -29,19 +31,21 @@ namespace Project8.Source.Entities.Behaviors
             bool Z = GameMain.KB.IsKeyDown(Keys.Z);
             bool S = GameMain.KB.IsKeyDown(Keys.S);
             bool Space = GameMain.KB.IsKeyDown(Keys.Space);
+            bool is_crouching = S;
 
             vecf last_vec = new(Target.X, Target.Y);
             vec last_tile = new(new(Target.TileX, Target.TileY));
 
-            is_on_ladder = Tile.Tiles[map.Tiles[0, Target.TileX, Target.TileY]].IsLadder || Tile.Tiles[map.Tiles[0, Target.TileX, Target.GetTileY((int)(Target.H / 2 + 2))]].IsLadder;
-            is_on_ground = map.Collider(Target, (0F, 5F).Vf()) != null || is_on_ladder;
+            is_on_ladder = Tile.Tiles[map.Tiles[0, Target.TileX, Target.TileY]].IsLadder || Tile.Tiles[map.Tiles[0, Target.TileX, Target.GetTileY((int)(Target.H / 2 + 16))]].IsLadder;
+            is_on_ground = (map.Collider(Target, (0F, 5F).Vf()) as Tile)?.IsSolid ?? false || is_on_ladder;
             float speed = 1.5F;
             float speed_jump = 1.0F;
             float jump_force = 2.0F;
             float input_look_x = (Q ? -1F : 0F) + (D ? 1F : 0F);
-            if(is_on_ladder && (Z||S))
+            if (is_on_ladder && ((Z||S) || ((Q||D) && map.Collider(Target, (Q ? -speed : speed, 0F).Vf()) != null)))
             {
-                move(new vecf(0F, 1F * (Z?-1:1)), speed);
+                move(new vecf(0F, S ? 1 : -1), speed);
+                jump_look_y = 0F;
             }
             if (jump_look_y == 0F)
             {
@@ -52,7 +56,7 @@ namespace Project8.Source.Entities.Behaviors
             }
             if (Space && is_on_ground && jump_look_y == 0F)
             {
-                jump_look_y = -3F;
+                jump_look_y = is_on_ladder  ? -speed  : -3F;
             }
             if (jump_look_y < 0F)
             {
@@ -62,59 +66,54 @@ namespace Project8.Source.Entities.Behaviors
             }
             else
             {
-                if (is_on_ground)
-                    jump_look_y = 0F;
-                else
+                if (!is_on_ladder)
                 {
-                    jump_look_y += 0.2F;
-                    if (jump_look_y > 5F) jump_look_y = 5F;
-                    move(new vecf(input_look_x, jump_look_y), speed_jump);
+                    if (is_on_ground)
+                        jump_look_y = 0F;
+                    else
+                    {
+                        jump_look_y += 0.2F;
+                        if (jump_look_y > 5F) jump_look_y = 5F;
+                        move(new vecf(input_look_x, jump_look_y), speed_jump);
+                    }
                 }
             }
-
-            //if (Z)
-            //    (DB.Room.PhysicalObjects.FirstOrDefault(po => po is ITriggerable && (vec / GraphicsManager.TSZ).i == (po.vec / GraphicsManager.TSZ).i) as ITriggerable)?.Trigger(this);
-
-
-            //if (DB.Room.isout(vec.x / GraphicsManager.TSZ, vec.y / GraphicsManager.TSZ))
+            //if(Target.Y-test < -0.5F)
             //{
-            //    var warp = DB.Room.Warps.FirstOrDefault(w => (w.source_x, w.source_y).V() == last_tile);
-            //    if (warp != null)
-            //    {
-            //        var next_room = Room.Load((byte)warp.target_room);
-            //        var next_vec = (warp.target_x, warp.target_y).Vf() * GraphicsManager.TSZ + h % GraphicsManager.TSZ;
-            //        var door = next_room.Doors.FirstOrDefault(d => d.vec.tile(GraphicsManager.TSZ) == next_vec.tile(GraphicsManager.TSZ) || d.vec.tile(GraphicsManager.TSZ) == next_vec.tile(GraphicsManager.TSZ) - (0, 1).Vf());
-            //        bool blocked_by_locked_door = false;
-            //        if (door != null)
-            //        {
-            //            if (door.Locked)
-            //                blocked_by_locked_door = true;
-            //            else
-            //                door.LoadState(2);
-            //        }
-            //        if (!blocked_by_locked_door)
-            //        {
-            //            DB.Room = next_room;
-            //            DB.FluidsManager.Initialize();
-            //            vec = next_vec;
-            //        }
-            //        else
-            //        {
-            //            vec = last_vec;
-            //        }
-            //    }
             //}
+            //test = Target.Y;
+            //System.Diagnostics.Debug.WriteLine(Target.Y);
 
-            if (oldX != Target.X || oldY != Target.Y)
-                Target.Animation?.Update();
+
+            if (is_crouching && !is_on_ladder)
+            {
+                set_anim(AnimationsNeeds.Crouch);
+            }
+            else
+            {
+                bool is_moving = oldX != Target.X || oldY != Target.Y;
+                set_anim(is_moving ? AnimationsNeeds.Walk : AnimationsNeeds.Idle);
+            }
+            Target.AnimationController?.Update();
 
             return "";
+        }
+        private void set_anim(AnimationsNeeds anim)
+        {
+            int ha = Target.AnimationController.GetCurrentFrame().Height;
+            int hb = Target.AnimationController.Animations[Enum.GetName(anim)].Frames[0].Height;
+            if(ha < hb)
+                Target.Y -= hb - ha + 4;
+            else if(ha > hb)
+                Target.Y += ha - hb;
+            Target.AnimationController.CurrentAnimation = Enum.GetName(anim);
         }
 
         /// <returns>false if colliding (then no move)</returns>
         private bool move(vecf look, float speed, bool isJump = false)
         {
             bool collides;
+            float oldx = Target.X, oldy = Target.Y;
             Target.LookX = look.x;
             Target.LookY = look.y;
 
@@ -148,6 +147,13 @@ namespace Project8.Source.Entities.Behaviors
                         Target.X += look.x * speed * n;
                 }
             }
+
+            if(map.Collider(Target) is Tile)
+            {
+                Target.X = oldx;
+                Target.Y = oldy;
+            }
+
             return !collides;
         }
 

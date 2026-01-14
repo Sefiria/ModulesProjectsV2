@@ -278,7 +278,9 @@ namespace Project8.Editor
                         e.Exists = false;
                     }
                     Map.Tiles[0, hit.x, hit.y] = -1;
-                    new Entitytest(hit.x * TSZ, hit.y * TSZ);
+                    var _e = new Entitytest(hit.x * TSZ, hit.y * TSZ);
+                    _e.X += (TSZ - _e.W) / 2F;
+                    _e.Y += (TSZ - _e.H) / 2F - 1;
                 }
             }
         }

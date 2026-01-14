@@ -8,6 +8,11 @@ namespace Project8.Source.Entities.Behaviors
 {
     public class Behavior
     {
+        public enum AnimationsNeeds
+        {
+            Idle, Walk, Crouch
+        }
+
         public Behavior()
         {
         }

@@ -7,6 +7,8 @@ using System.Drawing;
 using System.Linq;
 using Tooling;
 using Tools;
+using Tools.Animations;
+using Box = Tooling.Box;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace Project8.Source.Entities
@@ -20,7 +22,7 @@ namespace Project8.Source.Entities
         public Guid ID;
         public string Name;
         public bool Exists;
-        public Animation2D Animation;
+        public AnimationController AnimationController;
         public Texture2D Texture = null;
         public List<Behavior> Behaviors;
         public float X, Y, scale = 1F;
@@ -32,7 +34,6 @@ namespace Project8.Source.Entities
         public Dictionary<object, object> UserData = new Dictionary<object, object>();
 
         public vecf displayed_vec => Alignment switch
-
         {
             Alignments.center => new vecf(X - W / 2F, Y - H / 2F),
             Alignments.bottom => new vecf(X - W / 2F, Y - H),
@@ -47,8 +48,8 @@ namespace Project8.Source.Entities
 
         private Texture2D CachedWhiteTex = null;
 
-        public float W => GlobalVariables.tilesize;
-        public float H => GlobalVariables.tilesize;
+        public float W => AnimationController?.GetCurrentFrame()?.Width ?? GlobalVariables.tilesize;
+        public float H => AnimationController?.GetCurrentFrame()?.Height ?? GlobalVariables.tilesize;
         public RectangleF GetTextureBounds() => new RectangleF(X, Y, W, H);
         public int TileX => (int)((X + W / 2f) / Context.scale / Context.tilesize);
         public int TileY => (int)((Y + H / 2f) / Context.scale / Context.tilesize);
@@ -137,7 +138,7 @@ namespace Project8.Source.Entities
         Vector2 vec_bottom => new Vector2(W / 2f, H);
         public void Draw(GraphicsDevice graphics)
         {
-            Texture2D tex = Texture ?? Animation?.Texture;
+            Texture2D tex = AnimationController?.GetCurrentFrame();
             if (tex != null)
             {
                 if (Outlined)
@@ -145,7 +146,7 @@ namespace Project8.Source.Entities
                     if(CachedWhiteTex == null)
                         CachedWhiteTex = graphics.CloneAsWhite(tex);
                     float thin = 0.01f;
-                    Context.spriteBatch.Draw(CachedWhiteTex, new Vector2(X - W * scale * thin, Y - H * scale * thin), Animation.Get(), Color.White, rotation: 0f, Vector2.Zero, scale * (1F + thin * 4F), SpriteEffects.None, 0f);
+                    Context.spriteBatch.Draw(CachedWhiteTex, new Vector2(X - W * scale * thin, Y - H * scale * thin), tex.Bounds, Color.White, rotation: 0f, Vector2.Zero, scale * (1F + thin * 4F), SpriteEffects.None, 0f);
                 }
                 Graphics.Graphics.Instance.DrawTexture(
                     texture:    tex,
@@ -156,7 +157,7 @@ namespace Project8.Source.Entities
                     depth:      0F,
                     origin:     ApplyRotationFromLook ? new Vector2(W / 2f, H / 2f) : null,
                     color:      null,
-                    source:     Animation?.Get() ?? new Microsoft.Xna.Framework.Rectangle(0, 0, (int)(GlobalVariables.tilesize * scale), (int)(GlobalVariables.tilesize * scale)));
+                    source:     null);
             }
         }
     }

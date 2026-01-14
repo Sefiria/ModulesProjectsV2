@@ -36,6 +36,8 @@
   <ItemGroup>
     <None Remove="Assets\Data\tileset.json" />
     <None Remove="Assets\Data\tileset.json.backup" />
+    <None Remove="Assets\Textures\Animations\player_crouch.png" />
+    <None Remove="Assets\Textures\Animations\player_walk.png" />
     <None Remove="Assets\Textures\Entities\test_idle.png" />
     <None Remove="Assets\Textures\missing.png" />
     <None Remove="Assets\Textures\Tilesets\entities\global.png" />
@@ -51,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Assets\SFX\" />
+    <Folder Include="Assets\Textures\Entities\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Editor\TileCreator\TileSetGenerator.cs">
