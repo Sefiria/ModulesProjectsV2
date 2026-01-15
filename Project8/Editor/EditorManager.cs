@@ -15,6 +15,7 @@ using System.Threading;
 using System.Windows.Forms;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
 using Project8.Editor.TileCreator;
+using System.IO;
 
 namespace Project8.Editor
 {
@@ -40,9 +41,14 @@ namespace Project8.Editor
             UIButtons = new Dictionary<string, UIButton>()
             {
                 ["playstop"]         = new UIButton(new Rectangle(16, EditorUIBox.Y + 48, 32, 32), () => { if(IsPlaying) DisposeTest(); else LoadTest(); IsPlaying = !IsPlaying; }),
-                ["Tile Creator"]      = new UIButton(new Rectangle(16 + 160 * 0, EditorUIBox.Y + 48 + 32, 155, 32), OpenFormWithOwner<TileCreator.TileCreator>),
-                ["TileSet Creator"]   = new UIButton(new Rectangle(16 + 160 * 1, EditorUIBox.Y + 48 + 32, 190, 32), OpenFormWithOwner<TileSetCreator.TileSetCreator>),
-                ["TileSet Generator"]   = new UIButton(new Rectangle(16 + 177 * 2, EditorUIBox.Y + 48 + 32, 215, 32), OpenFormWithOwner<TileSetCreator.TileSetGenerator>),
+
+                ["Tile Creator"]      = new UIButton(new Rectangle(16 + 160 * 0, EditorUIBox.Y + 48 + 32 * 1, 155, 32), OpenFormWithOwner<TileCreator.TileCreator>),
+                ["TileSet Creator"]   = new UIButton(new Rectangle(16 + 160 * 1, EditorUIBox.Y + 48 + 32 * 1, 190, 32), OpenFormWithOwner<TileSetCreator.TileSetCreator>),
+                ["TileSet Generator"]   = new UIButton(new Rectangle(16 + 177 * 2, EditorUIBox.Y + 48 + 32 * 1, 215, 32), OpenFormWithOwner<TileSetCreator.TileSetGenerator>),
+
+                ["Reset Map"]      = new UIButton(new Rectangle(16 + 160 * 0, EditorUIBox.Y + 48 + 32 * 2, 140, 32), () => Map.Reset()),
+                ["Save Map"] = new UIButton(new Rectangle(16 + 160 * 1, EditorUIBox.Y + 48 + 32 * 2, 140, 32), () => Map.Save()),
+                ["Load Map"]      = new UIButton(new Rectangle(16 + 160 * 2, EditorUIBox.Y + 48 + 32 * 2, 140, 32), () => Map.Load()),
             };
         }
         sealed class WindowHandleWrapper : IWin32Window

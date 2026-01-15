@@ -52,6 +52,7 @@
     <None Remove="Assets\UI\play_stop_button.png" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Assets\Maps\" />
     <Folder Include="Assets\SFX\" />
     <Folder Include="Assets\Textures\Entities\" />
   </ItemGroup>

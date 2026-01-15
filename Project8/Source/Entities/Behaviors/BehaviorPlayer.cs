@@ -36,7 +36,7 @@ namespace Project8.Source.Entities.Behaviors
             vecf last_vec = new(Target.X, Target.Y);
             vec last_tile = new(new(Target.TileX, Target.TileY));
 
-            is_on_ladder = Tile.Tiles[map.Tiles[0, Target.TileX, Target.TileY]].IsLadder || Tile.Tiles[map.Tiles[0, Target.TileX, Target.GetTileY((int)(Target.H / 2 + 16))]].IsLadder;
+            is_on_ladder = Tile.Tiles[map.Tiles[0, Target.TileX, Target.TileY]].IsLadder || (!map.isout(Target.TileX, Target.GetTileY((int)(Target.H / 2 + 16))) && Tile.Tiles[map.Tiles[0, Target.TileX, Target.GetTileY((int)(Target.H / 2 + 16))]].IsLadder);
             is_on_ground = (map.Collider(Target, (0F, 5F).Vf()) as Tile)?.IsSolid ?? false || is_on_ladder;
             float speed = 1.5F;
             float speed_jump = 1.0F;
@@ -78,11 +78,6 @@ namespace Project8.Source.Entities.Behaviors
                     }
                 }
             }
-            //if(Target.Y-test < -0.5F)
-            //{
-            //}
-            //test = Target.Y;
-            //System.Diagnostics.Debug.WriteLine(Target.Y);
 
 
             if (is_crouching && !is_on_ladder)
@@ -95,6 +90,8 @@ namespace Project8.Source.Entities.Behaviors
                 set_anim(is_moving ? AnimationsNeeds.Walk : AnimationsNeeds.Idle);
             }
             Target.AnimationController?.Update();
+
+            if ((Target.Y + Target.H) / (GlobalVariables.tilesize * GlobalVariables.scale) >= map.h) Target.Y = 0;
 
             return "";
         }
