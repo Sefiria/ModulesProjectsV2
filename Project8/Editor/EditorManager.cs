@@ -16,6 +16,7 @@ using System.Windows.Forms;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
 using Project8.Editor.TileCreator;
 using System.IO;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 
 namespace Project8.Editor
 {
@@ -33,6 +34,7 @@ namespace Project8.Editor
         public static Texture2D play_stop_button_tex;
         public static Dictionary<string, UIButton> UIButtons;
         public static int SelectedLayer = 0;
+        public static bool TriggerMode = false;
         
 
         public static void Init(GraphicsDevice GraphicsDevice)
@@ -49,6 +51,9 @@ namespace Project8.Editor
                 ["Reset Map"]      = new UIButton(new Rectangle(16 + 160 * 0, EditorUIBox.Y + 48 + 32 * 2, 140, 32), () => Map.Reset()),
                 ["Save Map"] = new UIButton(new Rectangle(16 + 160 * 1, EditorUIBox.Y + 48 + 32 * 2, 140, 32), () => Map.Save()),
                 ["Load Map"]      = new UIButton(new Rectangle(16 + 160 * 2, EditorUIBox.Y + 48 + 32 * 2, 140, 32), () => Map.Load()),
+
+                ["MapEdit Mode"]      = new UIButton(new Rectangle(16 + 160 * 0, EditorUIBox.Y + 48 + 32 * 3, 155, 32), () => TriggerMode = false),
+                ["Trigger Mode"]      = new UIButton(new Rectangle(16 + 160 * 1, EditorUIBox.Y + 48 + 32 * 3, 155, 32), () => TriggerMode = true),
             };
         }
         sealed class WindowHandleWrapper : IWin32Window
@@ -93,7 +98,7 @@ namespace Project8.Editor
                     if (t.Tex != null)
                     {
                         g.DrawTexture(
-                            t.Tex[t.Mode == Tile.Modes.Autotile ? Tile.Tiles[i].id - 1 : 0],
+                            t.Tex[0],
                             gap + i % tilesPerRow * (TSZ + gap),
                             gap + i / tilesPerRow * (TSZ + gap),
                             GameMain.Instance.scale,
@@ -124,12 +129,39 @@ namespace Project8.Editor
                 foreach (var b in UIButtons.Skip(1))
                 {
                     g.DrawString(b.Key, b.Value.Collider.X, b.Value.Collider.Y, GameMain.Instance.font, Color.White);
-                    g.DrawRectangle(UIButtons[b.Key].Collider, Color.White, 1);
+                    var thickness = ((b.Key == "MapEdit Mode" && !TriggerMode) || (b.Key == "Trigger Mode" && TriggerMode)) ? 3 : 1;
+                    g.DrawRectangle(UIButtons[b.Key].Collider, Color.White, thickness);
                 }
 
                 // PlayTest part
                 if (IsPlaying)
+                {
                     DrawTest();
+                }
+                else if (TriggerMode)
+                {
+                    var g = Graphics.Graphics.Instance;
+                    var mst = (ms.X / stsz, ms.Y / stsz).V();
+                    var rate = 64;// speed of blinking
+                    var mapped_value = 150F;// range of alpha (mapped_value < alpha < 255)
+                    var tickmod = (ticks % rate) / (float)rate;
+                    float raw_alpha = tickmod < 0.5f ? tickmod * 2f : (1f - tickmod) * 2f;
+                    var alpha = (byte)(raw_alpha * (255f - mapped_value) + mapped_value);
+                    if (mst.x >= 0 && mst.y >= 0 && mst.x < Map.w && mst.y < Map.h)
+                        g.DrawRectangle(new Rectangle(mst.x * TSZ, mst.y * TSZ, TSZ, TSZ), Color.White, 1);
+                    if (TriggerTilesSelection[0] != vec.Null)
+                        g.DrawRectangle(new Rectangle(TriggerTilesSelection[0].x * TSZ, TriggerTilesSelection[0].y * TSZ, TSZ, TSZ), new Color(Color.Yellow, alpha), 4);
+                    if (TriggerTilesSelection[1] != vec.Null)
+                        g.DrawRectangle(new Rectangle(TriggerTilesSelection[1].x * TSZ, TriggerTilesSelection[1].y * TSZ, TSZ, TSZ), new Color(Color.Red, alpha), 4);
+                    if(TriggerTilesSelection[0] != vec.Null && TriggerTilesSelection[1] != vec.Null)
+                        g.DrawLine(
+                            start_x: TriggerTilesSelection[0].x * TSZ + TSZ / 2,
+                            start_y: TriggerTilesSelection[0].y * TSZ + TSZ / 2,
+                            end_x: TriggerTilesSelection[1].x * TSZ + TSZ / 2,
+                            end_y: TriggerTilesSelection[1].y * TSZ + TSZ / 2,
+                            color: new Color(Color.White, (byte)((255f + mapped_value) - alpha)),
+                            thickness: 2);
+                }
             }
         }
 
@@ -140,6 +172,8 @@ namespace Project8.Editor
         static MS MS => GameMain.MS;
         static TiledMap Map => GameMain.Instance.Map;
         static bool rTab;
+        static vec[] TriggerTilesSelection = [vec.Null, vec.Null];
+
         public static void Update()
         {
             if (!GameMain.Instance.IsActive)
@@ -148,11 +182,12 @@ namespace Project8.Editor
             if (OtherEditor)
                 return;
 
+            ms = MS.Position;
+
             if (TabMenu)
             {
                 if (MS.IsLeftDown)
                 {
-                    var ms = MS.Position;
                     int gap = 5;
                     int tilesPerRow = Math.Max(1, (GameMain.ScreenWidth - gap) / (TSZ + gap));
                     if (ms.X < gap || ms.Y < gap) return;
@@ -167,8 +202,9 @@ namespace Project8.Editor
                     tile_id = Tile.Tiles.Keys.ElementAt(index);
                 }
             }
-            else
+            else if(!TriggerMode)
             {
+                // *=*=* MAPEDIT MODE *=*=*
                 // PlayTest part
                 if (IsPlaying)
                 {
@@ -231,20 +267,42 @@ namespace Project8.Editor
                         tile_id = MS.ScrollWheelSignInt > 0 ? add() : sub();
                     }
                 }
-
-                // Click in EditorBox
-                if (MS.IsLeftPressed && EditorUIBox.Contains(MS.Position))
+            }
+            else
+            {
+                var mst = (ms.X / stsz, ms.Y / stsz).V();
+                if (mst.x >= 0 && mst.y >= 0 && mst.x < Map.w && mst.y < Map.h)
                 {
-                    foreach (var btn in UIButtons.Values)
+                    // *=*=* TRIGGER MODE *=*=*
+                    if (MS.IsLeftPressed)
                     {
-                        if (btn.Collider.Contains(MS.Position))
-                            btn.Behavior();
+                        if (TriggerTilesSelection[0] == vec.Null)
+                            TriggerTilesSelection[0] = mst;
+                        else if (TriggerTilesSelection[1] == vec.Null)
+                            TriggerTilesSelection[1] = mst;
+                    }
+                    else if (MS.IsRightPressed)
+                    {
+                        if (TriggerTilesSelection[1] != vec.Null)
+                            TriggerTilesSelection[1] = vec.Null;
+                        else if (TriggerTilesSelection[0] != vec.Null)
+                            TriggerTilesSelection[0] = vec.Null;
                     }
                 }
             }
 
+            // Click in EditorBox
+            if (MS.IsLeftPressed && EditorUIBox.Contains(MS.Position))
+            {
+                foreach (var btn in UIButtons.Values)
+                {
+                    if (btn.Collider.Contains(MS.Position))
+                        btn.Behavior();
+                }
+            }
+
             //Tab
-            if (KB.IsKeyPressed(Keys.Tab))
+            if (KB.IsKeyPressed(Keys.Tab) && !TriggerMode)
                 TabMenu = !TabMenu;
         }
 
