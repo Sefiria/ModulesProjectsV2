@@ -1,0 +1,38 @@
+﻿{
+  "entities": [
+    {
+      "EntityName": "Player",
+      "behaviors": [ "BehaviorPlayer" ],
+      "alignment": "bottom",
+      "Animations": [
+        {
+          "AnimationsNeeds": "Idle",
+          "anim": "player_idle"
+        },
+        {
+          "AnimationsNeeds": "Walk",
+          "anim": "player_walk"
+        },
+        {
+          "AnimationsNeeds": "Crouch",
+          "anim": "player_crouch"
+        }
+      ],
+      "AnimationSpeed": "4F",
+      "CanCollect": true
+    },
+    {
+      "EntityName": "AMmo",
+      "behaviors": [ "BehaviorCollectible" ],
+      "alignment": "bottom",
+      "Animations": [
+        {
+          "AnimationsNeeds": "Idle",
+          "anim": "ammo"
+        }
+      ],
+      "AnimationSpeed": "4F",
+      "CanCollect": true
+    }
+  ]
+}

@@ -20,7 +20,7 @@ namespace Project8
         public static void Detect(Entity obj, Entity[] others)
         {
             if (obj == null || others.Count() == 0) return;
-            Entity collider = others.FirstOrDefault(o => o.GetTextureBounds().IntersectsWith(obj.GetTextureBounds()));
+            Entity collider = others.Except(obj).FirstOrDefault(o => o.GetTextureBounds().IntersectsWith(obj.GetTextureBounds()));
             if (collider != null)
             {
                 //if (collider is Mob && !(collider as Mob).HasBehavior<Passive>())
@@ -29,6 +29,11 @@ namespace Project8
                 //    (obj as Hittable)?.Hit((collider as Harmful).DMG);
                 //if (obj is IInventory)
                 //    (collider as Collectible)?.Collect(obj as IInventory);
+                if(collider.CanCollect && obj is Collectible)
+                {
+                    collider.Collect(obj as Collectible);
+                    (obj as Collectible).Collected();
+                }
             }
         }
 

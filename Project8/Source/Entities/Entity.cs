@@ -30,6 +30,7 @@ namespace Project8.Source.Entities
         public bool HasCollisions = true, ApplyRotationFromLook = false;
         public bool OutlineWhenHover = false, ForceOutline = false;
         public Alignments Alignment = Alignments.center;
+        public bool CanCollect = false;
 
         public Dictionary<object, object> UserData = new Dictionary<object, object>();
 
@@ -133,6 +134,9 @@ namespace Project8.Source.Entities
         /// Already tIled x, y
         /// </summary>
         private bool CheckMapTilesCollisions(int x, int y) => Context.Map[1, x, y] != -1;
+        public void Collect(Collectible collectible)
+        {
+        }
 
         Vector2 vec_center => new Vector2(W / 2f, H / 2f);
         Vector2 vec_bottom => new Vector2(W / 2f, H);

@@ -17,6 +17,7 @@ using Keys = Microsoft.Xna.Framework.Input.Keys;
 using Project8.Editor.TileCreator;
 using System.IO;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
+using Project8.Source.Entities;
 
 namespace Project8.Editor
 {
@@ -34,7 +35,8 @@ namespace Project8.Editor
         public static Texture2D play_stop_button_tex;
         public static Dictionary<string, UIButton> UIButtons;
         public static int SelectedLayer = 0;
-        public static bool TriggerMode = false;
+        public enum EditorModes { Map, Entities, Triggers }
+        public static EditorModes EditorMode = EditorModes.Map;
         
 
         public static void Init(GraphicsDevice GraphicsDevice)
@@ -47,13 +49,15 @@ namespace Project8.Editor
                 ["Tile Creator"]      = new UIButton(new Rectangle(16 + 160 * 0, EditorUIBox.Y + 48 + 32 * 1, 155, 32), OpenFormWithOwner<TileCreator.TileCreator>),
                 ["TileSet Creator"]   = new UIButton(new Rectangle(16 + 160 * 1, EditorUIBox.Y + 48 + 32 * 1, 190, 32), OpenFormWithOwner<TileSetCreator.TileSetCreator>),
                 ["TileSet Generator"]   = new UIButton(new Rectangle(16 + 177 * 2, EditorUIBox.Y + 48 + 32 * 1, 215, 32), OpenFormWithOwner<TileSetCreator.TileSetGenerator>),
+                ["Entity Creator"]   = new UIButton(new Rectangle(16 + 200 * 3, EditorUIBox.Y + 48 + 32 * 1, 188, 32), OpenFormWithOwner<EntityCreator.EntityCreator>),
 
                 ["Reset Map"]      = new UIButton(new Rectangle(16 + 160 * 0, EditorUIBox.Y + 48 + 32 * 2, 140, 32), () => Map.Reset()),
                 ["Save Map"] = new UIButton(new Rectangle(16 + 160 * 1, EditorUIBox.Y + 48 + 32 * 2, 140, 32), () => Map.Save()),
                 ["Load Map"]      = new UIButton(new Rectangle(16 + 160 * 2, EditorUIBox.Y + 48 + 32 * 2, 140, 32), () => Map.Load()),
 
-                ["MapEdit Mode"]      = new UIButton(new Rectangle(16 + 160 * 0, EditorUIBox.Y + 48 + 32 * 3, 155, 32), () => TriggerMode = false),
-                ["Trigger Mode"]      = new UIButton(new Rectangle(16 + 160 * 1, EditorUIBox.Y + 48 + 32 * 3, 155, 32), () => TriggerMode = true),
+                ["MapEdit Mode"]      = new UIButton(new Rectangle(16 + 160 * 0, EditorUIBox.Y + 48 + 32 * 3, 155, 32), () => EditorMode = EditorModes.Map),
+                ["Entity  Mode"]      = new UIButton(new Rectangle(16 + 160 * 1, EditorUIBox.Y + 48 + 32 * 3, 155, 32), () => EditorMode = EditorModes.Entities),
+                ["Trigger Mode"]      = new UIButton(new Rectangle(16 + 160 * 2, EditorUIBox.Y + 48 + 32 * 3, 155, 32), () => EditorMode = EditorModes.Triggers),
             };
         }
         sealed class WindowHandleWrapper : IWin32Window
@@ -92,23 +96,30 @@ namespace Project8.Editor
             {
                 int gap = 5;
                 int tilesPerRow = Math.Max(1, (GameMain.ScreenWidth - gap) / (TSZ + gap));
-                for (int i = 0; i < Tile.Tiles.Count; i++)
+                if(EditorMode == EditorModes.Map)
                 {
-                    Tile t = Tile.Tiles.ElementAt(i).Value;
-                    if (t.Tex != null)
+                    for (int i = 0; i < Tile.Tiles.Count; i++)
                     {
-                        g.DrawTexture(
-                            t.Tex[0],
-                            gap + i % tilesPerRow * (TSZ + gap),
-                            gap + i / tilesPerRow * (TSZ + gap),
-                            GameMain.Instance.scale,
-                            new Rectangle(t.Mode == Tile.Modes.MultiTile ? t.MultiTileIndex * 16 : 0, 0, 16, 16)
-                        );
-                        if(i == tile_id + 1)
+                        Tile t = Tile.Tiles.ElementAt(i).Value;
+                        if (t.Tex != null)
                         {
-                            g.DrawRectangle(gap + i % tilesPerRow * (TSZ + gap), gap + i / tilesPerRow * (TSZ + gap), TSZ, TSZ, Color.Yellow, 2);
+                            g.DrawTexture(
+                                t.Tex[0],
+                                gap + i % tilesPerRow * (TSZ + gap),
+                                gap + i / tilesPerRow * (TSZ + gap),
+                                GameMain.Instance.scale,
+                                new Rectangle(t.Mode == Tile.Modes.MultiTile ? t.MultiTileIndex * 16 : 0, 0, 16, 16)
+                            );
+                            if (i == tile_id + 1)
+                            {
+                                g.DrawRectangle(gap + i % tilesPerRow * (TSZ + gap), gap + i / tilesPerRow * (TSZ + gap), TSZ, TSZ, Color.Yellow, 2);
+                            }
                         }
                     }
+                }
+                else if (EditorMode == EditorModes.Entities)
+                {
+                    // TODO
                 }
             }
             else
@@ -129,7 +140,10 @@ namespace Project8.Editor
                 foreach (var b in UIButtons.Skip(1))
                 {
                     g.DrawString(b.Key, b.Value.Collider.X, b.Value.Collider.Y, GameMain.Instance.font, Color.White);
-                    var thickness = ((b.Key == "MapEdit Mode" && !TriggerMode) || (b.Key == "Trigger Mode" && TriggerMode)) ? 3 : 1;
+                    var thickness = ((b.Key == "MapEdit Mode" && EditorMode == EditorModes.Map)
+                                  || (b.Key == "Entity Mode" && EditorMode == EditorModes.Entities)
+                                  || (b.Key == "Trigger Mode" && EditorMode == EditorModes.Triggers)
+                                  ) ? 3 : 1;
                     g.DrawRectangle(UIButtons[b.Key].Collider, Color.White, thickness);
                 }
 
@@ -138,7 +152,7 @@ namespace Project8.Editor
                 {
                     DrawTest();
                 }
-                else if (TriggerMode)
+                else if (EditorMode == EditorModes.Triggers)
                 {
                     var g = Graphics.Graphics.Instance;
                     var mst = (ms.X / stsz, ms.Y / stsz).V();
@@ -149,18 +163,25 @@ namespace Project8.Editor
                     var alpha = (byte)(raw_alpha * (255f - mapped_value) + mapped_value);
                     if (mst.x >= 0 && mst.y >= 0 && mst.x < Map.w && mst.y < Map.h)
                         g.DrawRectangle(new Rectangle(mst.x * TSZ, mst.y * TSZ, TSZ, TSZ), Color.White, 1);
-                    if (TriggerTilesSelection[0] != vec.Null)
-                        g.DrawRectangle(new Rectangle(TriggerTilesSelection[0].x * TSZ, TriggerTilesSelection[0].y * TSZ, TSZ, TSZ), new Color(Color.Yellow, alpha), 4);
-                    if (TriggerTilesSelection[1] != vec.Null)
-                        g.DrawRectangle(new Rectangle(TriggerTilesSelection[1].x * TSZ, TriggerTilesSelection[1].y * TSZ, TSZ, TSZ), new Color(Color.Red, alpha), 4);
-                    if(TriggerTilesSelection[0] != vec.Null && TriggerTilesSelection[1] != vec.Null)
-                        g.DrawLine(
-                            start_x: TriggerTilesSelection[0].x * TSZ + TSZ / 2,
-                            start_y: TriggerTilesSelection[0].y * TSZ + TSZ / 2,
-                            end_x: TriggerTilesSelection[1].x * TSZ + TSZ / 2,
-                            end_y: TriggerTilesSelection[1].y * TSZ + TSZ / 2,
-                            color: new Color(Color.White, (byte)((255f + mapped_value) - alpha)),
-                            thickness: 2);
+                    List<vec[]> list = new List<vec[]>(TriggerTiles)
+                    {
+                        TriggerTilesSelection
+                    };
+                    foreach (var tt in list)
+                    {
+                        if (tt[0] != vec.Null)
+                            g.DrawRectangle(new Rectangle(tt[0].x * TSZ, tt[0].y * TSZ, TSZ, TSZ), new Color(Color.Yellow, alpha), 4);
+                        if (tt[1] != vec.Null)
+                            g.DrawRectangle(new Rectangle(tt[1].x * TSZ, tt[1].y * TSZ, TSZ, TSZ), new Color(Color.Red, alpha), 4);
+                        if (tt[0] != vec.Null && tt[1] != vec.Null)
+                            g.DrawLine(
+                                start_x: tt[0].x * TSZ + TSZ / 2,
+                                start_y: tt[0].y * TSZ + TSZ / 2,
+                                end_x: tt[1].x * TSZ + TSZ / 2,
+                                end_y: tt[1].y * TSZ + TSZ / 2,
+                                color: new Color(tt == TriggerTilesSelection ? Color.White : Color.Gray, (byte)((255f + mapped_value) - alpha)),
+                                thickness: 2);
+                    }
                 }
             }
         }
@@ -173,6 +194,7 @@ namespace Project8.Editor
         static TiledMap Map => GameMain.Instance.Map;
         static bool rTab;
         static vec[] TriggerTilesSelection = [vec.Null, vec.Null];
+        static List<vec[]> TriggerTiles = new List<vec[]>();
 
         public static void Update()
         {
@@ -188,21 +210,28 @@ namespace Project8.Editor
             {
                 if (MS.IsLeftDown)
                 {
-                    int gap = 5;
-                    int tilesPerRow = Math.Max(1, (GameMain.ScreenWidth - gap) / (TSZ + gap));
-                    if (ms.X < gap || ms.Y < gap) return;
-                    int col = (ms.X - gap) / (TSZ + gap);
-                    int row = (ms.Y - gap) / (TSZ + gap);
-                    if (col < 0 || col >= tilesPerRow || row < 0) return;
-                    int index = row * tilesPerRow + col;
-                    if (index < 0 || index >= Tile.Tiles.Count) return;
-                    int dxInCell = (ms.X - gap) % (TSZ + gap);
-                    int dyInCell = (ms.Y - gap) % (TSZ + gap);
-                    if (dxInCell >= TSZ || dyInCell >= TSZ) return;
-                    tile_id = Tile.Tiles.Keys.ElementAt(index);
+                    if (EditorMode == EditorModes.Map)
+                    {
+                        int gap = 5;
+                        int tilesPerRow = Math.Max(1, (GameMain.ScreenWidth - gap) / (TSZ + gap));
+                        if (ms.X < gap || ms.Y < gap) return;
+                        int col = (ms.X - gap) / (TSZ + gap);
+                        int row = (ms.Y - gap) / (TSZ + gap);
+                        if (col < 0 || col >= tilesPerRow || row < 0) return;
+                        int index = row * tilesPerRow + col;
+                        if (index < 0 || index >= Tile.Tiles.Count) return;
+                        int dxInCell = (ms.X - gap) % (TSZ + gap);
+                        int dyInCell = (ms.Y - gap) % (TSZ + gap);
+                        if (dxInCell >= TSZ || dyInCell >= TSZ) return;
+                        tile_id = Tile.Tiles.Keys.ElementAt(index);
+                    }
+                    else if (EditorMode == EditorModes.Entities)
+                    {
+                        // TODO
+                    }
                 }
             }
-            else if(!TriggerMode)
+            else if(EditorMode == EditorModes.Map)
             {
                 // *=*=* MAPEDIT MODE *=*=*
                 // PlayTest part
@@ -268,7 +297,11 @@ namespace Project8.Editor
                     }
                 }
             }
-            else
+            else if(EditorMode == EditorModes.Entities)
+            {
+                // TODO
+            }
+            else if(EditorMode == EditorModes.Triggers)
             {
                 var mst = (ms.X / stsz, ms.Y / stsz).V();
                 if (mst.x >= 0 && mst.y >= 0 && mst.x < Map.w && mst.y < Map.h)
@@ -279,14 +312,44 @@ namespace Project8.Editor
                         if (TriggerTilesSelection[0] == vec.Null)
                             TriggerTilesSelection[0] = mst;
                         else if (TriggerTilesSelection[1] == vec.Null)
+                        {
                             TriggerTilesSelection[1] = mst;
+                            TriggerTiles.Add([TriggerTilesSelection[0], TriggerTilesSelection[1]]);
+                            TriggerTilesSelection = [vec.Null, vec.Null];
+                        }
                     }
                     else if (MS.IsRightPressed)
                     {
+                        if (TriggerTilesSelection[0] == vec.Null && TriggerTilesSelection[1] == vec.Null && TriggerTiles.Count > 0)
+                            TriggerTilesSelection = TriggerTiles[TriggerTiles.Count - 1];
                         if (TriggerTilesSelection[1] != vec.Null)
                             TriggerTilesSelection[1] = vec.Null;
                         else if (TriggerTilesSelection[0] != vec.Null)
+                        {
                             TriggerTilesSelection[0] = vec.Null;
+                            var item = TriggerTiles.FirstOrDefault(t => t[0] == vec.Null && t[1] == vec.Null);
+                            if (item != null)
+                            {
+                                var id = TriggerTiles.IndexOf(item);
+                                if (id != -1)
+                                {
+                                    TriggerTiles.RemoveAt(id);
+                                    if (TriggerTiles.Count > 0)
+                                        TriggerTilesSelection = TriggerTiles[TriggerTiles.Count - 1];
+                                }
+                            }
+                        }
+                    }
+                    else if (MS.IsMiddlePressed)
+                    {
+                        var selected = TriggerTiles.FirstOrDefault(t => t.Any(v => new Rectangle(v.x * TSZ, v.y * TSZ, TSZ, TSZ).Contains(ms)));
+                        if (selected != null)
+                        {
+                            var temp = new vec[] { selected[0], selected[1] };
+                            TriggerTiles.Remove(selected);
+                            TriggerTiles.Add(temp);
+                            TriggerTilesSelection = temp;
+                        }
                     }
                 }
             }
@@ -302,7 +365,7 @@ namespace Project8.Editor
             }
 
             //Tab
-            if (KB.IsKeyPressed(Keys.Tab) && !TriggerMode)
+            if (KB.IsKeyPressed(Keys.Tab) && EditorMode != EditorModes.Triggers)
                 TabMenu = !TabMenu;
         }
 
@@ -315,6 +378,7 @@ namespace Project8.Editor
                 for (int x = 0; x < Map.w; x++)
                     for (int y = 0; y < Map.h; y++)
                         SavedMap[z, x, y] = Map.Tiles[z, x, y];
+            EntityFactory.CreateCollectible_Ammo(3, 20);
         }
         public static void DrawTest()
         {

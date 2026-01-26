@@ -8,11 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Tooling;
-using KB = Tooling.KB;
-using MS = Tooling.MouseStates;
 using G = System.Drawing.Graphics;
-using Project8.Source.TiledMap;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace Project8.Editor.TileSetCreator
 {

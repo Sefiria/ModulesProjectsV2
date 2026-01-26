@@ -4,6 +4,7 @@ using System.Linq;
 using System;
 using Tools.Animations;
 using Project8.Source.TiledMap;
+using System.IO;
 
 namespace Project8.Source.Entities.Behaviors
 {
@@ -98,6 +99,11 @@ namespace Project8.Source.Entities.Behaviors
         private void set_anim(AnimationsNeeds anim)
         {
             int ha = Target.AnimationController.GetCurrentFrame().Height;
+            if (!Target.AnimationController.Animations.ContainsKey(Enum.GetName(anim)))
+            {
+                Logging.Log(Logging.Levels.WARN, $"Missing animation '{anim}' in '{Target.Name}' AnimationController.");
+                return;
+            }
             int hb = Target.AnimationController.Animations[Enum.GetName(anim)].Frames[0].Height;
             if(ha < hb)
                 Target.Y -= hb - ha + 4;

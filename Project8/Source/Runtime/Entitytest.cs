@@ -13,9 +13,10 @@ namespace Project8.Source.Runtime
     internal class Entitytest : Entity
     {
         string[] behaviors = [];
-        Dictionary<Behavior.AnimationsNeeds, string> Animations;
+        Dictionary<AnimationsNeeds, string> Animations;
         Alignments alignment;
         float AnimationSpeed = 5F;
+        bool canCollect = false;
 
         public Entitytest(int x, int y)
         {
@@ -29,6 +30,7 @@ namespace Project8.Source.Runtime
                 [AnimationsNeeds.Crouch] = "player_crouch",
             };
             AnimationSpeed = 4F;
+            canCollect = true;
 
             // impl
             var path = Directory.GetCurrentDirectory() + "/Assets/Textures/Animations/";
@@ -43,6 +45,7 @@ namespace Project8.Source.Runtime
             X = x - W / 2F;
             Y = y - H / 2F;
             Alignment = alignment;
+            CanCollect = canCollect;
             AnimationController = new AnimationController(g);
             foreach (var anim in Animations)
             {
@@ -55,7 +58,7 @@ namespace Project8.Source.Runtime
                 if(found != null)
                     Behaviors.Add((Behavior)Activator.CreateInstance(found, this));
             }
-            GameMain.Instance.EntityManager.Entities.Add(this);
+            //GameMain.Instance.EntityManager.Entities.Add(this);
         }
     }
 }
