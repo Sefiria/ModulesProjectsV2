@@ -22,7 +22,7 @@
       "CanCollect": true
     },
     {
-      "EntityName": "AMmo",
+      "EntityName": "Ammo",
       "behaviors": [ "BehaviorCollectible" ],
       "alignment": "bottom",
       "Animations": [

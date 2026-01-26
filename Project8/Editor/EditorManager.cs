@@ -41,7 +41,7 @@ namespace Project8.Editor
 
         public static void Init(GraphicsDevice GraphicsDevice)
         {
-            play_stop_button_tex = Texture2D.FromFile(GraphicsDevice, "Assets/UI/play_stop_button.png");
+            play_stop_button_tex = Texture2D.FromFile(GraphicsDevice, Path.Combine(GlobalPaths.UI, "play_stop_button.png"));
             UIButtons = new Dictionary<string, UIButton>()
             {
                 ["playstop"]         = new UIButton(new Rectangle(16, EditorUIBox.Y + 48, 32, 32), () => { if(IsPlaying) DisposeTest(); else LoadTest(); IsPlaying = !IsPlaying; }),

@@ -263,7 +263,7 @@ namespace Project8.Source.Map
             }
         }
 
-        string temp_map_filename = Directory.GetCurrentDirectory() + "/Assets/Maps/test.map";
+        string temp_map_filename = Path.Combine(GlobalPaths.Maps, "test.map");
         public void Reset()
         {
             for (int l = 0; l < z; l++)

@@ -23,6 +23,7 @@ namespace Project8.Editor
         public Bitmap Image;
         public static int sz = GlobalVariables.tilesize;
         PictureBox usedColor, colorBuffer;
+        public event EventHandler RenderUpdated;
 
         public DrawBox(ref Bitmap img, ref PictureBox usedColor, ref PictureBox colorBuffer)
         {
@@ -60,8 +61,8 @@ namespace Project8.Editor
             bool IsMiddle = e.Button == MouseButtons.Middle;
             bool IsFill = IsLeft && ModifierKeys.HasFlag(Keys.Shift) && ModifierKeys.HasFlag(Keys.Control);
 
-            int tx = Math.Clamp((int)(ms.X / scale), 0, sz - 1);
-            int ty = Math.Clamp((int)(ms.Y / scale), 0, sz - 1);
+            int tx = Math.Clamp((int)(ms.X / scale * 2), 0, sz - 1);
+            int ty = Math.Clamp((int)(ms.Y / scale * 2), 0, sz - 1);
 
             if (IsFill)
             {
@@ -82,12 +83,11 @@ namespace Project8.Editor
                 for (double t = 0.0; t <= 1.0; t += step)
                 {
                     PointF p = Maths.Lerp(ms_old, ms, t);
-                    int px = (int)(p.X / scale);
-                    int py = (int)(p.Y / scale);
+                    int px = (int)(p.X / scale * 2);
+                    int py = (int)(p.Y / scale * 2);
                     if (px >= 0 && py >= 0 && px < sz && py < sz)
                         Image.SetPixel(px, py, IsLeft ? usedColor.BackColor : Color.Transparent);
                 }
-                Image.SetPixel(tx, ty, IsLeft ? usedColor.BackColor : Color.Transparent);
                 UpdateRender();
                 return;
             }
@@ -122,10 +122,11 @@ namespace Project8.Editor
                 g.SmoothingMode = SmoothingMode.None; g.InterpolationMode = InterpolationMode.NearestNeighbor; g.CompositingQuality = CompositingQuality.HighSpeed;
                 using var hb = new HatchBrush(HatchStyle.LargeCheckerBoard, Color.DarkGray, Color.LightGray);
                 g.FillRectangle(hb, 0, 0, img.Width, img.Height);
-                g.DrawImage(ResizeExact(Image, img.Width, img.Height), 0, 0);
+                g.DrawImage(ResizeExact(Image, img.Width / 2, img.Height / 2), 0, 0);
             }
             render.Image = ResizeExact(img, sz * scale, sz * scale);
             render.Refresh();
+            RenderUpdated?.Invoke(this, null);
         }
 
         private void FloodFill(Bitmap bmp, int x, int y, Color target, Color replacement)

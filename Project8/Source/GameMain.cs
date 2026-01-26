@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Project8.Editor;
+using System.IO;
 using Tools.Inputs;
 
 namespace Project8
@@ -49,7 +50,7 @@ namespace Project8
             base.Initialize();
 
             font = Resources.Instance.Fonts[0];
-            TexCursor = Texture2D.FromFile(GraphicsDevice, "Assets/UI/cursor.png");
+            TexCursor = Texture2D.FromFile(GraphicsDevice, Path.Combine(GlobalPaths.UI, "cursor.png"));
             ResourcesLoader.Load(GraphicsDevice);
             LoadSFX();
             LoadUpdate();

@@ -1,10 +1,13 @@
-﻿using Project8.Source;
-using SharpDX.Direct3D9;
+﻿using NAudio.MediaFoundation;
+using Project8.Source;
+using Project8.Source.JsonHelpers;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using static Project8.Source.Entities.Entity;
 using G = System.Drawing.Graphics;
 
 namespace Project8.Editor.EntityCreator
@@ -12,9 +15,13 @@ namespace Project8.Editor.EntityCreator
     public partial class EntityCreator : Form
     {
         public static int sz = GlobalVariables.tilesize;
+        PaletteRoll[] PaletteRolls = new PaletteRoll[4];
         Bitmap[] Frames;
         int CurrentFrame = 0;
         DrawBox DrawFrame;
+        static string PathAnimations = Directory.GetCurrentDirectory() + "/Assets/Textures/Animations/";
+        Dictionary<string, Entity> Metadata = new Dictionary<string, Entity>();
+        string Target = null;
 
         public EntityCreator()
         {
@@ -23,6 +30,41 @@ namespace Project8.Editor.EntityCreator
 
         private void EntityCreator_Load(object sender, EventArgs e)
         {
+            LoadGraphics();
+            LoadFilename();
+            LoadEntityConfiguration();
+        }
+        private void NewAnimation()
+        {
+        }
+        private void RenameAnimation()
+        {
+        }
+        private void DeleteAnimation()
+        {
+            int id = listAnimations.SelectedIndex;
+            if (id != -1)
+            {
+                RemoveAnimationByName(Metadata[Target], listAnimations.Items[id].ToString());
+                listAnimations.Items.RemoveAt(id);
+            }
+        }
+        public static void RemoveAnimationByName(Entity entity, string animationName)
+        {
+            var key = entity.Animations .FirstOrDefault(a => a.Value == animationName) .Key;
+            if (!entity.Animations.ContainsKey(key))
+                return;
+            entity.Animations.Remove(key);
+        }
+        private void LoadGraphics()
+        {
+            ToolStripDropDownMenu menu = new ToolStripDropDownMenu();
+            menu.Items[menu.Items.Add(new ToolStripButton("New...") { Name = "New" })].Click += (s, _e) => NewAnimation();
+            menu.Items[menu.Items.Add(new ToolStripButton("Rename...") { Name = "Rename" })].Click += (s, _e) => RenameAnimation();
+            menu.Items.Add(new ToolStripSeparator());
+            menu.Items[menu.Items.Add(new ToolStripButton("Delete", SystemIcons.Warning.ToBitmap()) { Name = "Delete" })].Click += (s, _e) => DeleteAnimation();
+            listAnimations.MouseDown += (s, _e) => { if (_e.Button != MouseButtons.Right) return; menu.Items["Rename"].Enabled = menu.Items["Delete"].Enabled = listAnimations.SelectedIndex != -1; menu.Show(listAnimations, _e.Location); };
+            listAnimations.Items.Add("test");
             var colorsbtn = new List<PictureBox>() { usedColor, color1, color2, color3, color4, color5, color6, color7, color8, colorBuffer };
             foreach (var c in colorsbtn)
             {
@@ -30,21 +72,43 @@ namespace Project8.Editor.EntityCreator
                 using (G g = G.FromImage(c.Image))
                 {
                     g.Clear(Color.White);
-                    g.DrawRectangle(Pens.Black, 0, 0, c.Image.Width - 1, c.Image.Height - 1);
+                    g.DrawRectangle(Pens.Black, 0, 0, c.Image.Width, c.Image.Height);
                 }
             }
+
+            int gX = groupGraphics.Location.X;
+            int gY = groupGraphics.Location.Y;
+            for (int i = 0; i < PaletteRolls.Length; i++)
+            {
+                PaletteRolls[i] = new PaletteRoll(ref usedColor) { Location = new Point(gX + 37, gY + 212 + 21 * i) };
+                groupGraphics.Controls.Add(PaletteRolls[i]);
+            }
+            PaletteRolls[0].SetMainColor(Color.FromArgb(167, 123, 91));
+            PaletteRolls[1].SetMainColor(Color.FromArgb(138, 176, 96));
+            PaletteRolls[2].SetMainColor(Color.FromArgb(106, 83, 110));
+            PaletteRolls[3].SetMainColor(Color.FromArgb(128, 128, 128));
 
             Frames = [new Bitmap(sz, sz), new Bitmap(sz, sz), new Bitmap(sz, sz), new Bitmap(sz, sz)];
             DrawFrame = new DrawBox(ref Frames[CurrentFrame], ref usedColor, ref colorBuffer)
             {
-                Location = new Point(37, 144),
+                Location = new Point(gX + 20, gY + 361),
                 Size = new Size(160, 160)
             };
-            Controls.Add(DrawFrame);
+            DrawFrame.RenderUpdated += (s, e) => Draw_FramesRender();
+            groupGraphics.Controls.Add(DrawFrame);
 
             FramesRender.Image = new Bitmap(FramesRender.Width, FramesRender.Height);
             Draw_FramesRender();
         }
+        private void LoadFilename()
+        {
+            Metadata = EntityLoader.Load(GlobalPaths.DataEntitiesJson);
+        }
+        private void LoadEntityConfiguration()
+        {
+            cbbAlignment.Items.AddRange(Enum.GetNames<Alignments>());
+        }
+
         private void color_MouseClick(object sender, MouseEventArgs e)
         {
             var colorsbtn = new List<PictureBox>() { color1, color2, color3, color4, color5, color6, color7, color8, colorBuffer };
@@ -56,7 +120,7 @@ namespace Project8.Editor.EntityCreator
                 using (G _g = G.FromImage(usedColor.Image))
                 {
                     _g.Clear(usedColor.BackColor);
-                    _g.DrawRectangle(Pens.Black, 0, 0, usedColor.Image.Width - 1, usedColor.Image.Height - 1);
+                    _g.DrawRectangle(Pens.Black, 0, 0, usedColor.Image.Width, usedColor.Image.Height);
                 }
             }
             else if (e.Button == MouseButtons.Middle)
@@ -66,12 +130,12 @@ namespace Project8.Editor.EntityCreator
                 using (G _g = G.FromImage(c.Image))
                 {
                     _g.Clear(c.BackColor);
-                    _g.DrawRectangle(Pens.Black, 0, 0, c.Image.Width - 1, c.Image.Height - 1);
+                    _g.DrawRectangle(Pens.Black, 0, 0, c.Image.Width, c.Image.Height);
                 }
                 using (G _g = G.FromImage(usedColor.Image))
                 {
                     _g.Clear(usedColor.BackColor);
-                    _g.DrawRectangle(Pens.Black, 0, 0, usedColor.Image.Width - 1, usedColor.Image.Height - 1);
+                    _g.DrawRectangle(Pens.Black, 0, 0, usedColor.Image.Width, usedColor.Image.Height);
                 }
             }
             else
@@ -86,12 +150,12 @@ namespace Project8.Editor.EntityCreator
                         using (G _g = G.FromImage(c.Image))
                         {
                             _g.Clear(c.BackColor);
-                            _g.DrawRectangle(Pens.Black, 0, 0, c.Image.Width - 1, c.Image.Height - 1);
+                            _g.DrawRectangle(Pens.Black, 0, 0, c.Image.Width, c.Image.Height);
                         }
                         using (G _g = G.FromImage(usedColor.Image))
                         {
                             _g.Clear(usedColor.BackColor);
-                            _g.DrawRectangle(Pens.Black, 0, 0, usedColor.Image.Width - 1, usedColor.Image.Height - 1);
+                            _g.DrawRectangle(Pens.Black, 0, 0, usedColor.Image.Width, usedColor.Image.Height);
                         }
                     }
                 }
@@ -114,9 +178,9 @@ namespace Project8.Editor.EntityCreator
                     {
                         CurrentFrame = x;
                         DrawFrame.UpdateImage(ref Frames[CurrentFrame]);
-                        Draw_FramesRender();
                     }
                 }
+                Draw_FramesRender();
             }
         }
         private void Draw_FramesRender()
@@ -145,6 +209,16 @@ namespace Project8.Editor.EntityCreator
                     }
                 }
             }
+        }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            PaletteRolls.ToList().ForEach(pr => pr.ChangeGap((int)numGap.Value));
+        }
+
+        private void btSave_Click(object sender, EventArgs e)
+        {
+            EntityLoader.Save(GlobalPaths.DataEntitiesJson, Metadata);
         }
     }
 }

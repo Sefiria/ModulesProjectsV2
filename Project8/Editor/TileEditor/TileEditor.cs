@@ -148,8 +148,6 @@ namespace Project8.Editor.TileEditor
             Converters = { new JsonStringEnumConverter() }
         };
 
-        private string _jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Directory.GetCurrentDirectory()+"/Assets/Data/tileset.json");
-
         private void Form_FormClosing(object sender, FormClosingEventArgs e)
         {
             try
@@ -188,7 +186,7 @@ namespace Project8.Editor.TileEditor
                 var root = new TilesRoot { tiles = tilesList };
                 var json = JsonSerializer.Serialize(root, JsonOptions);
 
-                File.WriteAllText(_jsonPath, json, System.Text.Encoding.UTF8);
+                File.WriteAllText(GlobalPaths.DataTilesetJson, json, System.Text.Encoding.UTF8);
             }
             catch (Exception ex)
             {
