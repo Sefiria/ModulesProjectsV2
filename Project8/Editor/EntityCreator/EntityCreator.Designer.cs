@@ -52,11 +52,17 @@
             label3 = new System.Windows.Forms.Label();
             tbMetadataPath = new System.Windows.Forms.TextBox();
             groupBox2 = new System.Windows.Forms.GroupBox();
+            btRemoveBehavior = new System.Windows.Forms.Button();
+            btAddBehavior = new System.Windows.Forms.Button();
+            lbExistingBehaviors = new System.Windows.Forms.ListBox();
+            lbEntityBehaviors = new System.Windows.Forms.ListBox();
             cbEntityCanCollect = new System.Windows.Forms.CheckBox();
             btEntityValidateRenaming = new System.Windows.Forms.Button();
             tbEntityName = new System.Windows.Forms.TextBox();
             numEntityAnimationSpeed = new System.Windows.Forms.NumericUpDown();
             label6 = new System.Windows.Forms.Label();
+            label11 = new System.Windows.Forms.Label();
+            label10 = new System.Windows.Forms.Label();
             label5 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
@@ -217,12 +223,18 @@
             // 
             // dgvAnims
             // 
+            dgvAnims.AllowUserToAddRows = false;
+            dgvAnims.AllowUserToDeleteRows = false;
+            dgvAnims.AllowUserToResizeRows = false;
             dgvAnims.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvAnims.Location = new System.Drawing.Point(6, 43);
             dgvAnims.Name = "dgvAnims";
+            dgvAnims.RowHeadersVisible = false;
             dgvAnims.Size = new System.Drawing.Size(429, 218);
             dgvAnims.TabIndex = 18;
             dgvAnims.CellMouseClick += dgvAnims_CellMouseClick;
+            dgvAnims.CellValueChanged += dgvAnims_CellValueChanged;
+            dgvAnims.CurrentCellDirtyStateChanged += dgvAnims_CurrentCellDirtyStateChanged;
             // 
             // label7
             // 
@@ -316,11 +328,17 @@
             // groupBox2
             // 
             groupBox2.BackColor = System.Drawing.Color.LightGray;
+            groupBox2.Controls.Add(btRemoveBehavior);
+            groupBox2.Controls.Add(btAddBehavior);
+            groupBox2.Controls.Add(lbExistingBehaviors);
+            groupBox2.Controls.Add(lbEntityBehaviors);
             groupBox2.Controls.Add(cbEntityCanCollect);
             groupBox2.Controls.Add(btEntityValidateRenaming);
             groupBox2.Controls.Add(tbEntityName);
             groupBox2.Controls.Add(numEntityAnimationSpeed);
             groupBox2.Controls.Add(label6);
+            groupBox2.Controls.Add(label11);
+            groupBox2.Controls.Add(label10);
             groupBox2.Controls.Add(label5);
             groupBox2.Controls.Add(label2);
             groupBox2.Controls.Add(label4);
@@ -332,6 +350,50 @@
             groupBox2.TabIndex = 20;
             groupBox2.TabStop = false;
             groupBox2.Text = "Configure Entity";
+            // 
+            // btRemoveBehavior
+            // 
+            btRemoveBehavior.BackColor = System.Drawing.Color.SeaShell;
+            btRemoveBehavior.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            btRemoveBehavior.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Pixel);
+            btRemoveBehavior.Location = new System.Drawing.Point(211, 208);
+            btRemoveBehavior.Name = "btRemoveBehavior";
+            btRemoveBehavior.Size = new System.Drawing.Size(25, 23);
+            btRemoveBehavior.TabIndex = 8;
+            btRemoveBehavior.Text = "→";
+            btRemoveBehavior.UseVisualStyleBackColor = false;
+            btRemoveBehavior.Click += btRemoveBehavior_Click;
+            // 
+            // btAddBehavior
+            // 
+            btAddBehavior.BackColor = System.Drawing.Color.Honeydew;
+            btAddBehavior.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            btAddBehavior.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Pixel);
+            btAddBehavior.Location = new System.Drawing.Point(211, 179);
+            btAddBehavior.Name = "btAddBehavior";
+            btAddBehavior.Size = new System.Drawing.Size(25, 23);
+            btAddBehavior.TabIndex = 7;
+            btAddBehavior.Text = "←";
+            btAddBehavior.UseVisualStyleBackColor = false;
+            btAddBehavior.Click += btAddBehavior_Click;
+            // 
+            // lbExistingBehaviors
+            // 
+            lbExistingBehaviors.FormattingEnabled = true;
+            lbExistingBehaviors.ItemHeight = 15;
+            lbExistingBehaviors.Location = new System.Drawing.Point(239, 179);
+            lbExistingBehaviors.Name = "lbExistingBehaviors";
+            lbExistingBehaviors.Size = new System.Drawing.Size(202, 319);
+            lbExistingBehaviors.TabIndex = 6;
+            // 
+            // lbEntityBehaviors
+            // 
+            lbEntityBehaviors.FormattingEnabled = true;
+            lbEntityBehaviors.ItemHeight = 15;
+            lbEntityBehaviors.Location = new System.Drawing.Point(6, 179);
+            lbEntityBehaviors.Name = "lbEntityBehaviors";
+            lbEntityBehaviors.Size = new System.Drawing.Size(202, 319);
+            lbEntityBehaviors.TabIndex = 6;
             // 
             // cbEntityCanCollect
             // 
@@ -382,6 +444,24 @@
             label6.Size = new System.Drawing.Size(182, 15);
             label6.TabIndex = 1;
             label6.Text = "-----------------------------------";
+            // 
+            // label11
+            // 
+            label11.AutoSize = true;
+            label11.Location = new System.Drawing.Point(275, 161);
+            label11.Name = "label11";
+            label11.Size = new System.Drawing.Size(119, 15);
+            label11.TabIndex = 1;
+            label11.Text = "All existing Behaviors";
+            // 
+            // label10
+            // 
+            label10.AutoSize = true;
+            label10.Location = new System.Drawing.Point(64, 161);
+            label10.Name = "label10";
+            label10.Size = new System.Drawing.Size(91, 15);
+            label10.TabIndex = 1;
+            label10.Text = "Entity Behaviors";
             // 
             // label5
             // 
@@ -499,5 +579,11 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.DataGridView dgvAnims;
+        private System.Windows.Forms.ListBox lbExistingBehaviors;
+        private System.Windows.Forms.ListBox lbEntityBehaviors;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Button btRemoveBehavior;
+        private System.Windows.Forms.Button btAddBehavior;
     }
 }

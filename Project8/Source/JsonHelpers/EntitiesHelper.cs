@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 using static Project8.Source.Entities.Behaviors.Behavior;
 using static Project8.Source.Entities.Entity;
 
@@ -8,13 +9,15 @@ namespace Project8.Source.JsonHelpers
     {
         public string[] Behaviors { get; set; }
         public Dictionary<AnimationsNeeds, string> Animations { get; set; }
+        public Dictionary<string, Bitmap> AnimationsTextures { get; set; }
         public Alignments Alignment { get; set; }
-        public float AnimationSpeed { get; set; } = 5f;
+        public float AnimationSpeed { get; set; } = 4f;
         public bool CanCollect { get; set; } = false;
         public static Entity New() => new Entity()
         {
             Behaviors = [],
             Animations = new Dictionary<AnimationsNeeds, string>(),
+            AnimationsTextures = new Dictionary<string, Bitmap>(),
             Alignment = Alignments.bottom,
             AnimationSpeed = 4F,
             CanCollect = false
@@ -22,6 +25,7 @@ namespace Project8.Source.JsonHelpers
         public Entity Clone() => new Entity() {
             Behaviors = Behaviors,
             Animations = Animations,
+            AnimationsTextures = AnimationsTextures,
             Alignment = Alignment,
             AnimationSpeed = AnimationSpeed,
             CanCollect = CanCollect

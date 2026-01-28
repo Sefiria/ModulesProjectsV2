@@ -1,6 +1,8 @@
 ﻿using Project8.Source.Entities.Behaviors;
+using SharpDX.MediaFoundation;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -10,6 +12,8 @@ namespace Project8.Source.JsonHelpers
 {
     public static class EntityLoader
     {
+        public static int sz = GlobalVariables.tilesize;
+
         public static Dictionary<string, Entity> Load(string filePath)
         {
             string json = File.ReadAllText(filePath);
@@ -20,11 +24,10 @@ namespace Project8.Source.JsonHelpers
 
             foreach (var e in root.entities)
             {
-                var entity = new Entity
-                {
-                    // Behaviors
-                    //Behaviors = e.behaviors;// besoin de reflexion ici
-                };
+                var entity = new Entity();
+
+                // Behaviors
+                entity.Behaviors = e.behaviors.ToArray();
 
                 // Alignment (enum)
                 if (Enum.TryParse<Alignments>(e.alignment, true, out var align))
@@ -46,6 +49,14 @@ namespace Project8.Source.JsonHelpers
                         if (Enum.TryParse<Behavior.AnimationsNeeds>(anim.AnimationsNeeds, true, out var need))
                             entity.Animations[need] = anim.anim;
                     }
+                }
+
+                entity.AnimationsTextures = new Dictionary<string, Bitmap>();
+                foreach (var anim in entity.Animations.Values)
+                {
+                    string animation_filename = Path.Combine(GlobalPaths.Animations, anim) + ".png";
+                    using (Bitmap texture = File.Exists(animation_filename) ? (Bitmap)Image.FromFile(animation_filename) : new Bitmap(sz * 4, sz))
+                        entity.AnimationsTextures[anim] = new Bitmap(texture);
                 }
 
                 result[e.EntityName] = entity;
@@ -80,6 +91,16 @@ namespace Project8.Source.JsonHelpers
                 };
 
                 root.entities.Add(data);
+
+                // --- Sauvegarde des textures PNG ---
+                if (e.AnimationsTextures != null)
+                {
+                    foreach (var tex in e.AnimationsTextures)
+                    {
+                        string filename = Path.Combine(GlobalPaths.Animations, tex.Key) + ".png";
+                        tex.Value.Save(filename, System.Drawing.Imaging.ImageFormat.Png);
+                    }
+                }
             }
 
             var json = JsonSerializer.Serialize(root, new JsonSerializerOptions
@@ -89,6 +110,5 @@ namespace Project8.Source.JsonHelpers
 
             File.WriteAllText(filePath, json);
         }
-
     }
 }

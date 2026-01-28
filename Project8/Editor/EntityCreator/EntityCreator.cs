@@ -1,15 +1,16 @@
 ﻿using Project8.Source;
 using Project8.Source.Entities.Behaviors;
 using Project8.Source.JsonHelpers;
+using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using Tooling;
 using static Project8.Source.Entities.Entity;
 using G = System.Drawing.Graphics;
-using Tooling;
 
 namespace Project8.Editor.EntityCreator
 {
@@ -18,7 +19,7 @@ namespace Project8.Editor.EntityCreator
         public static int sz = GlobalVariables.tilesize;
         PaletteRoll[] PaletteRolls = new PaletteRoll[4];
         Bitmap[] Frames;
-        int CurrentFrame = 0;
+        int CurrentFrame = 0, dgvAnimsLastRowIndex = -1;
         DrawBox DrawFrame;
         Dictionary<string, Entity> Metadata = new Dictionary<string, Entity>();
         string Target = null, PreviousTarget = null;
@@ -94,8 +95,24 @@ namespace Project8.Editor.EntityCreator
         {
             cbbEntityAlignment.Items.AddRange(Enum.GetNames<Alignments>());
             cbbEntityAlignment.SelectedItem = Enum.GetName(Alignments.bottom);
-        }
 
+            FillListExistingBehaviors();
+            lbExistingBehaviors.SelectedIndex = 0;
+        }
+        private void FillListExistingBehaviors()
+        {
+            lbExistingBehaviors.Items.Clear();
+            lbExistingBehaviors.Items.AddRange(
+                AppDomain.CurrentDomain
+                .GetAssemblies()
+                .SelectMany(a => a.GetTypes())
+                .Where(t => t.IsClass
+                            && !t.IsAbstract
+                            && t.IsSubclassOf(typeof(Behavior)))
+                .Select(t => t.Name)
+                .ToArray()
+            );
+        }
         private void color_MouseClick(object sender, MouseEventArgs e)
         {
             var colorsbtn = new List<PictureBox>() { color1, color2, color3, color4, color5, color6, color7, color8, colorBuffer };
@@ -219,6 +236,14 @@ namespace Project8.Editor.EntityCreator
         {
             if (Target == null || !Metadata.ContainsKey(Target))
                 return;
+            tbEntityName.Text = Target;
+            FillListExistingBehaviors();
+            lbEntityBehaviors.Items.Clear();
+            foreach (string behavior in Metadata[Target].Behaviors)
+            {
+                lbEntityBehaviors.Items.Add(behavior);
+                lbExistingBehaviors.Items.Remove(behavior);
+            }
             cbbEntityAlignment.SelectedText = Enum.GetName(Metadata[Target].Alignment);
             numEntityAnimationSpeed.Value = (int)Metadata[Target].AnimationSpeed;
             cbEntityCanCollect.Checked = Metadata[Target].CanCollect;
@@ -228,13 +253,27 @@ namespace Project8.Editor.EntityCreator
         {
             if (Target == null || !Metadata.ContainsKey(Target))
                 return;
-            Metadata[target].Alignment = Enum.Parse<Alignments>(cbbEntityAlignment.SelectedText);
+            Metadata[target].Behaviors = lbEntityBehaviors.Items.Cast<string>().ToArray();
+            Metadata[target].Alignment = Enum.Parse<Alignments>(cbbEntityAlignment.SelectedItem.ToString());
             Metadata[target].AnimationSpeed = (float)numEntityAnimationSpeed.Value;
             Metadata[target].CanCollect = cbEntityCanCollect.Checked;
-            var anims = new Dictionary<Behavior.AnimationsNeeds, string>();
-            foreach (DataGridViewRow anim in dgvAnims.Rows)
-                anims[Enum.Parse<Behavior.AnimationsNeeds>(anim.Cells["cType"].Value.ToString())] = anim.Cells["cName"].Value.ToString();
-            Metadata[target].Animations = anims;
+            if (dgvAnimsLastRowIndex > -1 && dgvAnimsLastRowIndex < dgvAnims.RowCount)
+                UIToMetadata_Anim(dgvAnims.Rows[dgvAnimsLastRowIndex], target);
+        }
+        private void UIToMetadata_Anim(DataGridViewRow anim, string target = null)
+        {
+            if (anim.Cells["cType"].Value == null || anim.Cells["cName"].Value == null)
+                return;
+
+            var need = Enum.Parse<Behavior.AnimationsNeeds>(anim.Cells["cType"].Value.ToString());
+            var name = anim.Cells["cName"].Value.ToString();
+            Metadata[target ?? Target].Animations[need] = name;
+
+            var final = new Bitmap(Frames.Length * sz, sz);
+            using (var g = G.FromImage(final))
+                for (int i = 0; i < Frames.Length; i++)
+                    g.DrawImage(Frames[i], new Point(i * sz, 0));
+            Metadata[target ?? Target].AnimationsTextures[name] = final;
         }
         private void ReloadDataGridViewAnimations()
         {
@@ -244,7 +283,7 @@ namespace Project8.Editor.EntityCreator
                 column.Items.AddRange(Enum.GetNames<Behavior.AnimationsNeeds>());
                 column.Name = "cType";
                 column.HeaderText = "Type";
-                dgvAnims.Columns[dgvAnims.Columns.Add(column)].ReadOnly = true;
+                dgvAnims.Columns[dgvAnims.Columns.Add(column)].ReadOnly = false;
                 dgvAnims.Columns[dgvAnims.Columns.Add("cName", "Name")].ReadOnly = false;
             }
 
@@ -283,37 +322,57 @@ namespace Project8.Editor.EntityCreator
         }
         private void cbbEntities_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (PreviousTarget != null)
-                UIToMetadata(PreviousTarget);
             PreviousTarget = Target;
             Target = cbbEntities.SelectedItem.ToString();
+            if (PreviousTarget != null && Metadata.ContainsKey(PreviousTarget))
+                UIToMetadata(PreviousTarget);
             MetadataToUI();
         }
 
         private void LoadAnimation(int rowIndex)
         {
-            string animation_filename = Path.Combine(GlobalPaths.Animations, dgvAnims["cName", rowIndex].Value.ToString()) + ".png";
-            Bitmap img = null;
-            if (!File.Exists(animation_filename))
-                (img = new Bitmap(sz * 4, sz)).Save(animation_filename);
-            else
-                img = (Bitmap)Image.FromFile(animation_filename);
+            if (rowIndex == -1 || dgvAnims["cName", rowIndex].Value == null)
+                return;
+            string name = dgvAnims["cName", rowIndex].Value.ToString();
+            if (!Metadata[Target].AnimationsTextures.ContainsKey(name))
+                return;
+            var img = Metadata[Target].AnimationsTextures[name];
             Frames = img.Split(x: sz, y: sz).ToArray();
             CurrentFrame = 0;
             Draw_FramesRender();
+            BeginInvoke(new Action(() => { DrawFrame.UpdateImage(ref Frames[CurrentFrame]); DrawFrame.Invalidate(); }));
         }
         private void NewAnimation()
         {
-            dgvAnims.Rows.Add("Idle", "unnamed");
+            int i = 0;
+            while (Metadata[Target].Animations.ContainsKey((Behavior.AnimationsNeeds)i))
+            {
+                i++;
+                if (i >= Enum.GetNames<Behavior.AnimationsNeeds>().Length)
+                    return;
+            }
+            var need = Enum.GetNames<Behavior.AnimationsNeeds>()[i];
+            var row_id = dgvAnims.Rows.Add(need, need);
+            Metadata[Target].Animations.Add((Behavior.AnimationsNeeds)i, need);
+            Metadata[Target].AnimationsTextures.Add(need, new Bitmap(sz * 4, sz));
+            dgvAnims.Rows[row_id].Selected = true;
+            LoadAnimation(row_id);
         }
         private void DeleteAnimation(int rowIndex)
         {
+            if (rowIndex == -1)
+                return;
+            var need = dgvAnims["cType", rowIndex].Value.ToString();
+            Metadata[Target].Animations.Remove(Enum.Parse<Behavior.AnimationsNeeds>(need));
+            Metadata[Target].AnimationsTextures.Remove(need);
             dgvAnims.Rows.RemoveAt(rowIndex);
         }
         private void dgvAnims_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
+                if (dgvAnimsLastRowIndex > -1 && dgvAnimsLastRowIndex < dgvAnims.RowCount)
+                    UIToMetadata_Anim(dgvAnims.Rows[dgvAnimsLastRowIndex]);
                 LoadAnimation(e.RowIndex);
             }
             else if (e.Button == MouseButtons.Right)
@@ -322,7 +381,9 @@ namespace Project8.Editor.EntityCreator
                 menu.Items[menu.Items.Add(new ToolStripButton("New...") { Name = "New" })].Click += (s, _e) => NewAnimation();
                 menu.Items.Add(new ToolStripSeparator());
                 menu.Items[menu.Items.Add(new ToolStripButton("Delete", SystemIcons.Warning.ToBitmap()) { Name = "Delete" })].Click += (s, _e) => DeleteAnimation(e.RowIndex);
+                menu.Show(Cursor.Position);
             }
+            dgvAnimsLastRowIndex = e.RowIndex;
         }
 
         private void btNewEntity_Click(object sender, EventArgs e)
@@ -332,7 +393,7 @@ namespace Project8.Editor.EntityCreator
                 new_entity_name += "_new";
             Metadata[new_entity_name] = Entity.New();
             cbbEntities.Items.Add(new_entity_name);
-            cbbEntities.SelectedText = new_entity_name;
+            cbbEntities.SelectedItem = new_entity_name;
         }
         private void btRemoveEntity_Click(object sender, EventArgs e)
         {
@@ -347,6 +408,38 @@ namespace Project8.Editor.EntityCreator
                 else
                     cbbEntities.SelectedIndex = 0;
             }
+        }
+
+        private void btAddBehavior_Click(object sender, EventArgs e)
+        {
+            if (lbExistingBehaviors.SelectedIndex == -1)
+                return;
+            lbEntityBehaviors.Items.Add(lbExistingBehaviors.SelectedItem);
+            lbExistingBehaviors.Items.RemoveAt(lbExistingBehaviors.SelectedIndex);
+            if (lbExistingBehaviors.SelectedIndex >= lbExistingBehaviors.Items.Count)
+                lbExistingBehaviors.SelectedIndex = -1;
+        }
+        private void btRemoveBehavior_Click(object sender, EventArgs e)
+        {
+            if (lbEntityBehaviors.SelectedIndex == -1)
+                return;
+            lbExistingBehaviors.Items.Add(lbEntityBehaviors.SelectedItem);
+            lbEntityBehaviors.Items.RemoveAt(lbEntityBehaviors.SelectedIndex);
+            if (lbEntityBehaviors.SelectedIndex >= lbEntityBehaviors.Items.Count)
+                lbEntityBehaviors.SelectedIndex = -1;
+        }
+
+        private void dgvAnims_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == 0 && e.RowIndex >= 0)
+            {
+                // TODO + doublons?
+            }
+        }
+        private void dgvAnims_CurrentCellDirtyStateChanged(object sender, EventArgs e)
+        {
+            if (dgvAnims.IsCurrentCellDirty)
+                dgvAnims.CommitEdit(DataGridViewDataErrorContexts.Commit);
         }
     }
 }
