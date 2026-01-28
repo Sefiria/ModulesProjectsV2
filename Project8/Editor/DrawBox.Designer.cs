@@ -58,6 +58,6 @@
 
         #endregion
 
-        private System.Windows.Forms.PictureBox render;
+        public System.Windows.Forms.PictureBox render;
     }
 }

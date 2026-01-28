@@ -11,6 +11,21 @@ namespace Project8.Source.JsonHelpers
         public Alignments Alignment { get; set; }
         public float AnimationSpeed { get; set; } = 5f;
         public bool CanCollect { get; set; } = false;
+        public static Entity New() => new Entity()
+        {
+            Behaviors = [],
+            Animations = new Dictionary<AnimationsNeeds, string>(),
+            Alignment = Alignments.bottom,
+            AnimationSpeed = 4F,
+            CanCollect = false
+        };
+        public Entity Clone() => new Entity() {
+            Behaviors = Behaviors,
+            Animations = Animations,
+            Alignment = Alignment,
+            AnimationSpeed = AnimationSpeed,
+            CanCollect = CanCollect
+        };
     }
 
     public class RootEntities
