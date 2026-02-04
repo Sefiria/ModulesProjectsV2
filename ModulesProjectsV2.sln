@@ -33,6 +33,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pixanim", "Pixanim\Pixanim.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project8", "Project8\Project8.csproj", "{3996C3D9-7C3D-46FD-A5EE-3545EF926DE8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project9", "Project9\Project9.csproj", "{C7A3235D-686F-4B67-8942-FB282C26AC0E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -130,6 +132,12 @@ Global
 		{3996C3D9-7C3D-46FD-A5EE-3545EF926DE8}.Editor|Any CPU.Build.0 = Debug|Any CPU
 		{3996C3D9-7C3D-46FD-A5EE-3545EF926DE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3996C3D9-7C3D-46FD-A5EE-3545EF926DE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7A3235D-686F-4B67-8942-FB282C26AC0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7A3235D-686F-4B67-8942-FB282C26AC0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7A3235D-686F-4B67-8942-FB282C26AC0E}.Editor|Any CPU.ActiveCfg = Release|Any CPU
+		{C7A3235D-686F-4B67-8942-FB282C26AC0E}.Editor|Any CPU.Build.0 = Release|Any CPU
+		{C7A3235D-686F-4B67-8942-FB282C26AC0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7A3235D-686F-4B67-8942-FB282C26AC0E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
