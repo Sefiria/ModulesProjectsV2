@@ -232,9 +232,11 @@
             dgvAnims.RowHeadersVisible = false;
             dgvAnims.Size = new System.Drawing.Size(429, 218);
             dgvAnims.TabIndex = 18;
+            dgvAnims.CellBeginEdit += dgvAnims_CellBeginEdit;
             dgvAnims.CellMouseClick += dgvAnims_CellMouseClick;
             dgvAnims.CellValueChanged += dgvAnims_CellValueChanged;
             dgvAnims.CurrentCellDirtyStateChanged += dgvAnims_CurrentCellDirtyStateChanged;
+            dgvAnims.SelectionChanged += dgvAnims_SelectionChanged;
             // 
             // label7
             // 
@@ -517,6 +519,7 @@
             Controls.Add(groupBox1);
             Controls.Add(groupGraphics);
             Name = "EntityCreator";
+            StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             Text = "EntityCreator";
             Load += EntityCreator_Load;
             ((System.ComponentModel.ISupportInitialize)colorBuffer).EndInit();

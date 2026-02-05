@@ -135,7 +135,18 @@ namespace Project8.Editor
             int h = bmp.Height;
 
             Stack<Point> stack = new Stack<Point>();
+            List<Point> treated = new List<Point>();
             stack.Push(new Point(x, y));
+            treated.Add(new Point(x, y));
+            
+            void add_to_stack(Point pt)
+            {
+                if (!treated.Contains(pt))
+                {
+                    stack.Push(pt);
+                    treated.Add(pt);
+                }
+            }
 
             while (stack.Count > 0)
             {
@@ -151,10 +162,13 @@ namespace Project8.Editor
 
                 bmp.SetPixel(px, py, replacement);
 
-                stack.Push(new Point(px + 1, py));
-                stack.Push(new Point(px - 1, py));
-                stack.Push(new Point(px, py + 1));
-                stack.Push(new Point(px, py - 1));
+                if (stack.Count < 10000)
+                {
+                    add_to_stack(new Point(px + 1, py));
+                    add_to_stack(new Point(px - 1, py));
+                    add_to_stack(new Point(px, py + 1));
+                    add_to_stack(new Point(px, py - 1));
+                }
             }
         }
         private Bitmap draw(Bitmap src, string pattern)

@@ -22,7 +22,8 @@ namespace Project8.Editor.EntityCreator
         int CurrentFrame = 0, dgvAnimsLastRowIndex = -1;
         DrawBox DrawFrame;
         Dictionary<string, Entity> Metadata = new Dictionary<string, Entity>();
-        string Target = null, PreviousTarget = null;
+        string Target = null, PreviousTarget = null, dgv_cell_old_value = null, dgv_cell_new_value = null;
+        bool IsSwitchingEntity = false;
 
         public EntityCreator()
         {
@@ -45,6 +46,7 @@ namespace Project8.Editor.EntityCreator
         private void LoadGraphics()
         {
             ReloadDataGridViewAnimations();
+            usedColor.BackColor = Color.Transparent;
             var colorsbtn = new List<PictureBox>() { usedColor, color1, color2, color3, color4, color5, color6, color7, color8, colorBuffer };
             foreach (var c in colorsbtn)
             {
@@ -257,8 +259,13 @@ namespace Project8.Editor.EntityCreator
             Metadata[target].Alignment = Enum.Parse<Alignments>(cbbEntityAlignment.SelectedItem.ToString());
             Metadata[target].AnimationSpeed = (float)numEntityAnimationSpeed.Value;
             Metadata[target].CanCollect = cbEntityCanCollect.Checked;
-            if (dgvAnimsLastRowIndex > -1 && dgvAnimsLastRowIndex < dgvAnims.RowCount)
+            if (dgvAnimsLastRowIndex > -1 && dgvAnimsLastRowIndex < dgvAnims.RowCount && !IsSwitchingEntity)
                 UIToMetadata_Anim(dgvAnims.Rows[dgvAnimsLastRowIndex], target);
+            else if (IsSwitchingEntity)
+            {
+                for (int i = 0; i < dgvAnims.RowCount; i++)
+                    UIToMetadata_Anim(dgvAnims.Rows[i], target);
+            }
         }
         private void UIToMetadata_Anim(DataGridViewRow anim, string target = null)
         {
@@ -277,6 +284,10 @@ namespace Project8.Editor.EntityCreator
         }
         private void ReloadDataGridViewAnimations()
         {
+            dgvAnims.CommitEdit(DataGridViewDataErrorContexts.Commit);
+            dgvAnims.ClearSelection();
+            dgvAnims.CurrentCell = null;
+
             if (dgvAnims.Columns.Count == 0)
             {
                 var column = new DataGridViewComboBoxColumn();
@@ -295,7 +306,10 @@ namespace Project8.Editor.EntityCreator
                 dgvAnims.Rows.Add(Enum.GetName(data_anim.Key), data_anim.Value);
 
             if (dgvAnims.Rows.Count > 0)
-                LoadAnimation(0);
+            {
+                dgvAnims.Rows[0].Selected = true;
+                dgvAnims.CurrentCell = dgvAnims.Rows[0].Cells[1];
+            }
         }
 
         private void btEntityValidateRenaming_Click(object sender, EventArgs _)
@@ -322,11 +336,15 @@ namespace Project8.Editor.EntityCreator
         }
         private void cbbEntities_SelectedIndexChanged(object sender, EventArgs e)
         {
+            IsSwitchingEntity = true;
+            dgvAnims.CommitEdit(DataGridViewDataErrorContexts.Commit);
+            dgvAnims.ClearSelection();
             PreviousTarget = Target;
             Target = cbbEntities.SelectedItem.ToString();
             if (PreviousTarget != null && Metadata.ContainsKey(PreviousTarget))
                 UIToMetadata(PreviousTarget);
             MetadataToUI();
+            IsSwitchingEntity = false;
         }
 
         private void LoadAnimation(int rowIndex)
@@ -369,13 +387,7 @@ namespace Project8.Editor.EntityCreator
         }
         private void dgvAnims_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left)
-            {
-                if (dgvAnimsLastRowIndex > -1 && dgvAnimsLastRowIndex < dgvAnims.RowCount)
-                    UIToMetadata_Anim(dgvAnims.Rows[dgvAnimsLastRowIndex]);
-                LoadAnimation(e.RowIndex);
-            }
-            else if (e.Button == MouseButtons.Right)
+            if (e.Button == MouseButtons.Right)
             {
                 ToolStripDropDownMenu menu = new ToolStripDropDownMenu();
                 menu.Items[menu.Items.Add(new ToolStripButton("New...") { Name = "New" })].Click += (s, _e) => NewAnimation();
@@ -384,6 +396,15 @@ namespace Project8.Editor.EntityCreator
                 menu.Show(Cursor.Position);
             }
             dgvAnimsLastRowIndex = e.RowIndex;
+        }
+        private void dgvAnims_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dgvAnims.SelectedCells.Count == 0)
+                return;
+            if (dgvAnimsLastRowIndex > -1 && dgvAnimsLastRowIndex < dgvAnims.RowCount && !IsSwitchingEntity)
+                UIToMetadata_Anim(dgvAnims.Rows[dgvAnimsLastRowIndex]);
+            if (dgvAnims.SelectedCells.Count > 0)
+                LoadAnimation(dgvAnims.SelectedCells[0].RowIndex);
         }
 
         private void btNewEntity_Click(object sender, EventArgs e)
@@ -429,11 +450,28 @@ namespace Project8.Editor.EntityCreator
                 lbEntityBehaviors.SelectedIndex = -1;
         }
 
+        private void dgvAnims_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
+        {
+            dgv_cell_old_value = dgvAnims[e.ColumnIndex, e.RowIndex].Value.ToString();
+        }
         private void dgvAnims_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
+            dgv_cell_new_value = dgvAnims[e.ColumnIndex, e.RowIndex].Value.ToString();
             if (e.ColumnIndex == 0 && e.RowIndex >= 0)
             {
-                // TODO + doublons?
+                if(dgv_cell_old_value != dgv_cell_new_value)
+                {
+                    // TODO
+                    var need = dgv_cell_old_value;
+                    var val = Metadata[Target].AnimationsTextures[need];
+                    Metadata[Target].AnimationsTextures.Remove(need);
+                    need = dgv_cell_new_value;
+                    Metadata[Target].AnimationsTextures[need] = val;
+                }
+                else
+                {
+                    dgvAnims[e.ColumnIndex, e.RowIndex].Value = dgv_cell_old_value;
+                }
             }
         }
         private void dgvAnims_CurrentCellDirtyStateChanged(object sender, EventArgs e)
@@ -441,5 +479,6 @@ namespace Project8.Editor.EntityCreator
             if (dgvAnims.IsCurrentCellDirty)
                 dgvAnims.CommitEdit(DataGridViewDataErrorContexts.Commit);
         }
+
     }
 }
