@@ -12,6 +12,93 @@ namespace Project9
 {
     public static class Behaviors
     {
+        // --- Vision/Raycast helpers ---
+        public struct VisionHit
+        {
+            public Point Cell;
+            public CellType Type;
+            public int Distance;     // en cases
+            public float AngleDeg;   // 0..360
+        }
+
+        // Bresenham integer line entre 2 cellules
+        private static IEnumerable<Point> BresenhamLine(Point a, Point b)
+        {
+            int x0 = a.X, y0 = a.Y, x1 = b.X, y1 = b.Y;
+            int dx = Math.Abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+            int dy = -Math.Abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+            int err = dx + dy, e2;
+
+            while (true)
+            {
+                yield return new Point(x0, y0);
+                if (x0 == x1 && y0 == y1) break;
+                e2 = 2 * err;
+                if (e2 >= dy) { err += dy; x0 += sx; }
+                if (e2 <= dx) { err += dx; y0 += sy; }
+            }
+        }
+
+        // Raycast 360° (stepDeg=2), stop sur Wall, portée >= 16 (ou ParamB si supérieur)
+        private static List<VisionHit> Scan360(Point origin, int paramB, ChunkManager chunks, int stepDeg = 2)
+        {
+            int range = Math.Max(16, Math.Max(1, paramB)); // jamais < 16
+            var hits = new List<VisionHit>(180);
+
+            for (int deg = 0; deg < 360; deg += stepDeg)
+            {
+                float rad = MathHelper.ToRadians(deg);
+                int endX = origin.X + (int)Math.Round(Math.Cos(rad) * range);
+                int endY = origin.Y + (int)Math.Round(Math.Sin(rad) * range);
+                var end = new Point(endX, endY);
+
+                int dist = 0;
+                foreach (var cell in BresenhamLine(origin, end))
+                {
+                    if (cell == origin) { continue; }
+                    dist++;
+
+                    var ct = chunks.GetCell(cell);
+
+                    // stop si mur (occlusion)
+                    if (ct == CellType.Wall)
+                        break;
+
+                    // on enregistre le PREMIER élément intéressant sur ce rayon
+                    if (ct == CellType.FoodVegetable || ct == CellType.FoodMeat || ct == CellType.Danger)
+                    {
+                        hits.Add(new VisionHit
+                        {
+                            Cell = cell,
+                            Type = ct,
+                            Distance = dist,
+                            AngleDeg = deg
+                        });
+                        break;
+                    }
+
+                    // fin de portée atteinte
+                    if (dist >= range)
+                        break;
+                }
+            }
+
+            return hits;
+        }
+
+        // Convertit un angle en delta 8‑directions (−1/0/1) pour Move
+        private static Point DirectionFromAngle(float deg)
+        {
+            float rad = MathHelper.ToRadians(deg);
+            int dx = (int)Math.Round(Math.Cos(rad));
+            int dy = (int)Math.Round(Math.Sin(rad));
+            // Clamp sur [-1, 1]
+            dx = Math.Max(-1, Math.Min(1, dx));
+            dy = Math.Max(-1, Math.Min(1, dy));
+            return new Point(dx, dy);
+        }
+
+        public enum ActionType { Move = 0, Eat = 1, Talk = 2, See = 3, Life = 4 }
         public static Point DirectionFromParam(byte p)
         {
             return p switch
@@ -33,16 +120,17 @@ namespace Project9
             public Point Target; // direction ou position
             public float Score;  // importance estimée
             public Gene SourceGene; // <- important
+            public int GeneIndex;
         }
-        public static ActionProposal GetProposal(PCA pca, Gene g, ChunkManager chunks)
+        public static ActionProposal GetProposal(PCA pca, Gene g, int gene_id, ChunkManager chunks)
         {
             switch (g.Type)
             {
-                case 0: return MoveProposal(pca, g);
-                case 1: return EatProposal(pca, g, chunks);
-                case 2: return SeeProposal(pca, g, chunks);
-                case 3: return TalkProposal(pca, g);
-                case 4: return LifeProposal(pca, g);
+                case 0: return MoveProposal(pca, g, gene_id);
+                case 1: return EatProposal(pca, g, gene_id, chunks);
+                case 2: return SeeProposal(pca, g, gene_id, chunks);
+                case 3: return TalkProposal(pca, g, gene_id);
+                case 4: return LifeProposal(pca, g, gene_id);
             }
 
             return default;
@@ -51,11 +139,45 @@ namespace Project9
         {
             float reward = 0f;
 
-            switch (p.Type)
+            pca.CurrentAction = "Thinking...";
+            switch ((ActionType)p.Type)
             {
-                case 0: // Move
+                case ActionType.Move:
+                    Logger.Write($"Action=Move Pos={pca.Position.X},{pca.Position.Y} GeneIndex={p.GeneIndex} Score={p.Score:F2}");
+                    pca.CurrentAction = $"Move dir=({p.Target.X},{p.Target.Y})";
+
                     var oldPos = pca.Position;
-                    pca.Position += p.Target;
+                    var targetPos = oldPos + p.Target;
+
+                    // --- COLLISION WITH WALL ---
+                    var cell = chunks.GetCell(targetPos);
+                    if (cell == CellType.Wall || !Game1.Instance._map.InBounds(targetPos))
+                    {
+                        // Collision detected → PCA does NOT move
+                        Logger.Write("Collision: WALL");
+
+                        // Encourage SEE genes a bit
+                        if (p.GeneIndex >= 0 && p.GeneIndex < pca.Genome.Genes.Count)
+                        {
+                            for (int i = 0; i < pca.Genome.Genes.Count; i++)
+                            {
+                                if (pca.Genome.Genes[i].Type == (byte)ActionType.See) // See gene
+                                {
+                                    var g = pca.Genome.Genes[i];
+                                    g.Weight = Math.Clamp(g.Weight + 0.05f, 0.1f, 5f);  // small boost
+                                    pca.Genome.Genes[i] = g;
+                                }
+                            }
+                        }
+
+                        // Penalize useless bumping
+                        reward = -0.3f;
+                        pca.stagnationCounter++;
+                        break;
+                    }
+
+                    // --- NO WALL → NORMAL MOVE ---
+                    pca.Position = targetPos;
                     chunks.ClampPosition(ref pca.Position);
 
                     reward = ComputeMoveReward(pca, oldPos, chunks);
@@ -63,12 +185,14 @@ namespace Project9
                     if (!pca.Visited.Contains(pca.Position))
                     {
                         pca.Visited.Add(pca.Position);
-                        reward += 0.2f; // exploration récompensée
+                        reward += 0.2f; // exploration reward
                     }
 
                     break;
 
-                case 1: // Eat
+                case ActionType.Eat: // Eat
+                    Logger.Write("EAT at " + pca.Position);
+                    pca.CurrentAction = "Eat";
                     pca.hunger = Math.Max(0, pca.hunger - 20);
                     chunks.SetCell(pca.Position, CellType.Floor);
                     reward = +5f; // gros bonus
@@ -76,73 +200,135 @@ namespace Project9
                     AdjustGeneWeight(ref p.SourceGene, +1.0f);
                     break;
 
-                case 2: // Talk
+                case ActionType.Talk:
+                    // Talk interdit si social trop bas
+                    if (pca.social < 20)  // valeur ajustable
+                    {
+                        reward = -0.2f;   // punition pour Talk inutile
+                        break;
+                    }
+
+                    Logger.Write("TALK symbol=" + pca.lastSymbol);
+                    pca.CurrentAction = $"Talk sym={pca.lastSymbol}";
                     pca.lastSymbol = 1;
-                    pca.talkTimer = 30;
+                    pca.talkTimer = 3;
+
+                    pca.social = Math.Max(0, pca.social - 20);
+
                     reward = +0.1f;
+                    break;
+
+                case ActionType.See:
+                    pca.See(p.SourceGene, chunks);
+                    reward = +0.01f;
+                    break;
+
+                case ActionType.Life:
+                    Logger.Write("LIFE");
+                    pca.CurrentAction = "Life";
+                    Behaviors.UpdateLifeSpan(pca, p.SourceGene);
+                    reward = 0;
                     break;
             }
 
             // éventuellement : ajuster aussi le poids en fonction du reward global
-            if (reward != 0)
-                AdjustGeneWeight(ref p.SourceGene, reward);
+            if (p.GeneIndex >= 0 && p.GeneIndex < pca.Genome.Genes.Count)
+            {
+                var g = pca.Genome.Genes[p.GeneIndex];   // copie locale
+                AdjustGeneWeight(ref g, reward);         // modif sur la copie
+                pca.Genome.Genes[p.GeneIndex] = g;       // réécriture du struct modifié
+            }
+
 
             if (reward > 0)
                 pca.stagnationCounter = 0;
             else
-                pca.stagnationCounter++;
+                pca.stagnationCounter += Helper.RandomRange(1, 5);
 
         }
 
-        private static ActionProposal MoveProposal(PCA pca, Gene g)
+        private static ActionProposal MoveProposal(PCA pca, Gene g, int gene_id)
         {
             Point dir = Behaviors.DirectionFromParam(g.ParamA);
 
             return new ActionProposal
             {
-                Type = 0,
+                Type = (byte)ActionType.Move,
                 Target = dir,
-                Score = 0.1f * g.Weight,
-                SourceGene = g
+                Score = 0.2f * g.Weight,
+                SourceGene = g,
+                GeneIndex = gene_id
             };
         }
-        private static ActionProposal SeeProposal(PCA pca, Gene g, ChunkManager chunks)
+        private static ActionProposal SeeProposal(PCA pca, Gene g, int gene_id, ChunkManager chunks)
         {
-            int maxDist = Math.Max(1, (int)g.ParamB);
-            Point dir = Behaviors.DirectionFromParam(g.ParamA);
+            int range = Math.Max(16, (int)g.ParamB);
+            var hits = Scan360(pca.Position, range, chunks, stepDeg: 2);
 
-            for (int i = 1; i <= maxDist; i++)
+            if (hits.Count == 0)
             {
-                Point p = new Point(pca.Position.X + dir.X * i, pca.Position.Y + dir.Y * i);
-                var cell = chunks.GetCell(p);
-
-                // Si c'est de la nourriture que le PCA peut manger
-                if ((cell == CellType.FoodVegetable || cell == CellType.FoodMeat)
-                    && Behaviors.CanEat(pca, cell))
+                // Pas d'infos → See = observation pure → score faible
+                return new ActionProposal
                 {
-                    return new ActionProposal
-                    {
-                        Type = 0, // Move vers la nourriture
-                        Target = dir,
-                        Score = 1.0f * g.Weight + 0.5f, // bonus perception
-                        SourceGene = g
-                    };
-                }
-
-                // Si c'est du danger → proposer de fuir
-                if (cell == CellType.Danger)
-                {
-                    return new ActionProposal
-                    {
-                        Type = 0,
-                        Target = new Point(-dir.X, -dir.Y), // fuite
-                        Score = 0.8f * g.Weight, // important mais moins que la nourriture
-                        SourceGene = g
-                    };
-                }
+                    Type = (byte)ActionType.See,
+                    Target = Point.Zero,
+                    Score = 0.2f * g.Weight,
+                    SourceGene = g,
+                    GeneIndex = gene_id
+                };
             }
 
-            return default;
+            // Priorités
+            VisionHit? bestFood = hits
+                .Where(h => (h.Type == CellType.FoodVegetable || h.Type == CellType.FoodMeat) && CanEat(pca, h.Type))
+                .OrderBy(h => h.Distance)
+                .FirstOrDefault();
+
+            VisionHit? bestDanger = hits
+                .Where(h => h.Type == CellType.Danger)
+                .OrderBy(h => h.Distance)
+                .FirstOrDefault();
+
+            // Si nourriture visible → See puis Move vers elle
+            if (bestFood != null)
+            {
+                var dir = DirectionFromAngle(bestFood.Value.AngleDeg);
+
+                return new ActionProposal
+                {
+                    Type = (byte)ActionType.Move,
+                    Target = dir,
+                    Score = 0.8f * g.Weight + (10f / bestFood.Value.Distance) + (pca.hunger / 100f),
+                    SourceGene = g,
+                    GeneIndex = gene_id
+                };
+            }
+
+            // Si danger visible → See puis Move (fuite)
+            if (bestDanger != null)
+            {
+                var dir = DirectionFromAngle(bestDanger.Value.AngleDeg);
+                dir = new Point(-dir.X, -dir.Y);
+
+                return new ActionProposal
+                {
+                    Type = (byte)ActionType.Move,
+                    Target = dir,
+                    Score = 0.7f * g.Weight + (8f / bestDanger.Value.Distance),
+                    SourceGene = g,
+                    GeneIndex = gene_id
+                };
+            }
+
+            // Sinon simple observation
+            return new ActionProposal
+            {
+                Type = (byte)ActionType.See,
+                Target = Point.Zero,
+                Score = 0.3f * g.Weight,
+                SourceGene = g,
+                GeneIndex = gene_id
+            };
         }
         public static bool CanEat(PCA pca, CellType cell)
         {
@@ -161,7 +347,7 @@ namespace Project9
 
             return false;
         }
-        private static ActionProposal EatProposal(PCA pca, Gene g, ChunkManager chunks)
+        private static ActionProposal EatProposal(PCA pca, Gene g, int gene_id, ChunkManager chunks)
         {
             var cell = chunks.GetCell(pca.Position);
 
@@ -175,10 +361,11 @@ namespace Project9
 
             return new ActionProposal
             {
-                Type = 1,
+                Type = (byte)ActionType.Eat,
                 Target = pca.Position,
                 Score = baseScore * g.Weight,
-                SourceGene = g
+                SourceGene = g,
+                GeneIndex = gene_id
             };
         }
         public static ActionProposal InstinctEatProposal(PCA pca, ChunkManager chunks)
@@ -189,7 +376,7 @@ namespace Project9
             {
                 return new ActionProposal
                 {
-                    Type = 1,
+                    Type = (byte)ActionType.Eat,
                     Target = pca.Position,
                     Score = 0.3f + (pca.hunger / 40f), // faim = priorité
                     SourceGene = default
@@ -198,28 +385,30 @@ namespace Project9
 
             return default;
         }
-        private static ActionProposal TalkProposal(PCA pca, Gene g)
+        private static ActionProposal TalkProposal(PCA pca, Gene g, int gene_id)
         {
             // Ici on peut décider que Talk sert surtout à "signaler" un état
             // On lui met une priorité faible par défaut
             return new ActionProposal
             {
-                Type = 2,              // 2 = Talk
+                Type = (byte)ActionType.Talk,              // 2 = Talk
                 Target = pca.Position, // pas de déplacement
                 Score = 0.2f * g.Weight,
-                SourceGene = g
+                SourceGene = g,
+                GeneIndex = gene_id
             };
         }
-        private static ActionProposal LifeProposal(PCA pca, Gene g)
+        private static ActionProposal LifeProposal(PCA pca, Gene g, int gene_id)
         {
             if (pca.lifeSpan < 1f)
             {
                 return new ActionProposal
                 {
-                    Type = 2,              // Talk
+                    Type = (byte)ActionType.Talk,              // Talk
                     Target = pca.Position,
                     Score = 0.5f * g.Weight,
-                    SourceGene = g
+                    SourceGene = g,
+                    GeneIndex = gene_id
                 };
             }
 
@@ -321,31 +510,50 @@ namespace Project9
 
             if (canEat)
             {
-                pca.hunger = Math.Max(0, pca.hunger - (20 + g.ParamB)); // faim réduite
-                chunks.SetCell(pca.Position, CellType.Floor);        // nourriture consommée
+                pca.hunger = Math.Max(0, pca.hunger - (20 + g.ParamB));
+                chunks.SetCell(pca.Position, CellType.Floor);
+                return;
             }
+
+            // --- Sinon → on bouge (gène Move cohérent) ---
+
+            // 1) récupérer un gène Move existant
+            var moveGene = pca.Genome.Genes
+                .FirstOrDefault(x => x.Type == (byte)ActionType.Move);
+
+            // 2) si absent → créer un gène Move de secours
+            if (moveGene.Type != (byte)ActionType.Move)
+            {
+                moveGene = new Gene
+                {
+                    Type = (byte)ActionType.Move,
+                    ParamA = Helper.RandomDir(), // direction aléatoire parmi 8
+                    ParamB = 1,                  // vitesse de base
+                    Weight = 1f
+                };
+            }
+
+            // 3) exécuter le mouvement avec le gène trouvé / créé
+            pca.Move(moveGene);
         }
         public static void See(this PCA pca, Gene g, ChunkManager chunks)
         {
-            int maxDist = Math.Max(1, (int)g.ParamB);
-            Point dir = DirectionFromParam(g.ParamA);
+            int range = Math.Max(16, (int)g.ParamB);
+            var hits = Scan360(pca.Position, range, chunks, stepDeg: 2);
 
-            for (int i = 1; i <= maxDist; i++)
+            foreach (var h in hits)
             {
-                Point p = new Point(pca.Position.X + dir.X * i, pca.Position.Y + dir.Y * i);
-                var cell = chunks.GetCell(p);
-
-                if (cell == CellType.Danger)
-                    pca.stress += 0.02f;
-
-                if (cell == CellType.FoodVegetable || cell == CellType.FoodMeat)
-                    pca.stress -= 0.01f;
+                if (h.Type == CellType.Danger)
+                    pca.stress += 0.01f;
+                if (h.Type == CellType.FoodVegetable || h.Type == CellType.FoodMeat)
+                    pca.stress = Math.Max(0, pca.stress - 0.005f);
             }
+            pca.CurrentAction = $"See 360° hits={hits.Count}";
         }
         public static void Talk(this PCA pca, Gene g)
         {
             pca.lastSymbol = g.ParamA; // ex: 0=faim, 1=peur, 2=explore…
-            pca.talkTimer = 30;        // affiché pendant 30 frames
+            pca.talkTimer = 3;        // affiché pendant 3 frames
         }
 
         public static void UpdateLifeSpan(this PCA pca, Gene g)

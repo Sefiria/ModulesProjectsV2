@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using static Project9.Behaviors;
 
 namespace Project9
 {
@@ -46,11 +47,12 @@ namespace Project9
                     if (pca.hunger > 50 && Helper.RandomChance(0.3f))
                         AddGeneSeeOrEat();
                 }
-
+                g.ParamA = (byte)Math.Clamp((int)g.ParamA, 0, 7);
+                g.ParamB = (byte)Math.Clamp((int)g.ParamB, 0, 10);
             }
 
             // ajout de gènes si pression environnementale
-            if (rng.NextDouble() < fb.AddGeneProbability)
+            if (Genes.Count < 40 && rng.NextDouble() < fb.AddGeneProbability)
                 Genes.Add(RandomGene(fb));
 
             // suppression si gène inutile
@@ -60,9 +62,9 @@ namespace Project9
         private void AddGeneSeeOrEat()
         {
             if (Helper.RandomChance(0.5f))
-                Genes.Add(new Gene { Type = 2, ParamA = Helper.RandomDir(), ParamB = 3, Weight = 1f }); // See
+                Genes.Add(new Gene { Type = (byte)ActionType.See, ParamA = Helper.RandomDir(), ParamB = 3, Weight = 1f }); // See
             else
-                Genes.Add(new Gene { Type = 1, ParamA = 2, ParamB = 1, Weight = 1f }); // Eat
+                Genes.Add(new Gene { Type = (byte)ActionType.Eat, ParamA = 2, ParamB = 1, Weight = 1f }); // Eat
         }
 
 

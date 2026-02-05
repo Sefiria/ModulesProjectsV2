@@ -14,13 +14,14 @@ namespace Project9
         Floor,
         FoodVegetable,
         FoodMeat,
-        Danger // par ex: vide mortel, trou, etc.
+        Danger,
+        Wall
     }
 
     public class MAP
     {
-        public const int Width = 20;
-        public const int Height = 20;
+        public const int Width = 80;
+        public const int Height = 80;
 
         private readonly CellType[,] _cells;
         private readonly Random _rng = new Random();
@@ -33,17 +34,78 @@ namespace Project9
 
         private void Generate()
         {
-            // Exemple simple : tout en Floor, quelques nourritures et dangers
+            // 1) Bordures solides
             for (int y = 0; y < Height; y++)
-            {
                 for (int x = 0; x < Width; x++)
+                    _cells[x, y] =
+                        (x == 0 || y == 0 || x == Width - 1 || y == Height - 1)
+                        ? CellType.Wall
+                        : CellType.Floor;
+
+            // 2) Génération
+            int roomCount = _rng.Next(10, 30);
+            List<Rectangle> rooms = new List<Rectangle>();
+
+            for (int i = 0; i < roomCount; i++)
+            {
+                int w = _rng.Next(8, 32);
+                int h = _rng.Next(8, 32);
+                int rx = _rng.Next(1, Width - w - 1);
+                int ry = _rng.Next(1, Height - h - 1);
+
+                var room = new Rectangle(rx, ry, w, h);
+                rooms.Add(room);
+
+                // Carve floor inside
+                for (int y = ry; y < ry + h; y++)
+                    for (int x = rx; x < rx + w; x++)
+                        _cells[x, y] = CellType.Floor;
+
+                // Murs autour
+                for (int y = ry - 1; y <= ry + h; y++)
+                    if (InBounds(new Point(rx - 1, y)))
+                        _cells[rx - 1, y] = CellType.Wall;
+                for (int y = ry - 1; y <= ry + h; y++)
+                    if (InBounds(new Point(rx + w, y)))
+                        _cells[rx + w, y] = CellType.Wall;
+                for (int x = rx - 1; x <= rx + w; x++)
+                    if (InBounds(new Point(x, ry - 1)))
+                        _cells[x, ry - 1] = CellType.Wall;
+                for (int x = rx - 1; x <= rx + w; x++)
+                    if (InBounds(new Point(x, ry + h)))
+                        _cells[x, ry + h] = CellType.Wall;
+            }
+
+            // 3) Couloirs entre pièces
+            for (int r = 0; r < rooms.Count - 1; r++)
+            {
+                var a = rooms[r];
+                var b = rooms[r + 1];
+
+                int ax = a.Center.X;
+                int ay = a.Center.Y;
+                int bx = b.Center.X;
+                int by = b.Center.Y;
+
+                // Couloir en L
+                for (int x = Math.Min(ax, bx); x <= Math.Max(ax, bx); x++)
+                    _cells[x, ay] = CellType.Floor;
+
+                for (int y = Math.Min(ay, by); y <= Math.Max(ay, by); y++)
+                    _cells[bx, y] = CellType.Floor;
+            }
+
+            // 4) Remplissage aléatoire nourriture/danger
+            for (int y = 1; y < Height - 1; y++)
+            {
+                for (int x = 1; x < Width - 1; x++)
                 {
-                    _cells[x, y] = CellType.Floor;
+                    if (_cells[x, y] != CellType.Floor) continue;
 
                     double r = _rng.NextDouble();
-                    if (r < 0.05) _cells[x, y] = CellType.FoodVegetable;
-                    else if (r < 0.08) _cells[x, y] = CellType.FoodMeat;
-                    else if (r < 0.10) _cells[x, y] = CellType.Danger;
+                    if (r < 0.001) _cells[x, y] = CellType.FoodMeat;
+                    else if (r < 0.002) _cells[x, y] = CellType.FoodVegetable;
+                    else if (r < 0.005) _cells[x, y] = CellType.Danger;
                 }
             }
         }
