@@ -147,6 +147,13 @@ namespace Project9
             p = new Point(x, y);
             return changed;
         }
+
+        internal void ClearMap()
+        {
+            for (int i = 0; i < _cells.GetLength(0); i++)
+                for (int j = 0; j < _cells.GetLength(1); j++)
+                    _cells[i, j] = CellType.Floor;
+        }
     }
 
     // ChunkManager devient juste un wrapper autour de MAP pour l’instant

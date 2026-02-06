@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows;
-using System.Windows.Media.Media3D;
 using Color = System.Drawing.Color;
 using Point = System.Drawing.Point;
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.Linq;
+using Tools.Inputs;
 
 namespace Project10
 {
@@ -18,6 +18,8 @@ namespace Project10
         public Texture2D _pixel;
         public SpriteFont _font;
         public BasicEffect basicEffect;
+        public static KB KB = new KB();
+        public static MS MS = new MS();
 
         public Game1()
         {
@@ -74,6 +76,9 @@ namespace Project10
 
             _pca.Update(gameTime);
 
+            KB.Update();
+            MS.Update();
+
             base.Update(gameTime);
         }
 
@@ -83,10 +88,11 @@ namespace Project10
 
             _spriteBatch.Begin();
             DrawMap();
+            _pca.SpriteDraw(gameTime);
             //DrawGenomePanel();
             _spriteBatch.End();
 
-            _pca.Draw(gameTime);
+            _pca.ShaderDraw(gameTime);
 
             base.Draw(gameTime);
         }

@@ -42,13 +42,13 @@ namespace Project10
                         : CellType.Floor;
 
             // 2) Génération
-            int roomCount = _rng.Next(10, 30);
+            int roomCount = _rng.Next(2, 8);
             List<Rectangle> rooms = new List<Rectangle>();
 
             for (int i = 0; i < roomCount; i++)
             {
-                int w = _rng.Next(8, 32);
-                int h = _rng.Next(8, 32);
+                int w = _rng.Next(8, 12);
+                int h = _rng.Next(8, 12);
                 int rx = _rng.Next(1, Width - w - 1);
                 int ry = _rng.Next(1, Height - h - 1);
 
@@ -75,7 +75,7 @@ namespace Project10
                         _cells[x, ry + h] = CellType.Wall;
             }
 
-            // 3) Couloirs entre pièces
+            // 3) Couloirs entre pièces (3x3)
             for (int r = 0; r < rooms.Count - 1; r++)
             {
                 var a = rooms[r];
@@ -86,12 +86,17 @@ namespace Project10
                 int bx = b.Center.X;
                 int by = b.Center.Y;
 
-                // Couloir en L
+                // Couloir horizontal élargi (3 cellules de haut)
                 for (int x = Math.Min(ax, bx); x <= Math.Max(ax, bx); x++)
-                    _cells[x, ay] = CellType.Floor;
+                    for (int dy = -1; dy <= 1; dy++)
+                        if (InBounds(new Point(x, ay + dy)))
+                            _cells[x, ay + dy] = CellType.Floor;
 
+                // Couloir vertical élargi (3 cellules de large)
                 for (int y = Math.Min(ay, by); y <= Math.Max(ay, by); y++)
-                    _cells[bx, y] = CellType.Floor;
+                    for (int dx = -1; dx <= 1; dx++)
+                        if (InBounds(new Point(bx + dx, y)))
+                            _cells[bx + dx, y] = CellType.Floor;
             }
 
             // 4) Remplissage aléatoire nourriture/danger

@@ -2,7 +2,9 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
+using Tools.Inputs;
 
 namespace Project9
 {
@@ -22,6 +24,9 @@ namespace Project9
         public Texture2D _pixel;   // 1x1 blanc pour tout dessiner
         public SpriteFont _font;
         public string oldAction = "";
+        public static KB KB = new KB();
+        public static MS MS = new MS();
+        CellType holdType = CellType.Empty;
 
         public Game1()
         {
@@ -74,6 +79,33 @@ namespace Project9
                 oldAction = _pca.CurrentAction;
                 _updateTimer = 0;
             }
+
+            var tile = new Point(MS.X / _cellSize, MS.Y / _cellSize);
+            if (_map.InBounds(tile))
+            {
+                if (MS.IsLeftPressed)
+                    _map.SetCell(tile, _map.GetCell(tile) == CellType.FoodVegetable ? CellType.FoodMeat : CellType.FoodVegetable);
+                if (MS.IsMiddlePressed)
+                    _map.SetCell(tile, _map.GetCell(tile) == CellType.Danger ? CellType.Floor : CellType.Danger);
+                if (MS.IsRightDown)
+                {
+                    if (holdType == CellType.Empty)
+                    {
+                        var celltype = _map.GetCell(tile) == CellType.Floor ? CellType.Wall : CellType.Floor;
+                        _map.SetCell(tile, celltype);
+                        holdType = celltype;
+                    }
+                    else if (holdType != _map.GetCell(tile))
+                        _map.SetCell(tile, holdType);
+                }
+                else
+                    holdType = CellType.Empty;
+            }
+            if (KB.IsKeyPressed(Keys.C))
+                _map.ClearMap();
+
+            KB.Update();
+            MS.Update();
 
             base.Update(gameTime);
         }
