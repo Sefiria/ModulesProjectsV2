@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Project10.Sources.Entities;
 using Tools.Inputs;
 
 namespace Project10
@@ -73,6 +74,9 @@ namespace Project10
         {
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+
+            if (!IsActive)
+                return;
 
             _pca.Update(gameTime);
 

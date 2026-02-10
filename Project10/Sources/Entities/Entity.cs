@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace Project10.Helpers
+namespace Project10.Sources.Entities
 {
     public abstract class Entity
     {
