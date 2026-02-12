@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -18,6 +19,7 @@ namespace Project11.Scenes
         Key key_to_repeat;
         byte repeat_cooldown;
         const byte repeat_cooldown_max = 25;
+        bool typing = false;
 
         [System.Runtime.InteropServices.DllImport("user32.dll")] static extern IntPtr GetKeyboardLayout(uint idThread);
         [System.Runtime.InteropServices.DllImport("user32.dll")] static extern int ToUnicodeEx(uint wVirtKey, uint wScanCode, byte[] lpKeyState, System.Text.StringBuilder pwszBuff, int cchBuff, uint wFlags, IntPtr dwhkl);
@@ -55,6 +57,7 @@ namespace Project11.Scenes
             {
                 if (c == '\n')
                 {
+                    Text[y * W + x] = '\n';
                     x = 0;
                     y++;
                     if ((uint)y >= H) break;
@@ -100,11 +103,12 @@ namespace Project11.Scenes
 
             FormMain.Instance.KeyPress += (s, e) =>
             {
+                typing = true;
                 if (e.KeyChar < 10 || e.KeyChar == 13)
                     return;
                 Write(Cursor.X, Cursor.Y, e.KeyChar.ToString());
             };
-
+            FormMain.Instance.KeyUp += (s, e) => typing = false;
             FormMain.Instance.KeyDown += (s, e) =>
             {
                 if (e.KeyCode == Keys.Escape) FormMain.Instance.Close();
@@ -118,10 +122,10 @@ namespace Project11.Scenes
             if (Cursor.X == 0 && Cursor.Y == 0) return;
             int x = Cursor.X, y = Cursor.Y;
             if (x > 0) x--; else { y--; x = W - 1; }
+            while (x >= 1 && (Text[y * W + x - 1] == '\0' || Text[y * W + x - 1] == '\n'))
+                Cursor.X = --x;
             Text[y * W + x] = '\0';
             Cursor = new Point(x, y);
-            while (x > 1 && Text[y * W + x - 1] == '\0')
-                Cursor.X = --x;
         }
 
         public void Update()
@@ -156,7 +160,7 @@ namespace Project11.Scenes
             }
 
             // Curseur clignotant
-            if ((GV.Ticks & 32) == 0)
+            if ((GV.Ticks & 32) == 0 | typing)
             {
                 int cx = (int)(Cursor.X * GV.FontWidth);
                 int cy = (int)(Cursor.Y * GV.FontHeight);

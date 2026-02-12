@@ -127,7 +127,7 @@ namespace Project11
             Draw();
             Render.Image = Image;
 
-            Focus();
+            Render.Focus();
         }
     }
 
