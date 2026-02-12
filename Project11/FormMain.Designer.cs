@@ -49,7 +49,9 @@
             this.Controls.Add(this.Render);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "FormMain";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "S-CLI";
+            this.Load += new System.EventHandler(this.FormMain_Load);
             ((System.ComponentModel.ISupportInitialize)(this.Render)).EndInit();
             this.ResumeLayout(false);
 
@@ -57,7 +59,7 @@
 
         #endregion
 
-        private System.Windows.Forms.PictureBox Render;
+        public System.Windows.Forms.PictureBox Render;
     }
 }
 
