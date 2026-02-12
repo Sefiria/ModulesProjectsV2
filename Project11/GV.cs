@@ -14,13 +14,10 @@ namespace Project11
         public static void Initialize()
         {
             Ticks = 0L;
-            Font = new Font("Courrier New", 12F);
-            //FontWidth = (int)FormMain.Graphics.MeasureString("W", Font).Width;
-            //FontHeight = Font.Height;
-            FontWidth = 12;
-            FontHeight = 20;
+            Font = new Font("Segoe UI", 10F);
+            FontWidth = (int)FormMain.Graphics.MeasureString("i", Font).Width;
+            FontHeight = Font.Height;
             MouseStates.Initialize(FormMain.Instance.Render);
-            //KB.Init();
         }
         public static void Update()
         {
@@ -28,7 +25,6 @@ namespace Project11
             while (Ticks < 0) Ticks += max_ticks;
             while (Ticks > max_ticks) Ticks -= max_ticks;
             MouseStates.Update();
-            //KB.Update();
         }
     }
 }

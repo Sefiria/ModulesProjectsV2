@@ -139,8 +139,19 @@ namespace Project11.Scenes
                 {
                     char c = Text[o + x];
                     if (c != '\0')
-                        FormMain.Graphics.DrawString(c.ToString(), GV.Font,
-                            Brushes.White, x * GV.FontWidth, y * GV.FontHeight);
+                    {
+                        Size sz = TextRenderer.MeasureText(c.ToString(), GV.Font, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding);
+                        int dx = (int)(GV.FontWidth + (GV.FontWidth - sz.Width) / 2);
+
+                        TextRenderer.DrawText(
+                            FormMain.Graphics,
+                            c.ToString(),
+                            GV.Font,
+                            new Point((int)(x * GV.FontWidth + dx), (int)(y * GV.FontHeight)),
+                            Color.White,
+                            TextFormatFlags.NoPadding
+                        );
+                    }
                 }
             }
 
@@ -153,14 +164,17 @@ namespace Project11.Scenes
                 FormMain.Graphics.FillRectangle(
                     Brushes.White,
                     cx, cy,
-                    2, GV.FontHeight
+                    GV.FontWidth, GV.FontHeight
                 );
             }
 
             // Sur le point de fermer le programme
             Point p = FormMain.Instance.close.PointToClient(Control.MousePosition);
+            var rect = new Rectangle(0, 0, FormMain.Instance.Render.Width - 1, FormMain.Instance.Render.Height - 1);
             if (FormMain.Instance.close.ClientRectangle.Contains(p))
-                FormMain.Graphics.DrawRectangle(new Pen(Color.Red, 16F), FormMain.Instance.Render.ClientRectangle);
+                FormMain.Graphics.DrawRectangle(new Pen(Color.Red, 16F), rect);
+            else
+                FormMain.Graphics.DrawRectangle(new Pen(Color.DimGray, 1F), rect);
         }
     }
 }
