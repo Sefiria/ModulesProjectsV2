@@ -20,7 +20,7 @@ namespace Project11
             FontWidth = 12;
             FontHeight = 20;
             MouseStates.Initialize(FormMain.Instance.Render);
-            KB.Init();
+            //KB.Init();
         }
         public static void Update()
         {
@@ -28,7 +28,7 @@ namespace Project11
             while (Ticks < 0) Ticks += max_ticks;
             while (Ticks > max_ticks) Ticks -= max_ticks;
             MouseStates.Update();
-            KB.Update();
+            //KB.Update();
         }
     }
 }

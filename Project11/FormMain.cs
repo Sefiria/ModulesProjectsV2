@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using System.Windows.Input;
+using Tooling;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip;
 
 namespace Project11
@@ -13,7 +14,7 @@ namespace Project11
 
         Timer timer = new Timer();
         Bitmap Image;
-        Button close;
+        public Button close;
 
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         static extern bool ReleaseCapture();
@@ -24,6 +25,7 @@ namespace Project11
         {
             InitializeComponent();
             InitializeHeader();
+            KeyPreview = true;
         }
         private void InitializeHeader()
         {
@@ -50,8 +52,7 @@ namespace Project11
                 Dock = DockStyle.Right
             };
             close.FlatAppearance.BorderSize = 0;
-            close.Click += (s, e) => Close();
-            close.MouseEnter += (s, e) => close.BackColor = Color.FromArgb(170, header.BackColor.G - 25, header.BackColor.B - 25);
+            close.MouseEnter += (s, e) => close.BackColor = Color.FromArgb(170, 25, 25);
             close.MouseLeave += (s, e) => close.BackColor = Color.Transparent;
             //close.PreviewKeyDown += (s, e) =>
             //{
@@ -86,14 +87,22 @@ namespace Project11
             header.MouseDown += Drag;
             title.MouseDown += Drag;
             close.MouseDown += (s, e) => {
-                if (e.Button == MouseButtons.Left && e.X < 0)
-                    SendMessage(Handle, 0xA1, 0x2, 0);
+                if (e.Button == MouseButtons.Left)
+                {
+                    if (e.X < 0)
+                        SendMessage(Handle, 0xA1, 0x2, 0);
+                    else
+                        Close();
+                }
             };
         }
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if (keyData == Keys.Space && close.Focused)
+            if (close.Focused)
+            {
+                Render.Focus();
                 return true;
+            }
             return base.ProcessCmdKey(ref msg, keyData);
         }
         private void FormMain_Load(object sender, EventArgs e)
@@ -117,6 +126,8 @@ namespace Project11
             Graphics = Graphics.FromImage(Image);
             Draw();
             Render.Image = Image;
+
+            Focus();
         }
     }
 

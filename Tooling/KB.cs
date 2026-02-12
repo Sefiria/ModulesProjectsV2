@@ -165,54 +165,50 @@ namespace Tooling
             System.Windows.Input.Key.Delete,
             System.Windows.Input.Key.Back,
             System.Windows.Input.Key.Insert,
-            System.Windows.Input.Key.OemComma,
-            System.Windows.Input.Key.OemQuestion,
-            System.Windows.Input.Key.OemPeriod,
-            System.Windows.Input.Key.Oem7,
         };
 
         public static void Init() => Update();
         //public static void Update() => AvailableKeys.ForEach(k => Released[k] = !Keyboard.IsKeyDown(k));
-        //public static void Update()
-        //{
-        //    bool a = false, b = false;
-        //    for(int i=0;i<AvailableKeys.Count;i++)
-        //    {
-        //        a = !Released[AvailableKeys[i]];
-        //        Released[AvailableKeys[i]] = !Keyboard.IsKeyDown(AvailableKeys[i]);
-        //        b = Released[AvailableKeys[i]];
-        //        if (a)
-        //        {
-        //            if (b) OnKeyPressed?.Invoke(AvailableKeys[i]);
-        //            else OnKeyDown?.Invoke(AvailableKeys[i]);
-        //        }
-        //        else
-        //        {
-        //            if (b) OnKeyReleased?.Invoke(AvailableKeys[i]);
-        //        }
-        //    }
-        //}
         public static void Update()
         {
+            bool a = false, b = false;
             for (int i = 0; i < AvailableKeys.Count; i++)
             {
-                var k = AvailableKeys[i];
-
-                bool wasDown = !Released[k];
-                bool isDown = Keyboard.IsKeyDown(k);
-
-                Released[k] = !isDown;
-
-                if (!wasDown && isDown)
-                    OnKeyPressed?.Invoke(k);
-
-                else if (wasDown && isDown)
-                    OnKeyDown?.Invoke(k);
-
-                else if (wasDown && !isDown)
-                    OnKeyReleased?.Invoke(k);
+                a = !Released[AvailableKeys[i]];
+                Released[AvailableKeys[i]] = !Keyboard.IsKeyDown(AvailableKeys[i]);
+                b = Released[AvailableKeys[i]];
+                if (a)
+                {
+                    if (b) OnKeyPressed?.Invoke(AvailableKeys[i]);
+                    else OnKeyDown?.Invoke(AvailableKeys[i]);
+                }
+                else
+                {
+                    if (b) OnKeyReleased?.Invoke(AvailableKeys[i]);
+                }
             }
         }
+        //public static void Update()
+        //{
+        //    for (int i = 0; i < AvailableKeys.Count; i++)
+        //    {
+        //        var k = AvailableKeys[i];
+
+        //        bool wasDown = !Released[k];
+        //        bool isDown = Keyboard.IsKeyDown(k);
+
+        //        Released[k] = !isDown;
+
+        //        if (!wasDown && isDown)
+        //            OnKeyPressed?.Invoke(k);
+
+        //        else if (wasDown && isDown)
+        //            OnKeyDown?.Invoke(k);
+
+        //        else if (wasDown && !isDown)
+        //            OnKeyReleased?.Invoke(k);
+        //    }
+        //}
         public static bool IsKeyDown(Key k) => Keyboard.IsKeyDown(AvailableKeys[(int)k]);
         public static bool IsKeyPressed(Key k) => Keyboard.IsKeyDown(AvailableKeys[(int)k]) && Released[AvailableKeys[(int)k]];
         public static bool IsKeyUp(Key k) => !IsKeyDown(k);

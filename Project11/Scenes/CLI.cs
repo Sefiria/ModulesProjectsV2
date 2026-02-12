@@ -94,87 +94,34 @@ namespace Project11.Scenes
 
         public CLI()
         {
-            Text = new char[W*H];
+            Text = new char[W * H];
             Cls();
             Cursor = new Point(0, 0);
-            KB.OnKeyDown += KB_OnKeyDown;
-            KB.OnKeyPressed += KB_OnKeyPressed;
-            KB.OnKeyReleased += KB_OnKeyReleased;
-        }
 
-        private void KB_OnKeyReleased(Key key)
-        {
-            if (key == key_to_repeat)
-                repeat_cooldown = 0;
-        }
-
-        private void KB_OnKeyDown(Key key)
-        {
-            if (key != key_to_repeat)
+            FormMain.Instance.KeyPress += (s, e) =>
             {
-                repeat_cooldown = 0;
-                key_to_repeat = key;
-            }
+                if (e.KeyChar < 10 || e.KeyChar == 13)
+                    return;
+                Write(Cursor.X, Cursor.Y, e.KeyChar.ToString());
+            };
 
-            if (repeat_cooldown == repeat_cooldown_max)
-                WriteKey(key);
-            else
-                repeat_cooldown++;
+            FormMain.Instance.KeyDown += (s, e) =>
+            {
+                if (e.KeyCode == Keys.Escape) FormMain.Instance.Close();
+                if (e.KeyCode == Keys.Back) Backspace();
+                if (e.KeyCode == Keys.Enter)  Write(Cursor.X, Cursor.Y, "\n");
+            };
         }
 
-        void KB_OnKeyPressed(Key key)
+        void Backspace()
         {
-            WriteKey(key);
-        }
-        private void WriteKey(Key key)
-        {
-            if (key == Key.Back)
-            {
-                if (Cursor.X == 0 && Cursor.Y == 0) return;
-                int x = Cursor.X, y = Cursor.Y;
-                if (x > 0) x--; else { y--; x = W - 1; }
-                Text[y * W + x] = '\0';
-                Cursor = new Point(x, y);
-                return;
-            }
-
-            if (key == Key.Enter) { Write(Cursor.X, Cursor.Y, "\n"); return; }
-
-            char? ch = ToChar(key);
-            if (ch.HasValue) Write(Cursor.X, Cursor.Y, ch.Value.ToString());
-        }
-
-        char? ToChar(Key k)
-        {
-            if (k == Key.LeftShift || k == Key.RightShift || k == Key.LeftCtrl || k == Key.RightCtrl || k == Key.LeftAlt || k == Key.RightAlt)
-                return null;
-            bool sh = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
-            bool caps = Keyboard.IsKeyToggled(Key.CapsLock);
-
-            if (k >= Key.A && k <= Key.Z)
-            {
-                char c = (char)('a' + (k - Key.A));
-                return (caps ^ sh) ? char.ToUpper(c) : c;
-            }
-
-            if (k >= Key.D0 && k <= Key.D9)
-            {
-                string normal = "0123456789";
-                string shifted = ")!@#$%^&*(";
-                return (sh ? shifted : normal)[k - Key.D0];
-            }
-
-            if (k == Key.Space) return ' ';
-            if (k == Key.OemMinus) return sh ? '_' : '-';
-            if (k == Key.OemPlus) return sh ? '+' : '=';
-            if (k == Key.OemComma) return sh ? '?' : ',';
-            if (k == Key.OemPeriod) return sh ? ':' : '.';
-
-            int vk = KeyInterop.VirtualKeyFromKey(k);
-            var ch = FromLayout(vk, sh);
-            if (ch.HasValue) return ch.Value;
-
-            return null;
+            if (Cursor.X == 0 && Cursor.Y == 0) return;
+            int x = Cursor.X, y = Cursor.Y;
+            if (x > 0) x--; else { y--; x = W - 1; }
+            Text[y * W + x] = '\0';
+            Cursor = new Point(x, y);
+            while (x > 1 && Text[y * W + x - 1] == '\0')
+                Cursor.X = --x;
         }
 
         public void Update()
@@ -209,6 +156,11 @@ namespace Project11.Scenes
                     2, GV.FontHeight
                 );
             }
+
+            // Sur le point de fermer le programme
+            Point p = FormMain.Instance.close.PointToClient(Control.MousePosition);
+            if (FormMain.Instance.close.ClientRectangle.Contains(p))
+                FormMain.Graphics.DrawRectangle(new Pen(Color.Red, 16F), FormMain.Instance.Render.ClientRectangle);
         }
     }
 }
