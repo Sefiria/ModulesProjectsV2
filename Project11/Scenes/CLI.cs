@@ -187,23 +187,31 @@ namespace Project11.Scenes
             }
         }
 
+        bool IsLineEmpty(int y) { if ((uint)y >= H) return true; int o = y * W; for (int x = 0; x < W; x++) { char c = Text[o + x]; if (c != '\0' && c != '\n') return false; } return true; }
+        int NonEmptyLines() { int n = 0; for (int y = 0; y < H; y++) if (!IsLineEmpty(y)) n++; return n; }
         void ScrollViewportDown(int steps)
         {
             for (int k = 0; k < steps; k++)
             {
-                if (future.Count == 0) break;
-
-                string topVisible = GetLineTrimmed(0);
-                // on remet la top visible (qui est historique) dans l'historique
-                history.Add(topVisible);
-
-                ShiftBufferUp(archiveTopToHistory: false);
-
-                string fromFuture = future[future.Count - 1];
-                future.RemoveAt(future.Count - 1);
-                PutLine(H - 1, fromFuture);
-
-                scrollOffset = Math.Max(0, scrollOffset - 1);
+                if (future.Count > 0)
+                {
+                    string topVisible = GetLineTrimmed(0);
+                    history.Add(topVisible);
+                    ShiftBufferUp(archiveTopToHistory: false);
+                    string fromFuture = future[future.Count - 1];
+                    future.RemoveAt(future.Count - 1);
+                    PutLine(H - 1, fromFuture);
+                    scrollOffset = Math.Max(0, scrollOffset - 1);
+                }
+                else
+                {
+                    if (NonEmptyLines() <= 1) break;
+                    string topVisible = GetLineTrimmed(0);
+                    history.Add(topVisible);
+                    ShiftBufferUp(archiveTopToHistory: false);
+                    ClearLine(H - 1);
+                    scrollOffset = Math.Max(0, scrollOffset - 1);
+                }
             }
         }
 
@@ -250,7 +258,7 @@ namespace Project11.Scenes
         public void Update()
         {
             // Molette: MouseStates.Delta > 0 => scroll up (vers l'historique), < 0 => down (vers le bas)
-            int delta = MouseStates.Delta;
+            int delta = MouseStates.Delta / 16;
             if (delta > 0) ScrollViewportUp(delta);
             else if (delta < 0) ScrollViewportDown(-delta);
         }
