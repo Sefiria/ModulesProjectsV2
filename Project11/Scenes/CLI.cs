@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
@@ -21,6 +22,11 @@ namespace Project11.Scenes
         const byte repeat_cooldown_max = 25;
         bool typing = false;
 
+        // --- Scrollback ---
+        readonly List<string> history = new List<string>(); // lignes "au-dessus" (scrollback)
+        readonly List<string> future = new List<string>(); // lignes "en-dessous" quand on scrolle vers le haut
+        int scrollOffset = 0;
+
         [System.Runtime.InteropServices.DllImport("user32.dll")] static extern IntPtr GetKeyboardLayout(uint idThread);
         [System.Runtime.InteropServices.DllImport("user32.dll")] static extern int ToUnicodeEx(uint wVirtKey, uint wScanCode, byte[] lpKeyState, System.Text.StringBuilder pwszBuff, int cchBuff, uint wFlags, IntPtr dwhkl);
         char? FromLayout(int vk, bool shift)
@@ -39,13 +45,28 @@ namespace Project11.Scenes
             if ((uint)x < W && (uint)y < H)
             {
                 Text[y * W + x] = c;
-                x++; if (x == W) { x = 0; y++; if (y >= H) y = H - 1; }
+                x++;
+                if (x == W)
+                {
+                    x = 0;
+                    y++;
+                    if (y >= H)
+                    {
+                        // Lorsque l'écriture dépasse le bas, on scrolle et on archive la ligne du haut
+                        ShiftBufferUp(archiveTopToHistory: true);
+                        y = H - 1;
+                    }
+                }
                 Cursor = new Point(x, y);
             }
         }
+
         int Write(int x, int y, string s)
         {
             if ((uint)x >= W || (uint)y >= H || s == null) return 0;
+
+            // Si on est scrolled-up, on revient tout en bas pour écrire dans le flux courant
+            SnapToBottom();
 
             int o = y * W, i = o + x;
             for (int k = o; k < i; k++)
@@ -60,7 +81,11 @@ namespace Project11.Scenes
                     Text[y * W + x] = '\n';
                     x = 0;
                     y++;
-                    if ((uint)y >= H) break;
+                    if (y >= H)
+                    {
+                        ShiftBufferUp(archiveTopToHistory: true);
+                        y = H - 1;
+                    }
                     i = y * W;
                     continue;
                 }
@@ -73,7 +98,11 @@ namespace Project11.Scenes
                 {
                     x = 0;
                     y++;
-                    if ((uint)y >= H) break;
+                    if (y >= H)
+                    {
+                        ShiftBufferUp(archiveTopToHistory: true);
+                        y = H - 1;
+                    }
                     i = y * W;
                 }
                 else
@@ -83,9 +112,9 @@ namespace Project11.Scenes
             }
 
             Cursor = new Point(x, y);
-
             return w;
         }
+
         string GetLineTrimmed(int y)
         {
             if ((uint)y >= H) return "";
@@ -93,6 +122,96 @@ namespace Project11.Scenes
             while (n < W && Text[o + n] != '\0') n++;
             return new string(Text, o, n);
         }
+
+        void ClearLine(int y)
+        {
+            int o = y * W;
+            for (int i = 0; i < W; i++) Text[o + i] = '\0';
+        }
+
+        void PutLine(int y, string s)
+        {
+            ClearLine(y);
+            if (string.IsNullOrEmpty(s)) return;
+            int len = Math.Min(W, s.Length);
+            int o = y * W;
+            for (int i = 0; i < len; i++) Text[o + i] = s[i];
+        }
+
+        // Décale tout vers le haut d'1 ligne; si archiveTopToHistory, pousse la ligne 0 dans l'historique
+        void ShiftBufferUp(bool archiveTopToHistory)
+        {
+            string top = archiveTopToHistory ? GetLineTrimmed(0) : null;
+            for (int y = 0; y < H - 1; y++)
+            {
+                int src = (y + 1) * W;
+                int dst = y * W;
+                for (int x = 0; x < W; x++) Text[dst + x] = Text[src + x];
+            }
+            ClearLine(H - 1);
+            if (archiveTopToHistory) history.Add(top);
+            // si on écrit (flux), on invalide la pile "future" (on est tout en bas)
+            if (archiveTopToHistory && future.Count > 0)
+            {
+                future.Clear();
+                scrollOffset = 0;
+            }
+        }
+
+        // Décale tout vers le bas d'1 ligne, libérant la ligne 0
+        void ShiftBufferDown()
+        {
+            for (int y = H - 1; y >= 1; y--)
+            {
+                int src = (y - 1) * W;
+                int dst = y * W;
+                for (int x = 0; x < W; x++) Text[dst + x] = Text[src + x];
+            }
+            ClearLine(0);
+        }
+
+        void ScrollViewportUp(int steps)
+        {
+            for (int k = 0; k < steps; k++)
+            {
+                if (history.Count == 0) break;
+                string fromHistory = history[history.Count - 1];
+                history.RemoveAt(history.Count - 1);
+
+                string bottom = GetLineTrimmed(H - 1);
+                future.Add(bottom);
+
+                ShiftBufferDown();
+                PutLine(0, fromHistory);
+                scrollOffset++;
+            }
+        }
+
+        void ScrollViewportDown(int steps)
+        {
+            for (int k = 0; k < steps; k++)
+            {
+                if (future.Count == 0) break;
+
+                string topVisible = GetLineTrimmed(0);
+                // on remet la top visible (qui est historique) dans l'historique
+                history.Add(topVisible);
+
+                ShiftBufferUp(archiveTopToHistory: false);
+
+                string fromFuture = future[future.Count - 1];
+                future.RemoveAt(future.Count - 1);
+                PutLine(H - 1, fromFuture);
+
+                scrollOffset = Math.Max(0, scrollOffset - 1);
+            }
+        }
+
+        void SnapToBottom()
+        {
+            if (future.Count > 0) ScrollViewportDown(future.Count);
+        }
+
         void Cls() { for (int i = 0; i < Text.Length; i++) Text[i] = '\0'; }
 
         public CLI()
@@ -112,8 +231,8 @@ namespace Project11.Scenes
             FormMain.Instance.KeyDown += (s, e) =>
             {
                 if (e.KeyCode == Keys.Escape) FormMain.Instance.Close();
-                if (e.KeyCode == Keys.Back) Backspace();
-                if (e.KeyCode == Keys.Enter)  Write(Cursor.X, Cursor.Y, "\n");
+                if (e.KeyCode == Keys.Back) { SnapToBottom(); Backspace(); }
+                if (e.KeyCode == Keys.Enter) { Write(Cursor.X, Cursor.Y, "\n"); }
             };
         }
 
@@ -130,7 +249,12 @@ namespace Project11.Scenes
 
         public void Update()
         {
+            // Molette: MouseStates.Delta > 0 => scroll up (vers l'historique), < 0 => down (vers le bas)
+            int delta = MouseStates.Delta;
+            if (delta > 0) ScrollViewportUp(delta);
+            else if (delta < 0) ScrollViewportDown(-delta);
         }
+
         public void Draw()
         {
             FormMain.Graphics.Clear(Color.Black);
