@@ -19,6 +19,7 @@ namespace Project7
             //test = new Paragraph("Test\nun\ndeux___________zd_______________zd", Anchor.TopLeft);
             //UserInterface.Active.AddEntity(test);
             cursor_texture = Texture2D.FromFile(GraphicsDevice, assets_bindings.Resources["cursor"]);
+            UserInterface.Active.GlobalScale = 0.75f;
         }
 
         private void UpdateUI()

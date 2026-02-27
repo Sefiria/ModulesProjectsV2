@@ -1,10 +1,5 @@
 ﻿using Project7.Source.Arcade.Common;
-using SharpDX.Direct2D1.Effects;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tooling;
 
 namespace Project7.Source.Arcade.scenes.space

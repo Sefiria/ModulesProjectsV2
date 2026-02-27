@@ -19,7 +19,7 @@ namespace Project7.Source.Particles
         {
             Quests = new List<Quest>();
 
-            panelQuests = new Panel(new Vector2(500, 95), PanelSkin.Simple, Anchor.TopLeft, new Vector2(10, 10));
+            panelQuests = new Panel(new Vector2(500, 120), PanelSkin.Simple, Anchor.TopLeft, new Vector2(10, 10));
             panelQuests.Draggable = true;
             panelQuests.AddChild(new Header("Quests"));
             panelQuests.AddChild(new HorizontalLine());

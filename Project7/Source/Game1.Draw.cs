@@ -1,13 +1,7 @@
-﻿using GeonBit.UI;
-using GeonBit.UI.Entities;
-using GeonBit.UI.Utils;
-using Microsoft.VisualBasic.Logging;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Project7.Source.Map;
-using SharpDX.Direct3D9;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Tools;
 
